@@ -6,18 +6,23 @@ export interface Pipeline {
 	id: string;
 	input: z.AnyZodObject;
 	output: z.AnyZodObject;
-	flow: Builder<Record<string, any>>;
+	flow: Builder<z.AnyZodObject, []>;
 	apiKeys: Record<string, string>;
 }
 
-export type NodeDefinition<
-	T extends { id: string; schema: { input: z.AnyZodObject; output: z.AnyZodObject } }
-> = {
+export type NodeDefinition<Input extends z.AnyZodObject, Output extends z.AnyZodObject> = {
 	id: string;
-	schema: T['schema'];
-	input?: T['schema']['input']['shape'];
-	action: (
-		input: z.output<T['schema']['input']['shape']>,
-		apiKeys: Record<string, string>
-	) => Promise<z.output<T['schema']['output']['shape']>>;
+	schema: {
+		input: Input;
+		output: Output;
+	};
+	action: (input: z.output<Input>, apiKeys: Record<string, string>) => Promise<z.output<Output>>;
+};
+
+export type ConcreteNode<
+	Input extends z.AnyZodObject,
+	Output extends z.AnyZodObject
+> = NodeDefinition<Input, Output> & {
+	input: z.output<Input>;
+	output: z.output<Output>;
 };

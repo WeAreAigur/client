@@ -12,15 +12,13 @@ export const createClient = (opts: AigurConfiguration) => {
 	const { apiKeys } = opts;
 	return {
 		pipeline: {
-			create: (opts: {
+			create: <Input extends z.AnyZodObject, Output extends z.AnyZodObject>(opts: {
 				id: string;
-				input: z.AnyZodObject;
-				output: z.AnyZodObject;
-				flow: (
-					builder: Builder<z.infer<typeof opts.input>>
-				) => Builder<z.infer<typeof opts.output>>;
+				input: Input;
+				output: Output;
+				flow: (builder: Builder<Input, []>) => Builder<any, any>;
 			}) => {
-				const flow = opts.flow(new Builder(opts.input));
+				const flow = opts.flow(new Builder(opts.input, []));
 				const pipeline: Pipeline = {
 					id: opts.id,
 					input: opts.input,

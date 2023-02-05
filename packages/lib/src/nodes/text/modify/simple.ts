@@ -16,7 +16,7 @@ async function action(input: z.input<typeof inputSchema>): Promise<z.infer<typeo
 	};
 }
 
-export const simpleModificationDefinition = {
+export const simpleModificationNode = {
 	id: 'text.modify.simple',
 	schema: {
 		input: inputSchema,

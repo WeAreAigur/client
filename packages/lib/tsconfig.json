@@ -4,6 +4,7 @@
 	"compilerOptions": {
 		"target": "ES2015",
 		"baseUrl": ".",
+		"strictNullChecks": true,
 		"paths": {
 			"#/*": ["./src/*"]
 		}

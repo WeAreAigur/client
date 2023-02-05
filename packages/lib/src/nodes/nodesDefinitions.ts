@@ -1,31 +1,33 @@
-import { whisperDefintion } from './voice/transcribe/whisper';
-import { gpt3PredictionDefinition } from './text/prediction/gpt3';
-import { simpleModificationDefinition } from './text/modify/simple';
-import { enhanceWithKeywordsDefinition } from './text/modify/enhanceWithKeywords';
-import { uploadDefinition } from './results/upload';
-import { sdTextToImageDefinition } from './image/textToImage/sdTextToImage';
+import { whisperNode } from './voice/transcribe/whisper';
+import { gpt3PredictionNode } from './text/prediction/gpt3';
+import { simpleModificationNode } from './text/modify/simple';
+import { enhanceWithKeywordsNode } from './text/modify/enhanceWithKeywords';
+import { uploadNode } from './results/upload';
+import { stabilityTextToImageNode } from './image/textToImage/stability';
 
 export const nodeDefinitions = {
 	text: {
 		modify: {
-			simple: simpleModificationDefinition,
-			enhanceWithKeywords: enhanceWithKeywordsDefinition,
+			simple: simpleModificationNode,
+			enhanceWithKeywords: enhanceWithKeywordsNode,
 		},
 		prediction: {
-			gpt3: gpt3PredictionDefinition,
+			gpt3: gpt3PredictionNode,
 		},
 	},
 	voice: {
 		transcribe: {
-			whisper: whisperDefintion,
+			whisper: whisperNode,
 		},
 	},
 	image: {
 		textToImage: {
-			stableDiffusion: sdTextToImageDefinition,
+			stableDiffusion: {
+				stability: stabilityTextToImageNode,
+			},
 		},
 	},
 	results: {
-		upload: uploadDefinition,
+		upload: uploadNode,
 	},
 } as const;

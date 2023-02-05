@@ -1,105 +1,90 @@
 import { z } from 'zod';
 
-import { NodeDefinition } from './types';
+import { ConcreteNode, NodeDefinition } from './types';
 import { nodeDefinitions } from './nodes/nodesDefinitions';
 
-function placeholder(output, index) {
-	let placeholders: Record<string, string> = {};
-	const keys = output.keyof()._def.values;
-	console.log(`***keys`, keys);
-	for (let key of keys) {
-		placeholders[key] = `$context.${index}.${key}$`;
-	}
-	console.log(`***placeholders`, placeholders);
-	return placeholders;
-}
+export class Builder<
+	Input extends z.ZodObject<any, any, any>,
+	NodeDefinitions extends ConcreteNode<any, any>[]
+> {
+	constructor(private input: Input, private nodes: NodeDefinitions) {}
 
-export class Builder<T> {
-	constructor(private initialInput: z.AnyZodObject, private nodes: NodeDefinition<any>[] = []) {}
-
-	values = {
-		...this.nodes.map((node, index) => ({
-			[index]: placeholder(node.schema.output, index),
-		}))[0],
-		prev:
-			this.nodes.length > 0
-				? (placeholder(this.nodes.slice(-1)[0].schema.output, this.nodes.length - 1) as T)
-				: ({} as T),
-		input: placeholder(this.initialInput, 'input'),
-	} as Record<number, string> & { prev: Record<keyof T, string> } & {
-		input: Record<string, string>;
-	};
-
-	private getConfNodeIndex(nodes) {
-		if (nodes.length === 0) {
-			return 'input';
-		}
-		return nodes.length - 1;
+	static create<Input extends z.ZodObject<any, any, any>>(input: Input) {
+		return new Builder<Input, []>(input, []);
 	}
 
-	private getConfiguration<T>(nodes, nodeInputSchema, getUserInput): T {
-		const conf: T = getUserInput ? getUserInput(this) : {};
-		for (let key in nodeInputSchema) {
-			if (nodeInputSchema[key] === '') {
-				conf[key] = `$context.${this.getConfNodeIndex(nodes)}.${key}$`;
-			}
-		}
-		return conf;
-		// later - validate conf by nodeInputSchema
-	}
+	private nodeFactory<NodeDef extends NodeDefinition<any, any>>(nodeDefinition: NodeDef) {
+		return <NextNode extends ConcreteNode<NodeDef['schema']['input'], NodeDef['schema']['output']>>(
+			getUserInput: (data: {
+				nodes: NodeDefinitions;
+				prev: NodeDefinitions[-1]['output'];
+				input: z.output<Input>;
+			}) => z.input<NextNode['schema']['input']>
+		): Builder<Input, [...NodeDefinitions, NextNode]> => {
+			const input = this.setPlaceholderValues(this.input.keyof().options, 'input');
+			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
+			const node = {
+				...nodeDefinition,
+				input: getUserInput({
+					nodes: this.nodes,
+					prev: prev.output,
+					input,
+				}),
+				output: this.setPlaceholderValues<NextNode>(
+					nodeDefinition.schema.output.keyof().options,
+					this.nodes.length
+				),
+			} as ConcreteNode<NodeDef['schema']['input'], NodeDef['schema']['output']>;
 
-	nodeFactory<
-		T extends { id: string; action: any; schema: { input: z.AnyZodObject; output: z.AnyZodObject } }
-	>(nodeDefinition: NodeDefinition<T>) {
-		return (getUserInput?: (flow: this) => z.infer<typeof nodeDefinition.schema.input>) => {
-			console.log(`getting configuration for ${nodeDefinition.id}`);
-			const input = this.getConfiguration<z.infer<typeof nodeDefinition.schema.input>>(
-				this.nodes,
-				nodeDefinition.schema.input,
-				getUserInput
-			);
-			this.nodes.push({ ...nodeDefinition, input } as NodeDefinition<T>);
-			return new Builder<z.infer<typeof nodeDefinition.schema.output>>(
-				this.initialInput,
-				this.nodes
-			);
+			this.nodes.push(node);
+			return this as any;
 		};
+	}
+
+	private setPlaceholderValues<T extends ConcreteNode<any, any>>(
+		outputKeys: string[],
+		index: number | 'input'
+	): T['output'] {
+		const placeholderedOutput: T['output'] = {};
+		for (let key of outputKeys) {
+			// using nodes.length and not nodes.length - 1 because we haven't pushed the node yet
+			placeholderedOutput[key] = `$context.${index}.${key}$`;
+		}
+		return placeholderedOutput;
+	}
+
+	custom<Input extends z.AnyZodObject, Output extends z.AnyZodObject>(
+		node: NodeDefinition<Input, Output>
+	) {
+		return this.nodeFactory(node);
 	}
 
 	voice = {
 		transcribe: {
-			whisper: this.nodeFactory<typeof nodeDefinitions.voice.transcribe.whisper>(
-				nodeDefinitions.voice.transcribe.whisper
-			),
+			whisper: this.nodeFactory(nodeDefinitions.voice.transcribe.whisper),
 		},
 	};
 
 	text = {
 		modify: {
-			enhanceWithKeywords: this.nodeFactory<typeof nodeDefinitions.text.modify.enhanceWithKeywords>(
-				nodeDefinitions.text.modify.enhanceWithKeywords
-			),
-			simple: this.nodeFactory<typeof nodeDefinitions.text.modify.simple>(
-				nodeDefinitions.text.modify.simple
-			),
+			enhanceWithKeywords: this.nodeFactory(nodeDefinitions.text.modify.enhanceWithKeywords),
+			simple: this.nodeFactory(nodeDefinitions.text.modify.simple),
 		},
 		prediction: {
-			gpt3: this.nodeFactory<typeof nodeDefinitions.text.prediction.gpt3>(
-				nodeDefinitions.text.prediction.gpt3
-			),
+			gpt3: this.nodeFactory(nodeDefinitions.text.prediction.gpt3),
 		},
 	};
 
 	image = {
 		textToImage: {
-			stableDiffusion: this.nodeFactory<typeof nodeDefinitions.image.textToImage.stableDiffusion>(
-				nodeDefinitions.image.textToImage.stableDiffusion
-			),
+			stableDiffusion: {
+				stability: this.nodeFactory(nodeDefinitions.image.textToImage.stableDiffusion.stability),
+			},
 		},
 	};
 
 	results = {
-		upload: this.nodeFactory<typeof nodeDefinitions.results.upload>(nodeDefinitions.results.upload),
+		upload: this.nodeFactory(nodeDefinitions.results.upload),
 	};
 
 	getNodes() {

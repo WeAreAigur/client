@@ -15,7 +15,7 @@ async function action(input: z.input<typeof inputSchema>): Promise<z.infer<typeo
 	};
 }
 
-export const enhanceWithKeywordsDefinition = {
+export const enhanceWithKeywordsNode = {
 	id: 'text.modify.enhanceWithKeywords',
 	schema: {
 		input: inputSchema,

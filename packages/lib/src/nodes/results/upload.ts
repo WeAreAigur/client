@@ -15,7 +15,7 @@ async function action(input: z.input<typeof inputSchema>): Promise<z.infer<typeo
 	};
 }
 
-export const uploadDefinition = {
+export const uploadNode = {
 	id: 'results.upload',
 	schema: {
 		input: inputSchema,

@@ -33,7 +33,7 @@ async function action(
 	return { text: output };
 }
 
-export const gpt3PredictionDefinition = {
+export const gpt3PredictionNode = {
 	id: 'text.prediction.gpt3',
 	schema: {
 		input: inputSchema,

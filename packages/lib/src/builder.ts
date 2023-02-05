@@ -1,24 +1,33 @@
-import { AigurNode } from './types';
-import { NodeDefinitions } from './nodes';
+import { z } from 'zod';
+
+import { NodeDefinition } from './types';
+import { nodeDefinitions } from './nodes/nodesDefinitions';
 
 function placeholder(output, index) {
-	return Object.keys(output).map((k) => ({
-		[k]: `$context.${index}.${k}$`,
-	}))[0];
+	let placeholders: Record<string, string> = {};
+	const keys = output.keyof()._def.values;
+	console.log(`***keys`, keys);
+	for (let key of keys) {
+		placeholders[key] = `$context.${index}.${key}$`;
+	}
+	console.log(`***placeholders`, placeholders);
+	return placeholders;
 }
 
 export class Builder<T> {
-	constructor(private initialInput: Record<string, any>, private nodes: AigurNode[] = []) {}
+	constructor(private initialInput: z.AnyZodObject, private nodes: NodeDefinition<any>[] = []) {}
 
 	values = {
 		...this.nodes.map((node, index) => ({
-			[index]: placeholder(node.output, index),
+			[index]: placeholder(node.schema.output, index),
 		}))[0],
 		prev:
 			this.nodes.length > 0
-				? placeholder(this.nodes.slice(-1)[0].output, this.nodes.length - 1)
-				: {},
+				? (placeholder(this.nodes.slice(-1)[0].schema.output, this.nodes.length - 1) as T)
+				: ({} as T),
 		input: placeholder(this.initialInput, 'input'),
+	} as Record<number, string> & { prev: Record<keyof T, string> } & {
+		input: Record<string, string>;
 	};
 
 	private getConfNodeIndex(nodes) {
@@ -28,66 +37,69 @@ export class Builder<T> {
 		return nodes.length - 1;
 	}
 
-	private getConfiguration(nodes, nodeInput, userInputFn): Record<string, any> {
-		const userInput = userInputFn ? userInputFn(this) : null;
-		if (userInput) {
-			return userInput;
-		}
-
-		const conf = userInputFn ? userInputFn() : {};
-		for (let key in nodeInput) {
-			if (nodeInput[key] === '') {
+	private getConfiguration<T>(nodes, nodeInputSchema, getUserInput): T {
+		const conf: T = getUserInput ? getUserInput(this) : {};
+		for (let key in nodeInputSchema) {
+			if (nodeInputSchema[key] === '') {
 				conf[key] = `$context.${this.getConfNodeIndex(nodes)}.${key}$`;
 			}
 		}
 		return conf;
-		// later - validate input by nodeInput
+		// later - validate conf by nodeInputSchema
 	}
 
-	voice = {
-		transcribe: (conf?: (flow: this) => typeof NodeDefinitions.Voice.Transcribe.input) => {
-			const input = this.getConfiguration(this.nodes, NodeDefinitions.Voice.Transcribe.input, conf);
-			this.nodes.push({ ...NodeDefinitions.Voice.Transcribe, input });
-			return new Builder<typeof NodeDefinitions.Voice.Transcribe.output>(
+	nodeFactory<
+		T extends { id: string; action: any; schema: { input: z.AnyZodObject; output: z.AnyZodObject } }
+	>(nodeDefinition: NodeDefinition<T>) {
+		return (getUserInput?: (flow: this) => z.infer<typeof nodeDefinition.schema.input>) => {
+			console.log(`getting configuration for ${nodeDefinition.id}`);
+			const input = this.getConfiguration<z.infer<typeof nodeDefinition.schema.input>>(
+				this.nodes,
+				nodeDefinition.schema.input,
+				getUserInput
+			);
+			this.nodes.push({ ...nodeDefinition, input } as NodeDefinition<T>);
+			return new Builder<z.infer<typeof nodeDefinition.schema.output>>(
 				this.initialInput,
 				this.nodes
 			);
+		};
+	}
+
+	voice = {
+		transcribe: {
+			whisper: this.nodeFactory<typeof nodeDefinitions.voice.transcribe.whisper>(
+				nodeDefinitions.voice.transcribe.whisper
+			),
 		},
 	};
 
 	text = {
 		modify: {
-			enhanceWithKeywords: (
-				conf?: (flow: this) => typeof NodeDefinitions.Text.Modify.EnhanceWithKeywords.input
-			) => {
-				const input = this.getConfiguration(
-					this.nodes,
-					NodeDefinitions.Text.Modify.EnhanceWithKeywords.input,
-					conf
-				);
-				this.nodes.push({ ...NodeDefinitions.Text.Modify.EnhanceWithKeywords, input });
-				return new Builder<typeof NodeDefinitions.Text.Modify.EnhanceWithKeywords.output>(
-					this.initialInput,
-					this.nodes
-				);
-			},
-			simple: (conf: (flow: this) => typeof NodeDefinitions.Text.Modify.Simple.input) => {
-				const input = this.getConfiguration(this.nodes, NodeDefinitions.Text.Modify.Simple, conf);
-				this.nodes.push({ ...NodeDefinitions.Text.Modify.Simple, input });
-				return new Builder<typeof NodeDefinitions.Text.Modify.Simple.output>(
-					this.initialInput,
-					this.nodes
-				);
-			},
+			enhanceWithKeywords: this.nodeFactory<typeof nodeDefinitions.text.modify.enhanceWithKeywords>(
+				nodeDefinitions.text.modify.enhanceWithKeywords
+			),
+			simple: this.nodeFactory<typeof nodeDefinitions.text.modify.simple>(
+				nodeDefinitions.text.modify.simple
+			),
 		},
-		prediction: (conf?: (flow: this) => typeof NodeDefinitions.Text.Prediction.input) => {
-			const input = this.getConfiguration(this.nodes, NodeDefinitions.Text.Prediction.input, conf);
-			this.nodes.push({ ...NodeDefinitions.Text.Prediction, input });
-			return new Builder<typeof NodeDefinitions.Text.Prediction.output>(
-				this.initialInput,
-				this.nodes
-			);
+		prediction: {
+			gpt3: this.nodeFactory<typeof nodeDefinitions.text.prediction.gpt3>(
+				nodeDefinitions.text.prediction.gpt3
+			),
 		},
+	};
+
+	image = {
+		textToImage: {
+			stableDiffusion: this.nodeFactory<typeof nodeDefinitions.image.textToImage.stableDiffusion>(
+				nodeDefinitions.image.textToImage.stableDiffusion
+			),
+		},
+	};
+
+	results = {
+		upload: this.nodeFactory<typeof nodeDefinitions.results.upload>(nodeDefinitions.results.upload),
 	};
 
 	getNodes() {

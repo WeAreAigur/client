@@ -62,11 +62,15 @@ importers:
 
   packages/lib:
     specifiers:
+      tsconfig: workspace:*
+      typescript: ^4.5.3
       vitest: ^0.28.4
       zod: ^3.20.2
     dependencies:
       zod: 3.20.2
     devDependencies:
+      tsconfig: link:../tsconfig
+      typescript: 4.9.5
       vitest: 0.28.4
 
   packages/tsconfig:

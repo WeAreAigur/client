@@ -13,6 +13,8 @@
 		"zod": "^3.20.2"
 	},
 	"devDependencies": {
-		"vitest": "^0.28.4"
+		"vitest": "^0.28.4",
+		"tsconfig": "workspace:*",
+		"typescript": "^4.5.3"
 	}
 }

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { expect, test } from 'vitest';
 
-import { NodeDefinitions } from '../src/nodes';
+import { NodeDefinitions } from '../src/nodes/nodesDefinitions';
 import { flow } from '../src/flow';
 import { createClient } from '../src/Aigur';
 

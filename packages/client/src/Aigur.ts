@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-import { Pipeline } from './types';
+import { PipelineConf } from './types';
 import { invokePipeline } from './invokePipeline';
 import { Builder } from './builder';
 
 interface AigurConfiguration {
-	apiKeys: Record<string, string>;
+	apiKeys: Record<string, string> & { openai?: string; stability?: string; googleapis?: string };
 }
 
 export const createClient = (opts: AigurConfiguration) => {
@@ -19,7 +19,7 @@ export const createClient = (opts: AigurConfiguration) => {
 				flow: (builder: Builder<Input, []>) => Builder<any, any>;
 			}) => {
 				const flow = opts.flow(new Builder(opts.input, []));
-				const pipeline: Pipeline = {
+				const pipelineConf: PipelineConf = {
 					id: opts.id,
 					input: opts.input,
 					output: opts.output,
@@ -27,7 +27,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					apiKeys,
 				};
 				return {
-					invoke: (input: z.input<Input>) => invokePipeline<Input, Output>(pipeline, input),
+					invoke: (input: z.input<Input>) => invokePipeline<Input, Output>(pipelineConf, input),
 					invokeRemote: (endpoint: string, input: z.input<Input>): Promise<z.output<Output>> => {
 						return fetch(endpoint, {
 							method: 'POST',

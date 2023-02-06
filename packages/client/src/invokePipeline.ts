@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import { Pipeline } from './types';
+import { PipelineConf } from './types';
 import { getInputByContext } from './getInputByContext';
 
 export async function invokePipeline<Input extends z.AnyZodObject, Output extends z.AnyZodObject>(
-	pipeline: Pipeline,
+	pipeline: PipelineConf,
 	input: z.input<Input>
 ): Promise<z.output<Output>> {
 	try {

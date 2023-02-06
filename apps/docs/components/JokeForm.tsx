@@ -18,7 +18,10 @@ export function JokeForm(props: JokeFormProps) {
 	};
 
 	return (
-		<form onSubmit={submit} className="flex items-center py-6 space-x-4">
+		<form
+			onSubmit={submit}
+			className="flex flex-col items-center py-6 space-y-4 md:space-x-4 md:space-y-0 md:flex-row"
+		>
 			<div className="form-control">
 				<div className="input-group">
 					<input

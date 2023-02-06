@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { Builder } from './builder';
 
-export interface Pipeline {
+export interface PipelineConf {
 	id: string;
 	input: z.AnyZodObject;
 	output: z.AnyZodObject;

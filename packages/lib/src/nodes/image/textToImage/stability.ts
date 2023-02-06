@@ -1,14 +1,16 @@
 import { z } from 'zod';
 
 const inputSchema = z.object({
-	prompt: z.string(),
-	negative_prompt: z.string().optional(),
-	// text_prompts: z.array(
-	// 	z.object({
-	// 		text: z.string(),
-	// 		weight: z.number().min(-1).max(1).optional().default(1),
-	// 	})
-	// ),
+	// prompt: z.string(),
+	// negative_prompt: z.string().optional(),
+	text_prompts: z
+		.array(
+			z.object({
+				text: z.string(),
+				weight: z.number().min(-1).max(1).optional().default(1),
+			})
+		)
+		.refine((val) => val.length > 0, 'Must have at least one text prompt'),
 	model: z.enum(['stable-diffusion-v1-5']).optional().default('stable-diffusion-v1-5'),
 	clip_guidance_preset: z
 		.enum(['NONE', 'FAST_BLUE', 'FAST_GREEN', 'SIMPLE', 'SLOW', 'SLOWER', 'SLOWEST'])
@@ -44,15 +46,7 @@ async function action(
 	input: z.input<typeof inputSchema>,
 	apiKeys: Record<string, string>
 ): Promise<z.infer<typeof outputSchema>> {
-	const payload: any = inputSchema.parse(input);
-	console.log(`***payload`, payload);
-	payload.text_prompts = [
-		{
-			text: input.prompt,
-		},
-	];
-	delete payload.prompt;
-	delete payload.negative_prompt;
+	const payload = inputSchema.parse(input);
 	const endpoint = `https://api.stability.ai/v1beta/generation/${payload.model}/text-to-image`;
 	const response = await fetch(endpoint, {
 		headers: {

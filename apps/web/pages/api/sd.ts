@@ -16,7 +16,11 @@ const pipeline = aigur.pipeline.create({
 	flow: (flow) =>
 		flow.image.textToImage.stableDiffusion
 			.stability(({ input }) => ({
-				prompt: input.prompt,
+				text_prompts: [
+					{
+						text: input.prompt,
+					},
+				],
 			}))
 			.custom(supabaseUpload)(({ prev, nodes }) => ({
 			file: prev.result,

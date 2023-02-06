@@ -1,42 +1,53 @@
 export function getInputByContext(rawInput, values, schema) {
 	const input: Record<string, any> = { ...rawInput };
-	// console.log(`***input before`, input);
 
-	for (const key in input) {
-		const value = input[key];
+	return getInputContextInner(input);
 
-		if (typeof value !== 'string') {
-			continue;
-		}
+	function getInputContextInner(input) {
+		for (const key in input) {
+			const value = input[key];
 
-		const contextReferences = getContextReferences(value);
-		console.log(`***contextReferences`, contextReferences);
-		let newValue: string | number | boolean | undefined = value;
-
-		// console.log(`***values`, JSON.stringify(values, null, 2));
-		for (let ref of contextReferences) {
-			const contextValue = values[ref.nodeId];
-			// console.log(`***contextValue`, contextValue);
-			const propertyValue = contextValue[ref.property];
-			// console.log(`***propertyValue`, propertyValue);
-			newValue = (newValue as string)?.replace(new RegExp(escapeRegExp(ref.value)), propertyValue);
-
-			if (newValue === 'undefined') {
-				newValue = undefined;
-			} else if (newValue !== propertyValue && newValue === propertyValue.toString()) {
-				newValue = propertyValue;
-			} else if (schema.input.shape[key]._def.typeName === 'ZodEffects') {
-				// console.log(`ZodEffects`);
-				newValue = propertyValue;
+			if (Array.isArray(value)) {
+				input[key] = value.map((item) => getInputContextInner(item));
+				continue;
 			}
+			if (typeof value === 'object' && value !== null) {
+				input[key] = getInputContextInner(value);
+				continue;
+			}
+
+			const contextReferences = getContextReferences(value);
+			// console.log(`***contextReferences`, contextReferences);
+			let newValue: any = value;
+
+			// console.log(`***values`, JSON.stringify(values, null, 2));
+			for (let ref of contextReferences) {
+				const contextValue = values[ref.nodeId];
+				// console.log(`***contextValue`, contextValue);
+				const propertyValue = contextValue[ref.property];
+				if (propertyValue instanceof Buffer) {
+					newValue = propertyValue;
+					continue;
+				}
+				// console.log(`***propertyValue`, propertyValue);
+				newValue = (newValue as string)?.replace(
+					new RegExp(escapeRegExp(ref.value)),
+					propertyValue
+				);
+
+				if (newValue === 'undefined') {
+					newValue = undefined;
+				} else if (newValue !== propertyValue && newValue === propertyValue.toString()) {
+					newValue = propertyValue;
+				}
+			}
+
+			input[key] = newValue;
 		}
 
-		input[key] = newValue;
+		// console.log(`***input after`, input);
+		return input;
 	}
-
-	// console.log(`***input after`, input);
-	return input;
-
 	function getContextReferences(value: string) {
 		const contextRegex = /\$context\.(\d+|input)\.(\w+)\$/g;
 		const matches = value.matchAll(contextRegex);

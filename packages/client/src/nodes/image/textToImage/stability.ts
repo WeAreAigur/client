@@ -39,7 +39,7 @@ const inputSchema = z.object({
 });
 
 const outputSchema = z.object({
-	result: z.instanceof(Buffer),
+	result: z.instanceof(ArrayBuffer),
 });
 
 async function action(
@@ -61,7 +61,7 @@ async function action(
 	const image = await response.arrayBuffer();
 
 	return {
-		result: Buffer.from(new Uint8Array(image)),
+		result: image,
 	};
 }
 

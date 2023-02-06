@@ -6,7 +6,7 @@ const inputSchema = z.object({
 	supabaseUrl: z.string(),
 	supabaseServiceKey: z.string(),
 	bucket: z.string(),
-	file: z.instanceof(Buffer),
+	file: z.instanceof(ArrayBuffer),
 	extension: z.string(),
 	name: z.string().optional(),
 });
@@ -29,7 +29,7 @@ async function action(input: z.input<typeof inputSchema>) {
 		url,
 	};
 
-	async function uploadFileToStorage(file: Buffer | ArrayBuffer, name: string, bucket: string) {
+	async function uploadFileToStorage(file: ArrayBuffer, name: string, bucket: string) {
 		const { data, error } = await supabase.storage.from(bucket).upload(name, file);
 		if (error) {
 			throw error;

@@ -22,7 +22,7 @@ export function getInputByContext(rawInput, values) {
 			for (let ref of contextReferences) {
 				const contextValue = values[ref.nodeId];
 				const propertyValue = contextValue[ref.property];
-				if (propertyValue instanceof Buffer) {
+				if (propertyValue instanceof ArrayBuffer) {
 					newValue = propertyValue;
 					continue;
 				}

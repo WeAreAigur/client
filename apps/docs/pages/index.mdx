@@ -1,12 +1,22 @@
+import { Callout } from 'nextra-theme-docs';
+import {JokeForm} from '#/components/JokeForm'
+
 # Aigur Client
 
 ### What is Aigur Client?
 
-A free and opensource (MIT) client to compose and invoke Generative AI pipelines.
+A free and opensource (MIT) client to compose and invoke fully typed Generative AI pipelines.
 
-> Aigur Client is supported by [Aigur](https://aigur.dev) but can be used independently of Aigur.
+<Callout>
+	Aigur Client is supported by [Aigur](https://aigur.dev) but can be used entirely independent of
+	Aigur.
+</Callout>
 
 ### A Simple Example
+
+This is a simple example of a pipeline that takes a subject and returns a joke about that subject.
+
+Everything is fully typed! 🎉
 
 ```ts
 import { createClient } from '@aigur/client';
@@ -14,23 +24,31 @@ import { z } from 'zod';
 
 export const aigur = createClient({
 	apiKeys: {
-		openai: process.env.NEXT_PUBLIC_OPENAI_KEY!,
+		openai: process.env.OPENAI_KEY!, // use this on the server side to avoid exposing your key
 	},
 });
 
-const pipeline = aigur.pipeline.create({
-	id: 'gpt-prediction',
+export const jokeGptPipeline = aigur.pipeline.create({
+	id: 'jokegpt',
 	input: z.object({
-		prompt: z.string(),
+		subject: z.string(), // <-- the next comment references this dude right here
 	}),
 	output: z.object({
 		text: z.string(),
 	}),
 	flow: (flow) =>
-		flow.text.prediction.gpt3(({ input }) => ({
-			prompt: input.prompt, // <-- references the pipeline's input
-		})),
+		flow.text.modify
+			.simple(({ input }) => ({
+				text: input.subject, // <-- references the pipeline's input (look at the comment above)
+				modifier: 'tell me a joke about $(text)$',
+			}))
+			.text.prediction.gpt3(({ prev }) => ({
+				prompt: prev.text, // <-- uses the previous node's output "text" property
+			})),
 });
 
+// both input and output are fully typed
 const { text } = await pipeline.invoke({ prompt: 'Tell me a joke about a car' });
 ```
+
+<JokeForm />

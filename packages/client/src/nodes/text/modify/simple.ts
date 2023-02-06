@@ -12,7 +12,7 @@ const outputSchema = z.object({
 async function action(input: z.input<typeof inputSchema>): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
 	return {
-		text: payload.modifier.replace(/\$\{text\}\$/gm, payload.text),
+		text: payload.modifier.replace(/\$\(text\)\$/gm, payload.text),
 	};
 }
 

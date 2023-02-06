@@ -1,8 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { jokeGptPipeline } from '#/pipelines/jokegpt';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const input = req.body;
+export default async function handler(req: NextRequest) {
+	const input = await new Response(req.body).json();
 	const output = await jokeGptPipeline.invoke(input);
-	return res.json(output);
+	return NextResponse.json(output);
 }
+
+export const config = {
+	runtime: 'edge',
+};

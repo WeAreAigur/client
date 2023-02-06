@@ -18,8 +18,11 @@ const pipeline = aigur.pipeline.create({
 			.stability(({ input }) => ({
 				prompt: input.prompt,
 			}))
-			.custom(supabaseUpload(supabaseUrl, supabaseKey, 'results'))(({ prev, nodes }) => ({
+			.custom(supabaseUpload)(({ prev, nodes }) => ({
 			file: prev.result,
+			bucket: 'results',
+			supabaseServiceKey: supabaseKey,
+			supabaseUrl: supabaseUrl,
 			extension: 'png',
 		})),
 });

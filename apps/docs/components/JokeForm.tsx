@@ -18,20 +18,29 @@ export function JokeForm(props: JokeFormProps) {
 	};
 
 	return (
-		<div className="flex flex-col">
-			<form onSubmit={submit}>
-				<input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} />
-				<button type="submit">Generate</button>
-				<div>{inProgress ? 'Generating...' : ''}</div>
-				{joke ? (
-					<div>
-						<div>{joke}</div>
-						<div>(Hey, I didnt say it would be funny!)</div>{' '}
-					</div>
-				) : (
-					<div>No joke yet :(</div>
-				)}
-			</form>
-		</div>
+		<form onSubmit={submit} className="flex items-center py-6 space-x-4">
+			<div className="form-control">
+				<div className="input-group">
+					<input
+						type="text"
+						placeholder="Subject"
+						className="input input-bordered"
+						value={subject}
+						onChange={(e) => setSubject(e.target.value)}
+					/>
+					<button className={`btn btn-square ${inProgress ? 'loading' : ''}`} type="submit">
+						GO
+					</button>
+				</div>
+			</div>
+			{joke ? (
+				<div>
+					<div className="text-lg">{joke}</div>
+					<div className="text-sm">(Hey, I didnt say it would be funny!)</div>{' '}
+				</div>
+			) : (
+				<div>No joke yet :(</div>
+			)}
+		</form>
 	);
 }

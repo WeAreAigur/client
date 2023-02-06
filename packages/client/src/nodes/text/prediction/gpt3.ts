@@ -29,8 +29,8 @@ async function action(
 		body: JSON.stringify(payload),
 	});
 
-	const output: string = await response.json();
-	return { text: output };
+	const output = await response.json();
+	return { text: output.choices[0]?.text.replace(/^(?:\n)+/gm, '') };
 }
 
 export const gpt3PredictionNode = {

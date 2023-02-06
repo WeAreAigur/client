@@ -8,7 +8,7 @@ const inputSchema = z.object({
 	bucket: z.string(),
 	file: z.instanceof(Buffer),
 	extension: z.string(),
-	name: z.string().optional().default(makeid()),
+	name: z.string().optional(),
 });
 
 const outputSchema = z.object({
@@ -20,7 +20,7 @@ async function action(input: z.input<typeof inputSchema>) {
 	const supabase = createClient(payload.supabaseUrl, payload.supabaseServiceKey);
 	const uploadedFile = await uploadFileToStorage(
 		payload.file,
-		`${payload.name}.${payload.extension}`,
+		`${payload.name ?? makeid(16)}.${payload.extension}`,
 		payload.bucket
 	);
 	const url = `${payload.supabaseUrl}/storage/v1/object/public/${payload.bucket}/${uploadedFile}`;

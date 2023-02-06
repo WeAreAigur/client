@@ -27,7 +27,16 @@ export const createClient = (opts: AigurConfiguration) => {
 					apiKeys,
 				};
 				return {
-					invoke: (input: Record<string, any>) => invokePipeline(pipeline, input),
+					invoke: (input: z.input<Input>) => invokePipeline<Input, Output>(pipeline, input),
+					invokeRemote: (endpoint: string, input: z.input<Input>): Promise<z.output<Output>> => {
+						return fetch(endpoint, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify(input),
+						}).then((res) => res.json());
+					},
 				};
 			},
 		},

@@ -17,19 +17,15 @@ export function getInputByContext(rawInput, values) {
 			}
 
 			const contextReferences = getContextReferences(value);
-			// console.log(`***contextReferences`, contextReferences);
 			let newValue: any = value;
 
-			// console.log(`***values`, JSON.stringify(values, null, 2));
 			for (let ref of contextReferences) {
 				const contextValue = values[ref.nodeId];
-				// console.log(`***contextValue`, contextValue);
 				const propertyValue = contextValue[ref.property];
 				if (propertyValue instanceof Buffer) {
 					newValue = propertyValue;
 					continue;
 				}
-				// console.log(`***propertyValue`, propertyValue);
 				newValue = (newValue as string)?.replace(
 					new RegExp(escapeRegExp(ref.value)),
 					propertyValue
@@ -45,9 +41,9 @@ export function getInputByContext(rawInput, values) {
 			input[key] = newValue;
 		}
 
-		// console.log(`***input after`, input);
 		return input;
 	}
+
 	function getContextReferences(value: string) {
 		const contextRegex = /\$context\.(\d+|input)\.(\w+)\$/g;
 		const matches = value.matchAll(contextRegex);

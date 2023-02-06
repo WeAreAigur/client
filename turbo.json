@@ -15,12 +15,12 @@
 		"web#dev": {
 			"dependsOn": ["^build"],
 			"env": [
-				"OPENAI_KEY",
-				"REPLICATE_KEY",
-				"STABILITY_KEY",
-				"SUPABASE_URL",
-				"SUPABASE_SERVICE_KEY",
-				"GOOGLE_KEY"
+				"NEXT_PUBLIC_OPENAI_KEY",
+				"NEXT_PUBLIC_REPLICATE_KEY",
+				"NEXT_PUBLIC_STABILITY_KEY",
+				"NEXT_PUBLIC_SUPABASE_URL",
+				"NEXT_PUBLIC_SUPABASE_SERVICE_KEY",
+				"NEXT_PUBLIC_GOOGLE_KEY"
 			],
 			"outputs": [".next/**"]
 		}

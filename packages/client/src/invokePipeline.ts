@@ -1,7 +1,12 @@
+import { z } from 'zod';
+
 import { Pipeline } from './types';
 import { getInputByContext } from './getInputByContext';
 
-export async function invokePipeline(pipeline: Pipeline, input: Record<string, any>) {
+export async function invokePipeline<Input extends z.AnyZodObject, Output extends z.AnyZodObject>(
+	pipeline: Pipeline,
+	input: z.input<Input>
+): Promise<z.output<Output>> {
 	try {
 		pipeline.input.parse(input);
 		const values: any = { input };

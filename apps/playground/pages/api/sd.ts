@@ -1,35 +1,5 @@
-import { z } from 'zod';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { supabaseKey, supabaseUrl } from '#/services/supabase';
-import { aigur } from '#/services/aigur';
-
-import { supabaseUpload } from '@aigur/helpers/supabase';
-
-const pipeline = aigur.pipeline.create({
-	id: 'myPipeline3',
-	input: z.object({
-		prompt: z.string(),
-	}),
-	output: z.object({
-		url: z.string().url(),
-	}),
-	flow: (flow) =>
-		flow.image.textToImage.stableDiffusion
-			.stability(({ input }) => ({
-				text_prompts: [
-					{
-						text: input.prompt,
-					},
-				],
-			}))
-			.custom(supabaseUpload)(({ prev, nodes }) => ({
-			file: prev.result,
-			bucket: 'results',
-			supabaseServiceKey: supabaseKey,
-			supabaseUrl: supabaseUrl,
-			extension: 'png',
-		})),
-});
+import { sdPipeline } from '#/pipelines/sd';
 
 // export default async function handler(req: NextRequest) {
 // 	const input = await new Response(req.body).json();
@@ -40,8 +10,9 @@ const pipeline = aigur.pipeline.create({
 // export const config = {
 // 	runtime: 'edge',
 // };
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const input = req.body;
-	const output = await pipeline.invoke(input);
+	const output = await sdPipeline.invoke(input);
 	return res.json(output);
 }

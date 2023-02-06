@@ -1,28 +1,28 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
+import { sdPipeline } from '#/pipelines/sd';
 
 import { useRecord } from '../hooks/useRecord';
 
 export default function Web() {
 	const { toggleRecording, result, isRecording } = useRecord();
-	useEffect(() => {
-		if (result) {
-			fetch('/api/whisper', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ audio: result }),
-			})
-				.then((res) => res.json())
-				.then((data) => {
-					console.log('received result:', data);
-				});
-		}
-	}, [result]);
+	const [image, setImage] = useState<string | null>(null);
+
+	const generate = () => {
+		sdPipeline.invokeRemote('/api/sd', { prompt: 'a computer' }).then((data) => {
+			setImage(data.url);
+		});
+	};
+
+	const generate2 = () => {
+		sdPipeline.invoke({ prompt: 'a chair' }).then((data) => setImage(data.url));
+	};
+
 	return (
 		<div>
 			<h1>Web</h1>
-			<button onClick={toggleRecording}>{isRecording ? 'Stop' : 'Start'}</button>
+			<button onClick={generate}>Generate1</button>
+			<button onClick={generate2}>Generate2</button>
+			{image ? <img src={image} /> : <div>no image</div>}
 		</div>
 	);
 }

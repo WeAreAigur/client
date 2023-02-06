@@ -33,9 +33,7 @@ async function action(
 			body: formData,
 		}
 	);
-	const output = response.data;
-	console.log(`***output`, output);
-	return output;
+	return response.data;
 }
 
 export const whisperNode = {

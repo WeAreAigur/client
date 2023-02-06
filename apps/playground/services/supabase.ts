@@ -1,2 +1,2 @@
-export const supabaseKey = process.env.SUPABASE_SERVICE_KEY!;
-export const supabaseUrl = process.env.SUPABASE_URL!;
+export const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!;
+export const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

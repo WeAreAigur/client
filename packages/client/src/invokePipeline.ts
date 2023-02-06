@@ -11,10 +11,10 @@ export async function invokePipeline(pipeline: Pipeline, input: Record<string, a
 		// TODO: handle errors, retries
 		// TODO: handle parallel nodes?
 		for (let i = 0; i < nodes.length; i++) {
-			const { id, input, schema, action } = nodes[i];
+			const { input, schema, action } = nodes[i];
 
 			const value = (await action(
-				getInputByContext(input, values, schema),
+				getInputByContext(input, values),
 				pipeline.apiKeys
 			)) as typeof schema.output;
 			lastValue = value;

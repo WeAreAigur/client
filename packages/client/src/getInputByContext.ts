@@ -1,4 +1,4 @@
-export function getInputByContext(rawInput, values, schema) {
+export function getInputByContext(rawInput, values) {
 	const input: Record<string, any> = { ...rawInput };
 
 	return getInputContextInner(input);

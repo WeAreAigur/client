@@ -11,7 +11,7 @@ export function JokeForm(props: JokeFormProps) {
 	const submit = (e: any) => {
 		e.preventDefault();
 		setInProgress(true);
-		jokeGptPipeline.invokeRemote('/api/joke', { subject }).then((data) => {
+		jokeGptPipeline.vercel.invoke({ subject }).then((data) => {
 			setJoke(data.text);
 			setInProgress(false);
 		});

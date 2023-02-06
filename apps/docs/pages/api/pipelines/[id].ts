@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jokeGptPipeline } from '#/pipelines/jokegpt';
+import { pipelines } from '#/pipelines/pipelines';
+
+import { vercelGenericEdge } from '@aigur/helpers/vercelGenericEdge';
 
 export default async function handler(req: NextRequest) {
-	const input = await new Response(req.body).json();
-	const output = await jokeGptPipeline.invoke(input);
+	const output = await vercelGenericEdge(pipelines, req);
 	return NextResponse.json(output);
 }
 

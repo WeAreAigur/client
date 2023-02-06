@@ -15,6 +15,7 @@ importers:
   apps/docs:
     specifiers:
       '@aigur/client': workspace:*
+      '@aigur/helpers': workspace:*
       '@next/font': 13.1.6
       '@types/node': 18.11.19
       '@types/react': 18.0.27
@@ -32,6 +33,7 @@ importers:
       zod: ^3.20.2
     dependencies:
       '@aigur/client': link:../../packages/client
+      '@aigur/helpers': link:../../packages/helpers
       '@next/font': 13.1.6
       '@types/node': 18.11.19
       '@types/react': 18.0.27

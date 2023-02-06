@@ -26,7 +26,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					flow,
 					apiKeys,
 				};
-				return {
+				const pipeline = {
 					invoke: (input: z.input<Input>) => invokePipeline<Input, Output>(pipelineConf, input),
 					invokeRemote: (endpoint: string, input: z.input<Input>): Promise<z.output<Output>> => {
 						return fetch(endpoint, {
@@ -37,7 +37,14 @@ export const createClient = (opts: AigurConfiguration) => {
 							body: JSON.stringify(input),
 						}).then((res) => res.json());
 					},
+					vercel: {
+						invoke: (input: z.input<Input>) => {
+							return pipeline.invokeRemote(`/api/pipelines/${opts.id}`, input);
+						},
+					},
 				};
+
+				return pipeline;
 			},
 		},
 	};

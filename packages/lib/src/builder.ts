@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
 import { ConcreteNode, NodeDefinition } from './types';
-import { nodeDefinitions } from './nodes/nodesDefinitions';
+import {
+    enhanceWithKeywordsNode, googleVisionNode, gpt3PredictionNode, simpleModificationNode,
+    stabilityTextToImageNode, whisperNode
+} from './nodes/nodesDefinitions';
 
 export class Builder<
 	Input extends z.ZodObject<any, any, any>,
@@ -61,30 +64,29 @@ export class Builder<
 
 	voice = {
 		transcribe: {
-			whisper: this.nodeFactory(nodeDefinitions.voice.transcribe.whisper),
+			whisper: this.nodeFactory(whisperNode),
 		},
 	};
 
 	text = {
 		modify: {
-			enhanceWithKeywords: this.nodeFactory(nodeDefinitions.text.modify.enhanceWithKeywords),
-			simple: this.nodeFactory(nodeDefinitions.text.modify.simple),
+			enhanceWithKeywords: this.nodeFactory(enhanceWithKeywordsNode),
+			simple: this.nodeFactory(simpleModificationNode),
 		},
 		prediction: {
-			gpt3: this.nodeFactory(nodeDefinitions.text.prediction.gpt3),
+			gpt3: this.nodeFactory(gpt3PredictionNode),
 		},
 	};
 
 	image = {
 		textToImage: {
 			stableDiffusion: {
-				stability: this.nodeFactory(nodeDefinitions.image.textToImage.stableDiffusion.stability),
+				stability: this.nodeFactory(stabilityTextToImageNode),
 			},
 		},
-	};
-
-	results = {
-		upload: this.nodeFactory(nodeDefinitions.results.upload),
+		labeling: {
+			googleVision: this.nodeFactory(googleVisionNode),
+		},
 	};
 
 	getNodes() {

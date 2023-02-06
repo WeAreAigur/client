@@ -15,17 +15,8 @@ const outputSchema = z.object({
 	url: z.string().url(),
 });
 
-export const supabaseUpload = {
-	id: 'results.upload.supabase',
-	schema: {
-		input: inputSchema,
-		output: outputSchema,
-	},
-	action,
-};
-
-async function action(input: z.input<typeof supabaseUpload.schema.input>) {
-	const payload = supabaseUpload.schema.input.parse(input);
+async function action(input: z.input<typeof inputSchema>) {
+	const payload = inputSchema.parse(input);
 	const supabase = createClient(payload.supabaseUrl, payload.supabaseServiceKey);
 	const uploadedFile = await uploadFileToStorage(
 		payload.file,
@@ -46,6 +37,15 @@ async function action(input: z.input<typeof supabaseUpload.schema.input>) {
 		return data?.path;
 	}
 }
+
+export const supabaseUpload = {
+	id: 'results.upload.supabase',
+	schema: {
+		input: inputSchema,
+		output: outputSchema,
+	},
+	action,
+};
 
 function makeid(length: number = 16) {
 	let result = '';

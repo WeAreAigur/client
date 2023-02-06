@@ -5,7 +5,7 @@ import { aigur } from '#/services/aigur';
 import { supabaseUpload } from '@aigur/helpers/supabase';
 
 export const sdPipeline = aigur.pipeline.create({
-	id: 'myPipeline3',
+	id: 'sdPipeline',
 	input: z.object({
 		prompt: z.string(),
 	}),

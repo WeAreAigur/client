@@ -1,0 +1,36 @@
+# Aigur Client
+
+### What is Aigur Client?
+
+A free and opensource (MIT) client to compose and invoke Generative AI pipelines.
+
+> Aigur Client is supported by [Aigur](https://aigur.dev) but can be used independently of Aigur.
+
+### A Simple Example
+
+```ts
+import { createClient } from '@aigur/client';
+import { z } from 'zod';
+
+export const aigur = createClient({
+	apiKeys: {
+		openai: process.env.NEXT_PUBLIC_OPENAI_KEY!,
+	},
+});
+
+const pipeline = aigur.pipeline.create({
+	id: 'gpt-prediction',
+	input: z.object({
+		prompt: z.string(),
+	}),
+	output: z.object({
+		text: z.string(),
+	}),
+	flow: (flow) =>
+		flow.text.prediction.gpt3(({ input }) => ({
+			prompt: input.prompt, // <-- references the pipeline's input
+		})),
+});
+
+const { text } = await pipeline.invoke({ prompt: 'Tell me a joke about a car' });
+```

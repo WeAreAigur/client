@@ -17,8 +17,8 @@ A free and opensource (MIT) client to compose and invoke fully typed Generative 
 This is a simple example of a pipeline that takes a subject and returns a joke about that subject.
 
 Everything is fully typed! 🎉
-
-```ts copy
+<CH.Code lineNumbers={true}>
+```ts index.ts
 import { createClient } from '@aigur/client';
 import { z } from 'zod';
 
@@ -50,5 +50,7 @@ export const jokeGptPipeline = aigur.pipeline.create({
 // both input and output are fully typed
 const { text } = await pipeline.invoke({ prompt: 'Tell me a joke about a car' });
 ```
+</CH.Code>
 #### Give it a try!
 <JokeForm />
+

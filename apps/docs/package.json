@@ -11,6 +11,7 @@
 	"dependencies": {
 		"@aigur/client": "workspace:*",
 		"@aigur/helpers": "workspace:*",
+		"@code-hike/mdx": "^0.8.0",
 		"@next/font": "13.1.6",
 		"@types/node": "18.11.19",
 		"@types/react": "18.0.27",

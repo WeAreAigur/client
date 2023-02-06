@@ -1,6 +1,7 @@
 {
 	"index": "Introduction",
 	"gettingstarted": "Getting Started",
+	"tutorial": "Tutorial",
 	"invocation": "Invocation",
 	"remoteinvocation": "Remote Invocation",
 	"frameworks": "Frameworks"

@@ -6,22 +6,17 @@ export async function invokePipeline(pipeline: Pipeline, input: Record<string, a
 		pipeline.input.parse(input);
 		const values: any = { input };
 		let lastValue: any = {};
-		const nodes = pipeline.flow.getNodes();
+		const nodes: any[] = pipeline.flow.getNodes();
 
 		// TODO: handle errors, retries
 		// TODO: handle parallel nodes?
 		for (let i = 0; i < nodes.length; i++) {
-			const {
-				id,
-				input,
-				schema: { output },
-				action,
-			} = nodes[i];
+			const { id, input, schema, action } = nodes[i];
 
 			const value = (await action(
-				getInputByContext(input, values),
+				getInputByContext(input, values, schema),
 				pipeline.apiKeys
-			)) as typeof output;
+			)) as typeof schema.output;
 			lastValue = value;
 			values[i] = value;
 		}

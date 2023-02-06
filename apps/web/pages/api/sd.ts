@@ -1,6 +1,9 @@
 import { z } from 'zod';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { supabaseKey, supabaseUrl } from '#/services/supabase';
 import { aigur } from '#/services/aigur';
+
+import { supabaseUpload } from '@aigur/helpers/supabase';
 
 const pipeline = aigur.pipeline.create({
 	id: 'myPipeline3',
@@ -8,25 +11,30 @@ const pipeline = aigur.pipeline.create({
 		prompt: z.string(),
 	}),
 	output: z.object({
-		text: z.string(),
+		url: z.string().url(),
 	}),
 	flow: (flow) =>
-		flow.text.modify
-			.simple(({ input }) => ({
-				text: input.prompt,
-				modifier: 'tell me a funny joke about: ${text}$',
+		flow.image.textToImage.stableDiffusion
+			.stability(({ input }) => ({
+				prompt: input.prompt,
 			}))
-			.text.prediction.gpt3(({ prev }) => ({
-				prompt: prev.text,
-			})),
+			.custom(supabaseUpload(supabaseUrl, supabaseKey, 'results'))(({ prev, nodes }) => ({
+			file: prev.result,
+			extension: 'png',
+		})),
 });
 
-export default async function handler(req: NextRequest) {
-	const input = await new Response(req.body).json();
-	const output = await pipeline.invoke(input);
-	return NextResponse.json(output);
-}
+// export default async function handler(req: NextRequest) {
+// 	const input = await new Response(req.body).json();
+// 	const output = await pipeline.invoke(input);
+// 	return NextResponse.json(output);
+// }
 
-export const config = {
-	runtime: 'edge',
-};
+// export const config = {
+// 	runtime: 'edge',
+// };
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+	const input = req.body;
+	const output = await pipeline.invoke(input);
+	return res.json(output);
+}

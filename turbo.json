@@ -14,7 +14,13 @@
 		},
 		"web#dev": {
 			"dependsOn": ["^build"],
-			"env": ["OPENAI_KEY", "REPLICATE_KEY"],
+			"env": [
+				"OPENAI_KEY",
+				"REPLICATE_KEY",
+				"STABILITY_KEY",
+				"SUPABASE_URL",
+				"SUPABASE_SERVICE_KEY"
+			],
 			"outputs": [".next/**"]
 		}
 	}

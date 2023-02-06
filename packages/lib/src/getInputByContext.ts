@@ -1,6 +1,6 @@
-export function getInputByContext(rawInput, values) {
+export function getInputByContext(rawInput, values, schema) {
 	const input: Record<string, any> = { ...rawInput };
-	console.log(`***input before`, input);
+	// console.log(`***input before`, input);
 
 	for (const key in input) {
 		const value = input[key];
@@ -13,30 +13,28 @@ export function getInputByContext(rawInput, values) {
 		console.log(`***contextReferences`, contextReferences);
 		let newValue: string | number | boolean | undefined = value;
 
-		console.log(`***values`, JSON.stringify(values, null, 2));
+		// console.log(`***values`, JSON.stringify(values, null, 2));
 		for (let ref of contextReferences) {
 			const contextValue = values[ref.nodeId];
-			console.log(`***contextValue`, contextValue);
+			// console.log(`***contextValue`, contextValue);
 			const propertyValue = contextValue[ref.property];
-			console.log(`***propertyValue`, propertyValue);
+			// console.log(`***propertyValue`, propertyValue);
 			newValue = (newValue as string)?.replace(new RegExp(escapeRegExp(ref.value)), propertyValue);
 
 			if (newValue === 'undefined') {
 				newValue = undefined;
-			} else if (newValue === propertyValue.toString()) {
-				// const keyType = node.pipeline_instance.pipeline.config.fields[key]?.type;
-				// if (keyType === 'number') {
-				// 	newValue = Number(newValue);
-				// } else if (keyType === 'boolean') {
-				// 	newValue = Boolean(newValue);
-				// }
+			} else if (newValue !== propertyValue && newValue === propertyValue.toString()) {
+				newValue = propertyValue;
+			} else if (schema.input.shape[key]._def.typeName === 'ZodEffects') {
+				// console.log(`ZodEffects`);
+				newValue = propertyValue;
 			}
 		}
 
 		input[key] = newValue;
 	}
 
-	console.log(`***input after`, input);
+	// console.log(`***input after`, input);
 	return input;
 
 	function getContextReferences(value: string) {

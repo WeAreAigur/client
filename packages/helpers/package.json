@@ -1,0 +1,19 @@
+{
+	"name": "@aigur/helpers",
+	"version": "1.0.0",
+	"description": "",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@supabase/supabase-js": "^2.7.1",
+		"zod": "^3.20.2"
+	},
+	"devDependencies": {
+		"tsconfig": "workspace:*",
+		"typescript": "^4.5.3"
+	}
+}

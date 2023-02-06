@@ -12,8 +12,9 @@ importers:
       prettier: 2.8.3
       turbo: 1.7.3
 
-  apps/web:
+  apps/playground:
     specifiers:
+      '@aigur/client': workspace:*
       '@aigur/helpers': workspace:*
       '@babel/core': ^7.0.0
       '@types/node': ^17.0.12
@@ -21,7 +22,6 @@ importers:
       '@types/react-dom': ^18.0.7
       eslint: 7.32.0
       eslint-config-custom: workspace:*
-      lib: workspace:*
       next: ^13.1.1
       react: 18.2.0
       react-dom: 18.2.0
@@ -29,8 +29,8 @@ importers:
       typescript: ^4.5.3
       zod: ^3.20.2
     dependencies:
+      '@aigur/client': link:../../packages/lib
       '@aigur/helpers': link:../../packages/helpers
-      lib: link:../../packages/lib
       next: 13.1.6_pjwopsidmaokadturxaafygjp4
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0

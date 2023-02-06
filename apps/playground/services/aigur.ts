@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { createClient } from 'lib';
+
+import { createClient } from '@aigur/client';
 
 const x = !!z;
 export const aigur = createClient({
@@ -7,5 +8,6 @@ export const aigur = createClient({
 		openai: process.env.OPENAI_KEY!,
 		replicate: process.env.REPLICATE_KEY!,
 		stability: process.env.STABILITY_KEY!,
+		googleapis: process.env.GOOGLE_KEY!,
 	},
 });

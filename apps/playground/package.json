@@ -1,5 +1,5 @@
 {
-	"name": "web",
+	"name": "aigur-playground",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
@@ -9,7 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
-		"lib": "workspace:*",
+		"@aigur/client": "workspace:*",
 		"next": "^13.1.1",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",

@@ -19,7 +19,8 @@
 				"REPLICATE_KEY",
 				"STABILITY_KEY",
 				"SUPABASE_URL",
-				"SUPABASE_SERVICE_KEY"
+				"SUPABASE_SERVICE_KEY",
+				"GOOGLE_KEY"
 			],
 			"outputs": [".next/**"]
 		}

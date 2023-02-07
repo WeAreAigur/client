@@ -8,6 +8,7 @@ export interface PipelineConf {
 	output: z.AnyZodObject;
 	flow: Builder<z.AnyZodObject, []>;
 	apiKeys: Record<string, string>;
+	retries: number;
 }
 
 export type NodeDefinition<Input extends z.AnyZodObject, Output extends z.AnyZodObject> = {

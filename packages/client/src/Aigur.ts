@@ -8,6 +8,8 @@ interface AigurConfiguration {
 	apiKeys: Record<string, string> & { openai?: string; stability?: string; googleapis?: string };
 }
 
+const DEFAULT_RETRIES = 2;
+
 export const createClient = (opts: AigurConfiguration) => {
 	const { apiKeys } = opts;
 	return {
@@ -16,6 +18,7 @@ export const createClient = (opts: AigurConfiguration) => {
 				id: string;
 				input: Input;
 				output: Output;
+				retries?: number
 				flow: (builder: Builder<Input, []>) => Builder<any, any>;
 			}) => {
 				const flow = opts.flow(new Builder(opts.input, []));
@@ -25,6 +28,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					output: opts.output,
 					flow,
 					apiKeys,
+					retries: opts.retries ?? DEFAULT_RETRIES
 				};
 				const pipeline = {
 					invoke: (input: z.input<Input>) => invokePipeline<Input, Output>(pipelineConf, input),

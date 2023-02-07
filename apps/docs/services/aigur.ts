@@ -1,4 +1,8 @@
+import { z } from 'zod';
+
 import { createClient } from '@aigur/client';
+
+const x = z;
 
 export const aigur = createClient({
 	apiKeys: {

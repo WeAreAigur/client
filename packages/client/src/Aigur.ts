@@ -18,7 +18,7 @@ export const createClient = (opts: AigurConfiguration) => {
 				id: string;
 				input: Input;
 				output: Output;
-				retries?: number
+				retries?: number;
 				flow: (builder: Builder<Input, []>) => Builder<any, any>;
 			}) => {
 				const flow = opts.flow(new Builder(opts.input, []));
@@ -28,7 +28,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					output: opts.output,
 					flow,
 					apiKeys,
-					retries: opts.retries ?? DEFAULT_RETRIES
+					retries: opts.retries ?? DEFAULT_RETRIES,
 				};
 				const pipeline = {
 					invoke: (input: z.input<Input>) => invokePipeline<Input, Output>(pipelineConf, input),

@@ -1,9 +1,9 @@
-export function getInputByContext(rawInput, values) {
+export function getInputByContext(rawInput: Record<string, any>, values: Record<string, any>) {
 	const input: Record<string, any> = { ...rawInput };
 
 	return getInputContextInner(input);
 
-	function getInputContextInner(input) {
+	function getInputContextInner(input: Record<string, any>) {
 		for (const key in input) {
 			const value = input[key];
 

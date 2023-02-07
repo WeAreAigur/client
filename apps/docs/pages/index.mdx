@@ -16,15 +16,101 @@ A free and opensource (MIT) client to compose and invoke fully typed Generative 
 
 This is a simple example of a pipeline that takes a subject and returns a joke about that subject.
 
-Everything is fully typed! 🎉
-<CH.Code lineNumbers={true}>
-```ts index.ts
+Btw, everything is fully typed! 🎉
+<CH.Scrollycoding>
+  ## Instantiate the Client
+
+adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
+adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
+adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdv
+adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
+
+```ts index.ts focus=1,3
+import { createClient } from '@aigur/client';
+
+export const aigur = createClient();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+```
+
+--- 
+## Define Your API Keys
+
+```ts index.ts focus=4:6
+import { createClient } from '@aigur/client';
+
+export const aigur = createClient({
+	apiKeys: {
+		openai: process.env.OPENAI_KEY!,
+	},
+});
+```
+
+--- 
+## Create a New Pipeline
+
+```ts index.ts focus=9:12
+import { createClient } from '@aigur/client';
+
+export const aigur = createClient({
+	apiKeys: {
+		openai: process.env.OPENAI_KEY!,
+	},
+});
+
+export const jokeGptPipeline = aigur.pipeline
+	.create({
+		id: 'jokegpt',
+	});
+```
+
+--- 
+## Input/Output
+
+```ts index.ts mark=12:17 focus=12:17
+```
+
+--- 
+## Go with the Flow
+
+```ts index.ts mark=18 focus=18
+```
+
+--- 
+## Nodes All the Way Down
+adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
+
+
+```ts index.ts focus=1,4,8
 import { createClient } from '@aigur/client';
 import { z } from 'zod';
 
 export const aigur = createClient({
 	apiKeys: {
-		openai: process.env.OPENAI_KEY!, // use this on the server side to avoid exposing your key
+		openai: process.env.OPENAI_KEY!,
 	},
 });
 
@@ -50,7 +136,8 @@ export const jokeGptPipeline = aigur.pipeline.create({
 // both input and output are fully typed
 const { text } = await pipeline.invoke({ prompt: 'Tell me a joke about a car' });
 ```
-</CH.Code>
+
+</CH.Scrollycoding>
 #### Give it a try!
 <JokeForm />
 

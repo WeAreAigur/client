@@ -8,8 +8,8 @@ import {JokeForm} from '#/components/JokeForm'
 A free and opensource (MIT) client to compose and invoke fully typed Generative AI pipelines.
 
 <Callout>
-	Aigur Client is supported by [Aigur](https://aigur.dev) but can be used entirely independent of
-	Aigur.
+  Aigur Client is supported by [Aigur](https://aigur.dev) but can be used entirely independent of
+  Aigur.
 </Callout>
 
 ### A Simple Example
@@ -20,15 +20,15 @@ Btw, everything is fully typed! 🎉
 <CH.Scrollycoding>
   ## Instantiate the Client
 
-adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
-adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
-adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asdv
-adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
+After installing the `@aigur/client` npm package, import the `createClient` function and instantiate the client.
 
 ```ts index.ts focus=1,3
 import { createClient } from '@aigur/client';
 
 export const aigur = createClient();
+
+
+
 
 
 
@@ -59,85 +59,160 @@ export const aigur = createClient();
 --- 
 ## Define Your API Keys
 
+Pipelines use different services to generate your desired output. Define your API keys for those services in the `apiKeys` property.
+It is typed for specific services (OpenAI, Stability, Google etc) but you can add additional custom keys as well.
+
+It is recommended to instantiate the Aigur Client on the server side as to not leak your API keys to the client but it's not mandatory.
+
+Since we're using the OpenAI GPT-3 service in our example, we'll add our API key for that.
+
 ```ts index.ts focus=4:6
 import { createClient } from '@aigur/client';
 
 export const aigur = createClient({
-	apiKeys: {
-		openai: process.env.OPENAI_KEY!,
-	},
+  apiKeys: {
+    openai: process.env.OPENAI_KEY!,
+  },
 });
 ```
 
 --- 
 ## Create a New Pipeline
 
+We'll create a new pipeline that will hold our logic. Let's name it `jokegpt`.
+
 ```ts index.ts focus=9:12
 import { createClient } from '@aigur/client';
 
 export const aigur = createClient({
-	apiKeys: {
-		openai: process.env.OPENAI_KEY!,
-	},
+  apiKeys: {
+    openai: process.env.OPENAI_KEY!,
+  },
 });
 
 export const jokeGptPipeline = aigur.pipeline
-	.create({
-		id: 'jokegpt',
-	});
+  .create({
+    id: 'jokegpt',
+  });
 ```
 
 --- 
 ## Input/Output
 
-```ts index.ts mark=12:17 focus=12:17
+Pipelines have input and output that are defined using [zod](https://github.com/colinhacks/zod).
+Input and Output must be of type `z.object`.
+
+```ts index.ts focus=2,13:18
+import { createClient } from '@aigur/client';
+import { z } from 'zod';
+
+export const aigur = createClient({
+  apiKeys: {
+    openai: process.env.OPENAI_KEY!,
+  },
+});
+
+export const jokeGptPipeline = 
+  aigur.pipeline.create({
+    id: 'jokegpt',
+    input: z.object({
+      subject: z.string(),
+    }),
+    output: z.object({
+      text: z.string(),
+    })
+  });
 ```
 
 --- 
 ## Go with the Flow
 
-```ts index.ts mark=18 focus=18
-```
+Now that we know what our pipeline accepts and returns, we need to define the flow of the pipeline itself.
+The flow is comprised of `nodes` that are chained together.
+Each node also has an input and an output, where the output of one node is the input of the next node.
 
---- 
-## Nodes All the Way Down
-adasd aasd asd asd asdadasd aasd asd asd asdadasd aasd asd asd asd
+We can access our different nodes using the `flow` builder, where they are organized by namespaces according to their type.
 
+When we define a node (`flow.text.modify.simple` for example), we need to define its input which is fully typed. We can enter hardcoded values in the input's properties or access previous nodes or the pipeline's input parameters.
 
-```ts index.ts focus=1,4,8
+In our first node, `flow.text.modify.simple`, which accepts `text` and `modifier` as input, we'll use the `input` parameter to access the pipeline's input and reference the `subject` property. This node takes our `subject` and adds the text "tell me a joke about" before it
+
+Next, we'll call OpenAI's GPT3 and pass the modified text as the prompt. Since we don't have any more nodes in our pipeline, the output of this node will be the output of the pipeline itself.
+
+```ts index.ts focus=18:27
 import { createClient } from '@aigur/client';
 import { z } from 'zod';
 
 export const aigur = createClient({
-	apiKeys: {
-		openai: process.env.OPENAI_KEY!,
-	},
+  apiKeys: {
+    openai: process.env.OPENAI_KEY!,
+  },
 });
 
-export const jokeGptPipeline = aigur.pipeline.create({
-	id: 'jokegpt',
-	input: z.object({
-		subject: z.string(), // <-- the next comment references this dude right here
-	}),
-	output: z.object({
-		text: z.string(),
-	}),
-	flow: (flow) =>
-		flow.text.modify
-			.simple(({ input }) => ({
-				text: input.subject, // <-- references the pipeline's input (look at the comment above)
-				modifier: 'tell me a joke about $(text)$',
-			}))
-			.text.prediction.gpt3(({ prev }) => ({
-				prompt: prev.text, // <-- uses the previous node's output "text" property
-			})),
+export const jokeGptPipeline = 
+  aigur.pipeline.create({
+    id: 'jokegpt',
+    input: z.object({
+      subject: z.string(),
+    }),
+    output: z.object({
+      text: z.string(),
+    }),
+    flow: (flow) =>
+      flow.text.modify
+        .simple(({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .text.prediction.gpt3(({ prev }) => ({
+          prompt: prev.text,
+        })),
+  });
+```
+
+--- 
+## Invoke it!
+All that's left is to execute our pipeline. We can do that by calling the `invoke` method on the pipeline and passing the input parameters.
+
+The output `text` is typed by the pipeline's `output` property.
+
+```ts index.ts focus=30:32
+import { createClient } from '@aigur/client';
+import { z } from 'zod';
+
+export const aigur = createClient({
+  apiKeys: {
+    openai: process.env.OPENAI_KEY!,
+  },
 });
 
-// both input and output are fully typed
-const { text } = await pipeline.invoke({ prompt: 'Tell me a joke about a car' });
+export const jokeGptPipeline = 
+  aigur.pipeline.create({
+    id: 'jokegpt',
+    input: z.object({
+      subject: z.string(),
+    }),
+    output: z.object({
+      text: z.string(),
+    }),
+    flow: (flow) =>
+      flow.text.modify
+        .simple(({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .text.prediction.gpt3(({ prev }) => ({
+          prompt: prev.text,
+        })),
+  });
+
+const { text } = await jokeGptPipeline.invoke({
+  subject: 'a car'
+});
 ```
 
 </CH.Scrollycoding>
-#### Give it a try!
+
+## Give it a try
 <JokeForm />
 

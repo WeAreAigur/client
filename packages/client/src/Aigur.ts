@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { PipelineConf } from './types';
+import { ConcreteNode, PipelineConf, ProgressType } from './types';
 import { invokePipeline } from './invokePipeline';
 import { Builder } from './builder';
 
@@ -29,6 +29,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					flow,
 					apiKeys,
 					retries: opts.retries ?? DEFAULT_RETRIES,
+					progressListeners: {},
 				};
 				const pipeline = {
 					invoke: (input: z.input<Input>) => invokePipeline<Input, Output>(pipelineConf, input),
@@ -43,13 +44,48 @@ export const createClient = (opts: AigurConfiguration) => {
 					},
 					vercel: {
 						invoke: (input: z.input<Input>) => {
+							// TODO: move base url to "create" optional param
 							return pipeline.invokeRemote(`/api/pipelines/${opts.id}`, input);
 						},
 					},
+					onProgress: (cb: (node: ConcreteNode<any, any>, type: ProgressType) => void) => {
+						const id = makeid();
+						pipelineConf.progressListeners[id] = cb;
+						return () => {
+							delete pipelineConf.progressListeners[id];
+						};
+					},
 				};
 
+				listenToSSE();
+
 				return pipeline;
+
+				function listenToSSE() {
+					if (typeof window !== 'undefined' && apiKeys.ably) {
+						const dataEndpoint = `https://realtime.ably.io/event-stream?channels=bla&v=1.2&key=${apiKeys.ably}&enveloped=false`;
+						const eventSource = new EventSource(dataEndpoint);
+						eventSource.onmessage = (event) => {
+							const data = JSON.parse(event.data);
+							if (data.name === 'progress') {
+								Object.values(pipelineConf.progressListeners).forEach((listener) =>
+									listener(data.node, data.type)
+								);
+							}
+						};
+					}
+				}
 			},
 		},
 	};
 };
+
+function makeid(length: number = 16) {
+	let result = '';
+	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	const charactersLength = characters.length;
+	for (let i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+}

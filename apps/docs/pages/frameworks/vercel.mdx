@@ -1,4 +1,4 @@
-```ts copy
+```ts pipelines/pipelines.ts
 import { jokeGptPipeline } from './jokegpt';
 
 export const pipelines = {
@@ -8,7 +8,7 @@ export const pipelines = {
 ```
 
 
-```ts copy
+```ts pages/api/pipelines/[id].ts
 import { NextRequest, NextResponse } from 'next/server';
 import { pipelines } from '#/pipelines/pipelines';
 
@@ -26,6 +26,6 @@ export const config = {
 ```
 
 
-```ts copy
+```ts index.ts
 jokeGptPipeline.vercel.invoke({ subject }).then(({text}) => {});
 ```

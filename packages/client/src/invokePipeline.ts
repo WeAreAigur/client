@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { PipelineConf } from './types';
+import { notifyProgress } from './notifyProgress';
 import { getInputByContext } from './getInputByContext';
 
 const RETRY_DELAY_MS = 350;
@@ -15,7 +16,10 @@ export async function invokePipeline<Input extends z.AnyZodObject, Output extend
 		let lastValue: any = {};
 		const nodes: any[] = pipeline.flow.getNodes();
 
+		let progressPromise;
+
 		for (let i = 0; i < nodes.length; i++) {
+			progressPromise = notifyProgress(pipeline, nodes[i], 'start');
 			let attemptCount = 0;
 			let isSuccess = false;
 			do {
@@ -31,6 +35,8 @@ export async function invokePipeline<Input extends z.AnyZodObject, Output extend
 					await delay(RETRY_DELAY_MS * attemptCount);
 				}
 			} while (!isSuccess && attemptCount <= pipeline.retries);
+			await progressPromise;
+			await notifyProgress(pipeline, nodes[i], 'end');
 		}
 
 		return lastValue;

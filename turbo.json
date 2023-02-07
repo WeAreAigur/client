@@ -20,7 +20,9 @@
 				"STABILITY_KEY",
 				"SUPABASE_URL",
 				"SUPABASE_SERVICE_KEY",
-				"GOOGLE_KEY"
+				"GOOGLE_KEY",
+				"ABLY_KEY",
+				"NEXT_PUBLIC_ABLY_KEY"
 			],
 			"outputs": [".next/**"]
 		}

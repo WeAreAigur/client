@@ -9,6 +9,7 @@ export interface PipelineConf {
 	flow: Builder<z.AnyZodObject, []>;
 	apiKeys: Record<string, string>;
 	retries: number;
+	progressListeners: Record<string, (node: ConcreteNode<any, any>, type: ProgressType) => void>;
 }
 
 export type NodeDefinition<Input extends z.AnyZodObject, Output extends z.AnyZodObject> = {
@@ -27,3 +28,5 @@ export type ConcreteNode<
 	input: z.output<Input>;
 	output: z.output<Output>;
 };
+
+export type ProgressType = 'start' | 'end' | 'stream';

@@ -1,7 +1,7 @@
+- streaming
+  - opt1 - should ALL pipeline responses be a stream?
+  - opt2 - mark pipeline as "stream" and stream the last node's response if relevant
 - "attach" supabase upload to builder node tree (results.upload.supabase)
-- support nested objects in input:
-  text_prompt: [
-  {
-  text: '$context.input.prompt$',
-  }
-  ]
+- move progress to external package that attaches to Client
+  - notifyProgress = ablyProgress
+  - client key should be subscribe only

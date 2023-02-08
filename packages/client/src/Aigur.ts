@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { ConcreteNode, PipelineConf, ProgressType } from './types';
-import { invokePipeline } from './invokePipeline';
 import { Builder } from './builder';
+import { invokePipeline } from './invokePipeline';
+import { ConcreteNode, PipelineConf, ProgressType } from './types';
 
 interface AigurConfiguration {
 	apiKeys: Record<string, string> & { openai?: string; stability?: string; googleapis?: string };
@@ -19,7 +19,7 @@ export const createClient = (opts: AigurConfiguration) => {
 				input: Input;
 				output: Output;
 				retries?: number;
-				flow: (builder: Builder<Input, []>) => Builder<any, any>;
+				flow: (builder: Builder<Input, Output, []>) => Builder<Input, Output, any>;
 			}) => {
 				const flow = opts.flow(new Builder(opts.input, []));
 				const pipelineConf: PipelineConf = {

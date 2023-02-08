@@ -1,19 +1,28 @@
 import { z } from 'zod';
 
-import { ConcreteNode, NodeDefinition } from './types';
 import {
-    enhanceWithKeywordsNode, googleVisionNode, gpt3PredictionNode, simpleModificationNode,
-    stabilityTextToImageNode, whisperNode
+	enhanceWithKeywordsNode,
+	googleVisionNode,
+	gpt3PredictionNode,
+	simpleModificationNode,
+	stabilityTextToImageNode,
+	whisperNode,
 } from './nodes/nodesDefinitions';
+import { outputNode } from './nodes/output/output';
+import { ConcreteNode, NodeDefinition } from './types';
 
 export class Builder<
 	Input extends z.ZodObject<any, any, any>,
+	Output extends z.ZodObject<any, any, any>,
 	NodeDefinitions extends ConcreteNode<any, any>[]
 > {
 	constructor(private input: Input, private nodes: NodeDefinitions) {}
 
-	static create<Input extends z.ZodObject<any, any, any>>(input: Input) {
-		return new Builder<Input, []>(input, []);
+	static create<
+		Input extends z.ZodObject<any, any, any>,
+		Output extends z.ZodObject<any, any, any>
+	>(input: Input) {
+		return new Builder<Input, Output, []>(input, []);
 	}
 
 	private nodeFactory<NodeDef extends NodeDefinition<any, any>>(nodeDefinition: NodeDef) {
@@ -23,7 +32,7 @@ export class Builder<
 				prev: NodeDefinitions[-1]['output'];
 				input: z.output<Input>;
 			}) => z.input<NextNode['schema']['input']>
-		): Builder<Input, [...NodeDefinitions, NextNode]> => {
+		): Builder<Input, Output, [...NodeDefinitions, NextNode]> => {
 			const input = this.setPlaceholderValues(this.input.keyof().options, 'input');
 			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 			const node = {
@@ -88,6 +97,8 @@ export class Builder<
 			googleVision: this.nodeFactory(googleVisionNode),
 		},
 	};
+
+	output = this.nodeFactory(outputNode<Output>());
 
 	getNodes() {
 		return this.nodes;

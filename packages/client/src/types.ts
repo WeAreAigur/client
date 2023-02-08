@@ -6,7 +6,7 @@ export interface PipelineConf {
 	id: string;
 	input: z.AnyZodObject;
 	output: z.AnyZodObject;
-	flow: Builder<z.AnyZodObject, []>;
+	flow: Builder<z.AnyZodObject, z.AnyZodObject, []>;
 	apiKeys: Record<string, string>;
 	retries: number;
 	progressListeners: Record<string, (node: ConcreteNode<any, any>, type: ProgressType) => void>;

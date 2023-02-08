@@ -1,7 +1,7 @@
 {
 	"index": "Introduction",
-	"gettingstarted": "Getting Started",
 	"invocation": "Invocation",
 	"remoteinvocation": "Remote Invocation",
+	"streaming": "Streaming Results",
 	"frameworks": "Frameworks"
 }

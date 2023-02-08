@@ -7,7 +7,7 @@ export const jokeGptPipeline = aigur.pipeline.create({
 		subject: z.string(),
 	}),
 	output: z.object({
-		text: z.string(),
+		joke: z.string(),
 	}),
 	flow: (flow) =>
 		flow.text.modify
@@ -19,6 +19,6 @@ export const jokeGptPipeline = aigur.pipeline.create({
 				prompt: prev.text,
 			}))
 			.output(({ prev }) => ({
-				text: prev.text,
+				joke: prev.text,
 			})),
 });

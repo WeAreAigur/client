@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { jokeGptPipeline } from '#/pipelines/jokegpt';
+import { useState } from 'react';
 
 jokeGptPipeline.onProgress((node, type) => {
 	console.log('progress', node, type);
@@ -16,16 +16,13 @@ export function JokeForm(props: JokeFormProps) {
 		e.preventDefault();
 		setInProgress(true);
 		jokeGptPipeline.vercel.invoke({ subject }).then((data) => {
-			setJoke(data.text);
+			setJoke(data.joke);
 			setInProgress(false);
 		});
 	};
 
 	return (
-		<form
-			onSubmit={submit}
-			className="flex flex-col items-center py-6 space-y-4 md:space-x-4 md:space-y-0 md:flex-row"
-		>
+		<form onSubmit={submit} className="flex flex-col items-center py-6 space-y-4">
 			<div className="form-control">
 				<div className="input-group">
 					<input

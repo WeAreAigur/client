@@ -9,6 +9,7 @@ import {
 	whisperNode,
 } from './nodes/nodesDefinitions';
 import { outputNode } from './nodes/output/output';
+import { gpt3PredictionStreamNode } from './nodes/text/prediction/gpt3.stream';
 import { ConcreteNode, NodeDefinition } from './types';
 
 export class Builder<
@@ -35,6 +36,7 @@ export class Builder<
 		): Builder<Input, Output, [...NodeDefinitions, NextNode]> => {
 			const input = this.setPlaceholderValues(this.input.keyof().options, 'input');
 			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
+			console.log(`***nodeDefinition`, nodeDefinition);
 			const node = {
 				...nodeDefinition,
 				input: getUserInput({
@@ -84,6 +86,7 @@ export class Builder<
 		},
 		prediction: {
 			gpt3: this.nodeFactory(gpt3PredictionNode),
+			gpt3Stream: this.nodeFactory(gpt3PredictionStreamNode),
 		},
 	};
 

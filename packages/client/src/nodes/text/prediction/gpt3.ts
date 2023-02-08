@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	prompt: z.string(),
 	model: z.string().default('text-davinci-003'),
 	temperature: z.number().default(0.7),
@@ -11,11 +11,12 @@ const inputSchema = z.object({
 	n: z.number().default(1),
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	text: z.string(),
 });
 
-async function action(
+
+export async function action(
 	input: z.input<typeof inputSchema>,
 	apiKeys: Record<string, string>
 ): Promise<z.infer<typeof outputSchema>> {

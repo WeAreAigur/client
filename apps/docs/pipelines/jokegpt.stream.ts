@@ -5,13 +5,12 @@ console.log(`***typeof window !== 'undefined'`, typeof window !== 'undefined');
 console.log(`***ReadableStream`, typeof ReadableStream !== 'undefined');
 
 export const jokeGptPipelineStream = aigur.pipeline.create({
-	id: 'jokegpt.stream',
+	id: 'jokegptStream',
+	stream: true,
 	input: z.object({
 		subject: z.string(),
 	}),
-	output: z.object({
-		joke: z.instanceof(ReadableStream),
-	}),
+	output: z.instanceof(ReadableStream),
 	flow: (flow) =>
 		flow.text.modify
 			.simple(({ input }) => ({
@@ -20,8 +19,6 @@ export const jokeGptPipelineStream = aigur.pipeline.create({
 			}))
 			.text.prediction.gpt3Stream(({ prev }) => ({
 				prompt: prev.text,
-			})),
-	// .output(({ prev }) => ({
-	// 	joke: new ReadableStream(),
-	// })),
+			}))
+			.output(({ prev }) => prev as ReadableStream),
 });

@@ -1,24 +1,30 @@
-import { jokeGptPipeline } from '#/pipelines/jokegpt';
 import { useState } from 'react';
 
-jokeGptPipeline.onProgress((node, type) => {
-	console.log('progress', node, type);
-});
+// jokeGptPipeline.onProgress((node, type) => {
+// 	console.log('progress', node, type);
+// });
 
 interface JokeFormProps {}
 
 export function JokeForm(props: JokeFormProps) {
 	const [subject, setSubject] = useState<string>('');
 	const [inProgress, setInProgress] = useState<boolean>(false);
-	const [joke, setJoke] = useState<string | null>(null);
+	const [joke, setJoke] = useState<string>('');
 
-	const submit = (e: any) => {
+	const submit = async (e: any) => {
 		e.preventDefault();
 		setInProgress(true);
-		jokeGptPipeline.vercel.invoke({ subject }).then((data) => {
-			setJoke(data.joke);
-			setInProgress(false);
-		});
+		const { jokegptStream, jokegpt } = await import('#/pipelines/pipelines').then(
+			(mod) => mod.pipelines
+		);
+		const { joke } = await jokegpt.vercel.invoke({ subject });
+		setJoke(joke);
+		setInProgress(false);
+		// jokegptStream.vercel.invokeStream({ subject }, (res) => {
+		// 	console.log(`***joke`, res);
+		// 	setJoke((prev) => prev + res);
+		// 	setInProgress(false);
+		// });
 	};
 
 	return (

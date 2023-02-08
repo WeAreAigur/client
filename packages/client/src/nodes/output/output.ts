@@ -1,14 +1,5 @@
 import { z } from 'zod';
 
-const inputSchema = z.object({
-	text: z.string(),
-	modifier: z.string(),
-});
-
-const outputSchema = z.object({
-	text: z.string(),
-});
-
 export const outputNode = <InputOutput>() => ({
 	id: 'output',
 	schema: {
@@ -16,6 +7,7 @@ export const outputNode = <InputOutput>() => ({
 		output: z.object({}) as InputOutput,
 	},
 	async action(input: InputOutput): Promise<InputOutput> {
+		console.log(`***input!!!!`, input);
 		return input;
 	},
 });

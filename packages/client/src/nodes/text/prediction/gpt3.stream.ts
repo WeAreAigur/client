@@ -9,9 +9,7 @@ const inputSchema = gpt3BaseInputSchema.merge(
 	})
 );
 
-const outputSchema = z.object({
-	text: z.instanceof(ReadableStream),
-});
+const outputSchema = z.instanceof(ReadableStream);
 
 async function action(
 	input: z.input<typeof inputSchema>,
@@ -29,7 +27,7 @@ async function action(
 	});
 
 	const stream = await OpenAIStream(response);
-	return { text: stream };
+	return stream;
 }
 
 export const gpt3PredictionStreamNode = {

@@ -5,10 +5,11 @@ import { Builder } from './builder';
 export interface PipelineConf {
 	id: string;
 	input: z.AnyZodObject;
-	output: z.AnyZodObject;
+	output: z.AnyZodObject | ZodReadableStream;
 	flow: Builder<z.AnyZodObject, z.AnyZodObject, []>;
 	apiKeys: Record<string, string>;
 	retries: number;
+	stream: boolean;
 	progressListeners: Record<string, (node: ConcreteNode<any, any>, type: ProgressType) => void>;
 }
 
@@ -30,3 +31,9 @@ export type ConcreteNode<
 };
 
 export type ProgressType = 'start' | 'end' | 'stream';
+
+export type ZodReadableStream = z.ZodType<
+	InstanceType<typeof ReadableStream>,
+	z.ZodTypeDef,
+	InstanceType<typeof ReadableStream>
+>;

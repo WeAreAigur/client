@@ -1,11 +1,28 @@
-export function getInputByContext(rawInput: Record<string, any>, values: Record<string, any>) {
+import { z } from 'zod';
+
+export function getInputByContext(
+	rawInput: Record<string, any> | z.ZodEffects<any>,
+	values: Record<string, any>
+) {
+	console.log(`***rawInput`, rawInput);
+	if (rawInput instanceof z.ZodEffects<any>) {
+		return values['1'];
+	}
 	const input: Record<string, any> = { ...rawInput };
 
 	return getInputContextInner(input);
 
 	function getInputContextInner(input: Record<string, any>) {
+		// if (value instanceof ReadableStream) {
+		// 	console.log(`***ReadableStream!!!`);
+		// 	input[key] = newValue;
+		// 	continue;
+		// }
+
 		for (const key in input) {
 			const value = input[key];
+
+			console.log(`***value`, value);
 
 			if (Array.isArray(value)) {
 				input[key] = value.map((item) => getInputContextInner(item));
@@ -16,8 +33,8 @@ export function getInputByContext(rawInput: Record<string, any>, values: Record<
 				continue;
 			}
 
-			const contextReferences = getContextReferences(value);
 			let newValue: any = value;
+			const contextReferences = getContextReferences(value);
 
 			for (let ref of contextReferences) {
 				const contextValue = values[ref.nodeId];
@@ -40,7 +57,7 @@ export function getInputByContext(rawInput: Record<string, any>, values: Record<
 
 			input[key] = newValue;
 		}
-
+		console.log(`***input`, input);
 		return input;
 	}
 

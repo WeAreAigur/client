@@ -10,11 +10,11 @@ import {
 } from './nodes/nodesDefinitions';
 import { outputNode } from './nodes/output/output';
 import { gpt3PredictionStreamNode } from './nodes/text/prediction/gpt3.stream';
-import { ConcreteNode, NodeDefinition } from './types';
+import { ConcreteNode, NodeDefinition, ZodReadableStream } from './types';
 
 export class Builder<
 	Input extends z.ZodObject<any, any, any>,
-	Output extends z.ZodObject<any, any, any>,
+	Output extends z.ZodObject<any, any, any> | ZodReadableStream,
 	NodeDefinitions extends ConcreteNode<any, any>[]
 > {
 	constructor(private input: Input, private nodes: NodeDefinitions) {}
@@ -36,7 +36,6 @@ export class Builder<
 		): Builder<Input, Output, [...NodeDefinitions, NextNode]> => {
 			const input = this.setPlaceholderValues(this.input.keyof().options, 'input');
 			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
-			console.log(`***nodeDefinition`, nodeDefinition);
 			const node = {
 				...nodeDefinition,
 				input: getUserInput({
@@ -44,10 +43,12 @@ export class Builder<
 					prev: prev.output,
 					input,
 				}),
-				output: this.setPlaceholderValues<NextNode>(
-					nodeDefinition.schema.output.keyof().options,
-					this.nodes.length
-				),
+				output: nodeDefinition.schema.output.keyof
+					? this.setPlaceholderValues<NextNode>(
+							nodeDefinition.schema.output.keyof().options,
+							this.nodes.length
+					  )
+					: nodeDefinition.schema.output,
 			} as ConcreteNode<NodeDef['schema']['input'], NodeDef['schema']['output']>;
 
 			this.nodes.push(node);

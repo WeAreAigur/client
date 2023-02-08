@@ -5,6 +5,8 @@ export async function vercelGenericEdge(pipelines, req) {
 		return new Response('Missing id', { status: 400 });
 	}
 	const id = searchParams.get('id') as string;
-	const output = await (pipelines as any)[id].invoke(input);
-	return output;
+	const pipeline = (pipelines as any)[id];
+	console.log(`***pipeline`, pipeline.conf.stream);
+	const output = await pipeline.invoke(input);
+	return { output, pipeline };
 }

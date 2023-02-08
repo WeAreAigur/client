@@ -12,8 +12,8 @@ const outputSchema = z.object({
 export const outputNode = <InputOutput>() => ({
 	id: 'output',
 	schema: {
-		input: {} as InputOutput,
-		output: {} as InputOutput,
+		input: z.object({}) as InputOutput,
+		output: z.object({}) as InputOutput,
 	},
 	async action(input: InputOutput): Promise<InputOutput> {
 		return input;

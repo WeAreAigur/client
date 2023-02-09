@@ -2,16 +2,17 @@ import { z } from 'zod';
 
 import { Builder } from './builder';
 
-export interface PipelineConf {
+export interface PipelineConf<Input, Output> {
 	id: string;
-	input: z.AnyZodObject;
-	output: z.AnyZodObject | ZodReadableStream;
-	flow: Builder<z.AnyZodObject, z.AnyZodObject, []>;
-	apiKeys: Record<string, string>;
-	retries: number;
-	stream: boolean;
-	retryDelayInMs: number;
-	updateProgress: boolean;
+	input: Input;
+	output: Output;
+	flow: (
+		builder: Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, []>
+	) => Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any>;
+	retries?: number;
+	stream?: boolean;
+	retryDelayInMs?: number;
+	updateProgress?: boolean;
 }
 
 export type NodeDefinition<Input extends z.AnyZodObject, Output extends z.AnyZodObject> = {
@@ -38,3 +39,9 @@ export type ZodReadableStream = z.ZodType<
 	z.ZodTypeDef,
 	InstanceType<typeof ReadableStream>
 >;
+
+export type APIKeys = Record<string, string> & {
+	openai?: string;
+	stability?: string;
+	googleapis?: string;
+};

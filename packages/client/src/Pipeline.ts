@@ -20,7 +20,7 @@ export class Pipeline<
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
-		public readonly flow: Builder<z.AnyZodObject, z.AnyZodObject, []>,
+		public readonly flow: Builder<z.AnyZodObject, z.AnyZodObject, [], null>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToProgressEvents();
@@ -74,8 +74,6 @@ export class Pipeline<
 			const { value, done: doneReading } = await reader.read();
 			done = doneReading;
 			const chunkValue = decoder.decode(value);
-			console.log(`***value`, value);
-			console.log(`***chunkValue`, chunkValue);
 			cb(chunkValue);
 		}
 	}
@@ -134,7 +132,7 @@ export class Pipeline<
 				do {
 					attemptCount++;
 					try {
-						lastValue = await executeAction(nodes, i);
+						lastValue = await this.executeAction(nodes, i, values);
 						values[i] = lastValue;
 						isSuccess = true;
 					} catch (e) {
@@ -150,16 +148,16 @@ export class Pipeline<
 			}
 
 			return lastValue;
-
-			async function executeAction(nodes, index) {
-				const { action, schema, input } = nodes[index];
-				const inputByContext = getInputByContext(input, values);
-				return action(inputByContext, this.apiKeys) as typeof schema.output;
-			}
 		} catch (e) {
 			console.error(e);
 			throw e;
 		}
+	}
+
+	private async executeAction(nodes, index, values) {
+		const { action, schema, input } = nodes[index];
+		const inputByContext = getInputByContext(input, values);
+		return action(inputByContext, this.apiKeys) as typeof schema.output;
 	}
 
 	private notifyProgress(node: any, type: 'start' | 'end' | 'stream') {

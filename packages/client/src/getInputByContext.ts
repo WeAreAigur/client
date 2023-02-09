@@ -4,61 +4,49 @@ export function getInputByContext(
 	inputPlaceholders: Record<string, any> | z.ZodEffects<any>,
 	values: Record<string, any>
 ) {
-	console.log(`***rawInput`, inputPlaceholders);
-	if (inputPlaceholders instanceof z.ZodEffects<any>) {
-		return values['1'];
+	if (typeof inputPlaceholders === 'string') {
+		return handleSingleValue(inputPlaceholders);
 	}
+
 	const input: Record<string, any> = { ...inputPlaceholders };
 
 	return getInputContextInner(input);
 
 	function getInputContextInner(input: Record<string, any>) {
-		// if (value instanceof ReadableStream) {
-		// 	console.log(`***ReadableStream!!!`);
-		// 	input[key] = newValue;
-		// 	continue;
-		// }
-
 		for (const key in input) {
-			const value = input[key];
-
-			console.log(`***value`, value);
-
-			if (Array.isArray(value)) {
-				input[key] = value.map((item) => getInputContextInner(item));
-				continue;
-			}
-			if (typeof value === 'object' && value !== null) {
-				input[key] = getInputContextInner(value);
-				continue;
-			}
-
-			let newValue: any = value;
-			const contextReferences = getContextReferences(value);
-
-			for (let ref of contextReferences) {
-				const contextValue = values[ref.nodeId];
-				const propertyValue = contextValue[ref.property];
-				if (propertyValue instanceof ArrayBuffer) {
-					newValue = propertyValue;
-					continue;
-				}
-				newValue = (newValue as string)?.replace(
-					new RegExp(escapeRegExp(ref.value)),
-					propertyValue
-				);
-
-				if (newValue === 'undefined') {
-					newValue = undefined;
-				} else if (newValue !== propertyValue && newValue === propertyValue.toString()) {
-					newValue = propertyValue;
-				}
-			}
-
-			input[key] = newValue;
+			input[key] = handleSingleValue(input[key]);
 		}
-		console.log(`***input`, input);
 		return input;
+	}
+
+	function handleSingleValue(value) {
+		if (Array.isArray(value)) {
+			return value.map((item) => getInputContextInner(item));
+		}
+		if (typeof value === 'object' && value !== null) {
+			return getInputContextInner(value);
+		}
+
+		let newValue: any = value;
+		const contextReferences = getContextReferences(value);
+
+		for (let ref of contextReferences) {
+			const contextValue = values[ref.nodeId];
+			const propertyValue = contextValue[ref.property];
+			if (propertyValue instanceof ArrayBuffer) {
+				newValue = propertyValue;
+				continue;
+			}
+			newValue = (newValue as string)?.replace(new RegExp(escapeRegExp(ref.value)), propertyValue);
+
+			if (newValue === 'undefined') {
+				newValue = undefined;
+			} else if (newValue !== propertyValue && newValue === propertyValue.toString()) {
+				newValue = propertyValue;
+			}
+		}
+
+		return newValue;
 	}
 
 	function getContextReferences(value: string) {

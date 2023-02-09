@@ -17,14 +17,14 @@ export function JokeForm(props: JokeFormProps) {
 		const { jokegptStream, jokegpt } = await import('#/pipelines/pipelines').then(
 			(mod) => mod.pipelines
 		);
-		const { joke } = await jokegpt.vercel.invoke({ subject });
-		setJoke(joke);
-		setInProgress(false);
-		// jokegptStream.vercel.invokeStream({ subject }, (res) => {
-		// 	console.log(`***joke`, res);
-		// 	setJoke((prev) => prev + res);
-		// 	setInProgress(false);
-		// });
+		// const { joke } = await jokegpt.vercel.invoke({ subject });
+		// setJoke(joke);
+		// setInProgress(false);
+		jokegptStream.vercel.invokeStream({ subject }, (res) => {
+			console.log(`***joke`, res);
+			setJoke((prev) => prev + res);
+			setInProgress(false);
+		});
 	};
 
 	return (

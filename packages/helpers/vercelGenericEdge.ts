@@ -6,7 +6,6 @@ export async function vercelGenericEdge(pipelines, req) {
 	}
 	const id = searchParams.get('id') as string;
 	const pipeline = (pipelines as any)[id];
-	console.log(`***pipeline`, pipeline.conf.stream);
 	const output = await pipeline.invoke(input);
 	return { output, pipeline };
 }

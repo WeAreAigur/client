@@ -7,7 +7,6 @@ export const outputNode = <InputOutput>() => ({
 		output: z.object({}) as InputOutput,
 	},
 	async action(input: InputOutput): Promise<InputOutput> {
-		console.log(`***input!!!!`, input);
 		return input;
 	},
 });

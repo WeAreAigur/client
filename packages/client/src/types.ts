@@ -7,8 +7,8 @@ export interface PipelineConf<Input, Output> {
 	input: Input;
 	output: Output;
 	flow: (
-		builder: Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, []>
-	) => Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any>;
+		builder: Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, [], null>
+	) => Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any, any>;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;

@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import { Builder } from './builder';
-import { delay } from './delay';
-import { getInputByContext } from './getInputByContext';
-import { makeid } from './makeid';
 import { APIKeys, ConcreteNode, PipelineConf, ProgressType, ZodReadableStream } from './types';
+import { makeid } from './makeid';
+import { getInputByContext } from './getInputByContext';
+import { delay } from './delay';
+import { Builder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -153,7 +153,8 @@ export class Pipeline<
 
 			async function executeAction(nodes, index) {
 				const { action, schema, input } = nodes[index];
-				return action(getInputByContext(input, values), this.apiKeys) as typeof schema.output;
+				const inputByContext = getInputByContext(input, values);
+				return action(inputByContext, this.apiKeys) as typeof schema.output;
 			}
 		} catch (e) {
 			console.error(e);

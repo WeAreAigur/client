@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 export function getInputByContext(
-	rawInput: Record<string, any> | z.ZodEffects<any>,
+	inputPlaceholders: Record<string, any> | z.ZodEffects<any>,
 	values: Record<string, any>
 ) {
-	console.log(`***rawInput`, rawInput);
-	if (rawInput instanceof z.ZodEffects<any>) {
+	console.log(`***rawInput`, inputPlaceholders);
+	if (inputPlaceholders instanceof z.ZodEffects<any>) {
 		return values['1'];
 	}
-	const input: Record<string, any> = { ...rawInput };
+	const input: Record<string, any> = { ...inputPlaceholders };
 
 	return getInputContextInner(input);
 

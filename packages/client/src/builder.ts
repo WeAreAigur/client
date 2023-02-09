@@ -15,7 +15,8 @@ import { ConcreteNode, NodeDefinition, ZodReadableStream } from './types';
 export class Builder<
 	Input extends z.ZodObject<any, any, any>,
 	Output extends z.ZodObject<any, any, any> | ZodReadableStream,
-	NodeDefinitions extends ConcreteNode<any, any>[]
+	NodeDefinitions extends ConcreteNode<any, any>[],
+	PrevNode extends ConcreteNode<any, any> | null
 > {
 	constructor(private input: Input, private nodes: NodeDefinitions) {}
 
@@ -23,17 +24,17 @@ export class Builder<
 		Input extends z.ZodObject<any, any, any>,
 		Output extends z.ZodObject<any, any, any>
 	>(input: Input) {
-		return new Builder<Input, Output, []>(input, []);
+		return new Builder<Input, Output, [], null>(input, []);
 	}
 
 	private nodeFactory<NodeDef extends NodeDefinition<any, any>>(nodeDefinition: NodeDef) {
 		return <NextNode extends ConcreteNode<NodeDef['schema']['input'], NodeDef['schema']['output']>>(
 			getUserInput: (data: {
 				nodes: NodeDefinitions;
-				prev: NodeDefinitions[-1]['output'];
+				prev: PrevNode extends ConcreteNode<any, any> ? PrevNode['output'] : Input;
 				input: z.output<Input>;
 			}) => z.input<NextNode['schema']['input']>
-		): Builder<Input, Output, [...NodeDefinitions, NextNode]> => {
+		): Builder<Input, Output, [...NodeDefinitions, NextNode], NextNode> => {
 			const input = this.setPlaceholderValues(this.input.keyof().options, 'input');
 			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 			const node = {
@@ -52,7 +53,7 @@ export class Builder<
 			} as ConcreteNode<NodeDef['schema']['input'], NodeDef['schema']['output']>;
 
 			this.nodes.push(node);
-			return this as any;
+			return this as unknown as Builder<Input, Output, [...NodeDefinitions, NextNode], NextNode>;
 		};
 	}
 
@@ -62,7 +63,6 @@ export class Builder<
 	): T['output'] {
 		const placeholderedOutput: T['output'] = {};
 		for (let key of outputKeys) {
-			// using nodes.length and not nodes.length - 1 because we haven't pushed the node yet
 			placeholderedOutput[key] = `$context.${index}.${key}$`;
 		}
 		return placeholderedOutput;

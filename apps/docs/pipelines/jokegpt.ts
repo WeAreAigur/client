@@ -1,5 +1,5 @@
-import { aigur } from '#/services/aigur';
 import { z } from 'zod';
+import { aigur } from '#/services/aigur';
 
 export const jokeGptPipeline = aigur.pipeline.create({
 	id: 'jokegpt',
@@ -18,7 +18,14 @@ export const jokeGptPipeline = aigur.pipeline.create({
 			.text.prediction.gpt3(({ prev }) => ({
 				prompt: prev.text,
 			}))
-			.output(({ prev }) => ({
-				joke: prev.text,
-			})),
+			.image.labeling.googleVision(({ prev }) => ({
+			image: prev.text
+			}))
+			.voice.transcribe.whisper(({ prev }) => ({
+				audio: prev.
+			}
+				))
+			// .output(({ prev }) => ({
+			// 	joke: prev.text,
+			// })),
 });

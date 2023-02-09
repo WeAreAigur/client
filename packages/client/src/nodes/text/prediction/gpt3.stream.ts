@@ -1,5 +1,5 @@
-import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 import { z } from 'zod';
+import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 
 import { inputSchema as gpt3BaseInputSchema } from './gpt3';
 
@@ -9,14 +9,13 @@ const inputSchema = gpt3BaseInputSchema.merge(
 	})
 );
 
-const outputSchema = z.instanceof(ReadableStream);
+const outputSchema = z.object({ stream: z.instanceof(ReadableStream) });
 
 async function action(
 	input: z.input<typeof inputSchema>,
 	apiKeys: Record<string, string>
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
-	console.log(`***payload`, payload);
 	const response = await fetch('https://api.openai.com/v1/completions', {
 		headers: {
 			'Content-Type': 'application/json',
@@ -27,7 +26,7 @@ async function action(
 	});
 
 	const stream = await OpenAIStream(response);
-	return stream;
+	return { stream };
 }
 
 export const gpt3PredictionStreamNode = {

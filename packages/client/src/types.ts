@@ -10,7 +10,8 @@ export interface PipelineConf {
 	apiKeys: Record<string, string>;
 	retries: number;
 	stream: boolean;
-	progressListeners: Record<string, (node: ConcreteNode<any, any>, type: ProgressType) => void>;
+	retryDelayInMs: number;
+	updateProgress: boolean;
 }
 
 export type NodeDefinition<Input extends z.AnyZodObject, Output extends z.AnyZodObject> = {

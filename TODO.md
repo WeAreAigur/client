@@ -1,6 +1,4 @@
-- streaming
-  - opt1 - should ALL pipeline responses be a stream?
-  - opt2 - mark pipeline as "stream" and stream the last node's response if relevant
+- complex flow, start from running it
 - "attach" supabase upload to builder node tree (results.upload.supabase)
 - move progress to external package that attaches to Client
   - notifyProgress => ablyProgress

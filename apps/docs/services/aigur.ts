@@ -1,10 +1,6 @@
-import { z } from 'zod';
+import { Aigur, createClient } from '@aigur/client';
 
-import { createClient } from '@aigur/client';
-
-const x = z;
-
-export const aigur = createClient({
+export const aigur: Aigur = createClient({
 	apiKeys: {
 		openai: process.env.OPENAI_KEY!,
 		stability: process.env.STABILITY_KEY!,

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { jokeGptPipeline } from './jokegpt';
 import { jokeGptPipelineStream } from './jokegpt.stream';
+import { jokeGptPipeline } from './jokegpt';
 
 const x = z;
 

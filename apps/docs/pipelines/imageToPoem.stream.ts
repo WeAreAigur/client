@@ -1,0 +1,24 @@
+import { z } from 'zod';
+import { aigur } from '#/services/aigur';
+
+export const imageToPoemStreamPipeline = aigur.pipeline.create({
+	id: 'imageToPoemStream',
+	stream: true,
+	input: z.object({
+		image: z.string(), // base64
+	}),
+	output: z.instanceof(ReadableStream),
+	flow: (flow) =>
+		flow.image.labeling
+			.googleVision(({ input }) => ({
+				image: input.image,
+			}))
+			.text.modify.simple(({ prev }) => ({
+				text: prev.labels,
+				modifier: 'Write a very short poem about an image with the following entities:\n$(text)$\n',
+			}))
+			.text.prediction.gpt3Stream(({ prev }) => ({
+				prompt: prev.text,
+			}))
+			.output(({ prev }) => prev.stream),
+});

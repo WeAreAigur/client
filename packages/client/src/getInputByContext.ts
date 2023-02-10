@@ -28,6 +28,8 @@ export function getInputByContext(
 		}
 
 		let newValue: any = value;
+		// a single string can contain multiple context references:
+		// {text: `$context.1.text$ - $context.0.text$`}
 		const contextReferences = getContextReferences(value);
 
 		for (let ref of contextReferences) {

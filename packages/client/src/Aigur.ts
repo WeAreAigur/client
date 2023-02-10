@@ -31,7 +31,9 @@ export const createClient = (opts: AigurConfiguration): Aigur => {
 					retries: conf.retries ?? DEFAULT_RETRIES,
 					retryDelayInMs: conf.retryDelayInMs ?? RETRY_DELAY_IN_MS,
 				};
-				const flow = conf.flow(new Builder(conf.input, []));
+				const flow = conf.flow(
+					new Builder<typeof conf.input, typeof conf.output, [], null>(conf.input, [])
+				);
 				return new Pipeline(pipelineConf, flow, apiKeys);
 			},
 		},

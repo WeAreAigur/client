@@ -36,7 +36,7 @@ async function action(
 	const data = await response.json();
 
 	return {
-		labels: data.responses[0].labelAnnotations,
+		labels: data.responses[0].labelAnnotations.map((label) => label.description),
 	};
 }
 

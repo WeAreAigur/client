@@ -50,6 +50,7 @@ export function getInputByContext(
 	}
 
 	function getContextReferences(value: string) {
+		if (typeof value !== 'string') return [];
 		const contextRegex = /\$context\.(\d+|input)\.(\w+)\$/g;
 		const matches = value.matchAll(contextRegex);
 		const references: any[] = [];

@@ -13,4 +13,7 @@ const withNextra = require('nextra')({
 module.exports = withNextra({
 	reactStrictMode: true,
 	transpilePackages: ['@aigur/client', '@aigur/helpers'],
+	images: {
+		domains: ['rxbcnsluyhrlazakjohf.supabase.co'],
+	},
 });

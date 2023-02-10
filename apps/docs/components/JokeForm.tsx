@@ -21,7 +21,6 @@ export function JokeForm(props: JokeFormProps) {
 		// setJoke(joke);
 		// setInProgress(false);
 		jokegptStream.vercel.invokeStream({ subject }, (res) => {
-			console.log(`***joke`, res);
 			setJoke((prev) => prev + res);
 			setInProgress(false);
 		});
@@ -39,7 +38,7 @@ export function JokeForm(props: JokeFormProps) {
 						onChange={(e) => setSubject(e.target.value)}
 					/>
 					<button className={`btn btn-square ${inProgress ? 'loading' : ''}`} type="submit">
-						GO
+						{inProgress ? '' : 'GO'}
 					</button>
 				</div>
 			</div>

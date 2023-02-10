@@ -1,3 +1,4 @@
+- why isnt stability input typed?
 - complex flow, start from running it
 - "attach" supabase upload to builder node tree (results.upload.supabase)
 - move progress to external package that attaches to Client

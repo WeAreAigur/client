@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
 const inputSchema = z.object({
-	// prompt: z.string(),
-	// negative_prompt: z.string().optional(),
 	text_prompts: z
 		.array(
 			z.object({
@@ -11,7 +9,10 @@ const inputSchema = z.object({
 			})
 		)
 		.refine((val) => val.length > 0, 'Must have at least one text prompt'),
-	model: z.enum(['stable-diffusion-v1-5']).optional().default('stable-diffusion-v1-5'),
+	model: z
+		.enum(['stable-diffusion-v1-5', 'stable-diffusion-512-v2-1', 'stable-diffusion-768-v2-1'])
+		.optional()
+		.default('stable-diffusion-v1-5'),
 	clip_guidance_preset: z
 		.enum(['NONE', 'FAST_BLUE', 'FAST_GREEN', 'SIMPLE', 'SLOW', 'SLOWER', 'SLOWEST'])
 		.optional(),

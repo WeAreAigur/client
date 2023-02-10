@@ -4,5 +4,6 @@
 	"invocation": "Invocation",
 	"remoteinvocation": "Remote Invocation",
 	"streaming": "Streaming Results",
-	"frameworks": "Frameworks"
+	"frameworks": "Frameworks",
+	"complexflows": "Complex Flows"
 }

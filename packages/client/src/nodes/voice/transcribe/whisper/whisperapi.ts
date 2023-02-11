@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { APIKeys } from '#/types';
+
+import type { APIKeys } from '../../../../types';
 
 const endpoint = 'https://transcribe.whisperapi.com';
 

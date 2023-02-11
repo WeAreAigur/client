@@ -1,5 +1,6 @@
 import '#/styles/globals.css';
 import '@code-hike/mdx/dist/index.css';
+import 'reactflow/dist/style.css';
 
 import type { AppProps } from 'next/app';
 

@@ -1,92 +1,106 @@
-import { PipelineEditor } from '../Pipeline/PipelineEditor';
+import { useEffect, useState } from 'react';
 
+import type { Pipeline } from '@aigur/client/src/Pipeline';
 interface VoiceToImagePipelineViewProps {
 	isActive: boolean;
+	inProgressNodeId: string;
+	doneProgressIds: string[];
+	getPipeline: () => Promise<Pipeline<any, any>>;
 }
 
 export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
+	const [pipeline, setPipeline] = useState<Pipeline<any, any> | null>(null);
+	useEffect(() => {
+		if (props.isActive) {
+			props.getPipeline().then(setPipeline);
+		}
+	}, [props, props.getPipeline]);
 	return (
-		<PipelineEditor
-			className="h-[750px]"
-			nodes={[
-				{
-					id: '0',
-					label: 'String to ArrayBuffer',
-					definition: {
-						type: 'transformation',
-					},
-				},
-				{
-					id: '1',
-					label: 'Supabase Upload Audio',
-					definition: {
-						type: 'custom',
-					},
-				},
-				{
-					id: '2',
-					label: 'Whisper',
-					definition: {
-						type: 'provider',
-						label: 'WhisperAPI',
-					},
-				},
-				{
-					id: '3',
-					label: 'Enhance Prompt',
-					definition: {
-						type: 'text modification',
-					},
-				},
-				{
-					id: '4',
-					label: 'Generate Keywords',
-					definition: {
-						type: 'provider',
-						label: 'GPT3',
-					},
-				},
-				{
-					id: '5',
-					label: 'Add Styles',
-					definition: {
-						type: 'text modification',
-					},
-				},
-				{
-					id: '6',
-					label: 'Generate Image',
-					definition: {
-						type: 'provider',
-						label: 'Stable Diffusion',
-					},
-				},
-				{
-					id: '7',
-					label: 'Supabase Upload Image',
-					definition: {
-						type: 'custom',
-					},
-				},
-				{
-					id: '8',
-					label: 'Output',
-					definition: {
-						type: 'output',
-					},
-				},
-			]}
-			edges={[
-				{ id: '0-1', source: '0', target: '1' },
-				{ id: '1-2', source: '1', target: '2' },
-				{ id: '2-3', source: '2', target: '3' },
-				{ id: '3-4', source: '3', target: '4' },
-				{ id: '4-5', source: '4', target: '5' },
-				{ id: '5-6', source: '5', target: '6' },
-				{ id: '6-7', source: '6', target: '7' },
-				{ id: '7-8', source: '7', target: '8' },
-			]}
-			isActive={props.isActive}
-		/>
+		<div>pipelineeditor</div>
+		// <PipelineEditor
+		// 	className="h-[750px]"
+		// 	pipeline={props.pipeline}
+		// 	inProgressNodeId={props.inProgressNodeId}
+		// 	doneProgressIds={props.doneProgressIds}
+		// 	nodes={[
+		// 		{
+		// 			id: '0',
+		// 			label: 'String to ArrayBuffer',
+		// 			definition: {
+		// 				type: 'transformation',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '1',
+		// 			label: 'Supabase Upload Audio',
+		// 			definition: {
+		// 				type: 'custom',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '2',
+		// 			label: 'Whisper',
+		// 			definition: {
+		// 				type: 'provider',
+		// 				label: 'WhisperAPI',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '3',
+		// 			label: 'Enhance Prompt',
+		// 			definition: {
+		// 				type: 'text modification',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '4',
+		// 			label: 'Generate Keywords',
+		// 			definition: {
+		// 				type: 'provider',
+		// 				label: 'GPT3',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '5',
+		// 			label: 'Add Styles',
+		// 			definition: {
+		// 				type: 'text modification',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '6',
+		// 			label: 'Generate Image',
+		// 			definition: {
+		// 				type: 'provider',
+		// 				label: 'Stable Diffusion',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '7',
+		// 			label: 'Supabase Upload Image',
+		// 			definition: {
+		// 				type: 'custom',
+		// 			},
+		// 		},
+		// 		{
+		// 			id: '8',
+		// 			label: 'Output',
+		// 			definition: {
+		// 				type: 'output',
+		// 			},
+		// 		},
+		// 	]}
+		// 	edges={[
+		// 		{ id: '0-1', source: '0', target: '1' },
+		// 		{ id: '1-2', source: '1', target: '2' },
+		// 		{ id: '2-3', source: '2', target: '3' },
+		// 		{ id: '3-4', source: '3', target: '4' },
+		// 		{ id: '4-5', source: '4', target: '5' },
+		// 		{ id: '5-6', source: '5', target: '6' },
+		// 		{ id: '6-7', source: '6', target: '7' },
+		// 		{ id: '7-8', source: '7', target: '8' },
+		// 	]}
+		// 	isActive={props.isActive}
+		// />
 	);
 }

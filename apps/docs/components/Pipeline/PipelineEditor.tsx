@@ -1,4 +1,5 @@
 'use client';
+import type { Pipeline } from '@aigur/client/src/Pipeline';
 import ReactFlow, {
     Background, BackgroundVariant, Edge, Panel, ReactFlowProvider, useEdgesState, useNodesState
 } from 'reactflow';
@@ -13,6 +14,9 @@ export interface PipelineEditorProps {
 	zoom?: number;
 	isHorizontal?: boolean;
 	className?: string;
+	inProgressNodeId: string;
+	doneProgressIds: string[];
+	pipeline: Pipeline<any, any>;
 }
 
 const nodeTypes = {
@@ -20,7 +24,16 @@ const nodeTypes = {
 };
 
 export function PipelineEditor(props: PipelineEditorProps) {
-	const [nodes] = useNodesState(convertNodes(props.nodes, props.edges, props.isHorizontal));
+	const [nodes] = useNodesState(
+		convertNodes(
+			props.nodes,
+			props.edges,
+			props.isHorizontal,
+			props.inProgressNodeId,
+			props.doneProgressIds,
+			props.pipeline
+		)
+	);
 	const [edges] = useEdgesState(props.edges);
 	const zoomLevel = props.zoom ?? 0.4;
 	const isDesktop = typeof window !== 'undefined' && window.innerWidth > 768;

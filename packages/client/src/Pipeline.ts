@@ -15,7 +15,7 @@ export class Pipeline<
 > {
 	public readonly progressListeners: Map<
 		string,
-		(node: ConcreteNode<any, any>, type: ProgressType) => void
+		(node: ConcreteNode<any, any>, type: ProgressType, index: number) => void
 	> = new Map();
 
 	constructor(
@@ -89,8 +89,9 @@ export class Pipeline<
 		},
 	};
 
-	public onProgress(cb: (node: ConcreteNode<any, any>, type: ProgressType) => void) {
+	public onProgress(cb: (node: ConcreteNode<any, any>, type: ProgressType, index: number) => void) {
 		const id = makeid();
+		console.log(`listening to progress ${id}`);
 		this.progressListeners[id] = cb;
 		return () => {
 			delete this.progressListeners[id];
@@ -98,18 +99,25 @@ export class Pipeline<
 	}
 
 	private listenToProgressEvents() {
-		if (this.conf.updateProgress && typeof window !== 'undefined' && this.apiKeys?.ably) {
-			const dataEndpoint = `https://realtime.ably.io/event-stream?channels=bla&v=1.2&key=${this.apiKeys.ably}&enveloped=false`;
-			const eventSource = new EventSource(dataEndpoint);
-			eventSource.onmessage = (event) => {
-				const data = JSON.parse(event.data);
-				if (data.name === 'progress') {
-					Object.values(this.progressListeners).forEach((listener) =>
-						listener(data.node, data.type)
-					);
-				}
-			};
+		if (
+			!this.conf.updateProgress ||
+			typeof window === 'undefined' ||
+			!this.apiKeys?.ablySubscribe
+		) {
+			return;
 		}
+		console.log(`LISTENING TO PROGRESS EVENTS`);
+		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client-temp-channel&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
+		const eventSource = new EventSource(dataEndpoint);
+		eventSource.onmessage = (event) => {
+			const e = JSON.parse(event.data);
+			console.log(`GOT PROGRESS EVENT`, e);
+			if (e.name === 'progress') {
+				Object.values(this.progressListeners).forEach((listener) =>
+					listener(e.data.node, e.data.type, e.data.index)
+				);
+			}
+		};
 	}
 
 	private async invokePipeline<
@@ -126,7 +134,7 @@ export class Pipeline<
 			let startProgressPromise;
 
 			for (let i = 0; i < nodes.length; i++) {
-				startProgressPromise = this.notifyProgress(nodes[i], 'start');
+				startProgressPromise = this.notifyProgress(nodes[i], 'start', i);
 				let attemptCount = 0;
 				let isSuccess = false;
 				do {
@@ -144,7 +152,7 @@ export class Pipeline<
 				} while (!isSuccess && attemptCount <= retriesCount);
 				// we wait here as to not delay the execution itself
 				await startProgressPromise;
-				await this.notifyProgress(nodes[i], 'end');
+				await this.notifyProgress(nodes[i], 'end', i);
 			}
 
 			return lastValue;
@@ -160,27 +168,30 @@ export class Pipeline<
 		return action(inputByContext, this.apiKeys) as typeof schema.output;
 	}
 
-	private notifyProgress(node: any, type: 'start' | 'end' | 'stream') {
-		if (
-			!this.conf.updateProgress ||
-			Object.keys(this.progressListeners).length === 0 ||
-			!this.apiKeys.ably
-		) {
+	private notifyProgress(node: any, type: 'start' | 'end' | 'stream', index: number) {
+		console.log(`should notify progress?`);
+		if (!this.conf.updateProgress || !this.apiKeys.ablyPublish) {
 			return;
 		}
-		return fetch('https://rest.ably.io/channels/bla/messages?enveloped=false ', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Basic ${btoa(this.apiKeys.ably)}`,
-			},
-			body: JSON.stringify({
-				name: 'progress',
-				data: {
-					node,
-					type,
+		console.log(`notifying progress`, node.id, type);
+
+		return fetch(
+			'https://rest.ably.io/channels/aigur-client-temp-channel/messages?enveloped=false ',
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Basic ${btoa(this.apiKeys.ablyPublish)}`,
 				},
-			}),
-		});
+				body: JSON.stringify({
+					name: 'progress',
+					data: {
+						node,
+						type,
+						index,
+					},
+				}),
+			}
+		);
 	}
 }

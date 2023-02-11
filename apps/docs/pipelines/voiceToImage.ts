@@ -5,6 +5,7 @@ import { supabaseUpload } from '@aigur/helpers/supabase';
 
 export const voiceToImagePipeline = aigur.pipeline.create({
 	id: 'voiceToImage',
+	updateProgress: true,
 	input: z.object({
 		audio: z.string(),
 	}),

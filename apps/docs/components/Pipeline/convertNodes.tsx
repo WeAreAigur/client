@@ -1,3 +1,4 @@
+import type { Pipeline } from '@aigur/client/src/Pipeline';
 import { Edge, Node as RFNode, Position } from 'reactflow';
 
 const nodeHeight = 200;
@@ -6,11 +7,14 @@ const nodeWidth = 300;
 export function convertNodes(
 	nodes: any[],
 	edges: Edge<any>[],
-	isHorizontal: boolean = false
+	isHorizontal: boolean = false,
+	inProgressNode: string,
+	doneProgressNodes: string[],
+	pipeline: Pipeline<any, any>
 ): RFNode<any>[] {
-	const nodeMap: Record<string, Node> = {};
-	for (const node of nodes) {
-		nodeMap[node.id.toString()] = node;
+	const nodeMap: Record<string, any> = {};
+	for (let i = 0; i < nodes.length; i++) {
+		nodeMap[i.toString()] = nodes[i];
 	}
 
 	const convertedNodes: RFNode[] = [];
@@ -18,10 +22,17 @@ export function convertNodes(
 	let i = 0;
 	for (const edge of edges) {
 		const sourceNode = nodeMap[edge.source];
-		convertedNodes.push(convertNode(sourceNode, i === 0, false, isHorizontal));
+		const isInProgress = inProgressNode === sourceNode.id;
+		const isDone = doneProgressNodes.includes(sourceNode.id);
+		console.log(`node ${edge.source}`, { isInProgress, isDone, id: edge.source });
+		convertedNodes.push(
+			convertNode(sourceNode, i === 0, false, isHorizontal, isInProgress, isDone, pipeline)
+		);
 		if (i === edges.length - 1) {
 			const targetNode = nodeMap[edge.target];
-			convertedNodes.push(convertNode(targetNode, false, true, isHorizontal));
+			convertedNodes.push(
+				convertNode(targetNode, false, true, isHorizontal, isInProgress, isDone, pipeline)
+			);
 		}
 		i++;
 	}
@@ -32,7 +43,10 @@ export function convertNodes(
 		node: any,
 		isFirst: boolean,
 		isLast: boolean,
-		isHorizontal: boolean
+		isHorizontal: boolean,
+		isInProgress: boolean,
+		isDone: boolean,
+		pipeline: Pipeline<any, any>
 	): RFNode<any> {
 		return {
 			id: node.id.toString(),
@@ -49,6 +63,9 @@ export function convertNodes(
 						? [{ position: isHorizontal ? Position.Right : Position.Bottom, type: 'source' }]
 						: []),
 				],
+				isInProgress,
+				isDone,
+				pipeline,
 			},
 			position: {
 				x: isHorizontal ? nodeWidth * (i + (isLast ? 1 : 0)) : 0,

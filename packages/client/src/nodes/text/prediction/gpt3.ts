@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { APIKeys } from '#/types';
 
 export const inputSchema = z.object({
 	prompt: z.string(),
@@ -15,10 +16,9 @@ export const outputSchema = z.object({
 	text: z.string(),
 });
 
-
 export async function action(
 	input: z.input<typeof inputSchema>,
-	apiKeys: Record<string, string>
+	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
 	const response = await fetch('https://api.openai.com/v1/completions', {

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { APIKeys } from '#/types';
 
 import { inputSchema as gpt3BaseInputSchema } from './gpt3';
 
@@ -13,7 +14,7 @@ const outputSchema = z.object({ stream: z.instanceof(ReadableStream) });
 
 async function action(
 	input: z.input<typeof inputSchema>,
-	apiKeys: Record<string, string>
+	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
 	const response = await fetch('https://api.openai.com/v1/completions', {

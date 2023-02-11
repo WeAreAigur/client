@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { APIKeys } from '#/types';
 
 const inputSchema = z.object({
 	text_prompts: z
@@ -45,7 +46,7 @@ const outputSchema = z.object({
 
 async function action(
 	input: z.input<typeof inputSchema>,
-	apiKeys: Record<string, string>
+	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
 	const endpoint = `https://api.stability.ai/v1beta/generation/${payload.model}/text-to-image`;
@@ -53,7 +54,7 @@ async function action(
 		headers: {
 			'Content-Type': 'application/json',
 			Accept: 'image/png',
-			Authorization: apiKeys.stability,
+			Authorization: apiKeys.stability!,
 		},
 		method: 'POST',
 		body: JSON.stringify(payload),

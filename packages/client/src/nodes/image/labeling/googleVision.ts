@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { APIKeys } from '#/types';
 
 const inputSchema = z.object({
 	image: z.string(), // base64
@@ -10,7 +11,7 @@ const outputSchema = z.object({
 
 async function action(
 	input: z.input<typeof inputSchema>,
-	apiKeys: Record<string, string>
+	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
 	const endpoint = `https://vision.googleapis.com/v1/images:annotate?key=${apiKeys.googleapis!}`;

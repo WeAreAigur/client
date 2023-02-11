@@ -44,4 +44,5 @@ export type APIKeys = Record<string, string> & {
 	openai?: string;
 	stability?: string;
 	googleapis?: string;
+	whisperapi?: string;
 };

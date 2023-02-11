@@ -1,5 +1,7 @@
+- upload audio to supabase before running whisper
 - why isnt stability input typed?
 - complex flow, start from running it
+- doctype for a node about the needed api key and usage
 - "attach" supabase upload to builder node tree (results.upload.supabase)
 - move progress to external package that attaches to Client
   - notifyProgress => ablyProgress

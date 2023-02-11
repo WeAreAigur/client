@@ -1,16 +1,12 @@
 import { z } from 'zod';
 
-import {
-	enhanceWithKeywordsNode,
-	googleVisionNode,
-	gpt3PredictionNode,
-	simpleModificationNode,
-	stabilityTextToImageNode,
-	whisperNode,
-} from './nodes/nodesDefinitions';
-import { outputNode } from './nodes/output/output';
-import { gpt3PredictionStreamNode } from './nodes/text/prediction/gpt3.stream';
 import { ConcreteNode, NodeDefinition, ZodReadableStream } from './types';
+import { gpt3PredictionStreamNode } from './nodes/text/prediction/gpt3.stream';
+import { outputNode } from './nodes/output/output';
+import {
+    enhanceWithKeywordsNode, googleVisionNode, gpt3PredictionNode, simpleModificationNode,
+    stabilityTextToImageNode, stringToArrayBufferNode, whisperApiNode
+} from './nodes/nodesDefinitions';
 
 export class Builder<
 	Input extends z.ZodObject<any, any, any>,
@@ -76,7 +72,9 @@ export class Builder<
 
 	voice = {
 		transcribe: {
-			whisper: this.nodeFactory(whisperNode),
+			whisper: {
+				whisperapi: this.nodeFactory(whisperApiNode),
+			},
 		},
 	};
 
@@ -103,6 +101,10 @@ export class Builder<
 	};
 
 	output = this.nodeFactory(outputNode<Output>());
+
+	transformation = {
+		stringToArrayBuffer: this.nodeFactory(stringToArrayBufferNode),
+	};
 
 	getNodes() {
 		return this.nodes;

@@ -22,7 +22,8 @@
 				"SUPABASE_SERVICE_KEY",
 				"GOOGLE_KEY",
 				"ABLY_KEY",
-				"NEXT_PUBLIC_ABLY_KEY"
+				"NEXT_PUBLIC_ABLY_KEY",
+				"WHISPERAPI_KEY"
 			],
 			"outputs": [".next/**"]
 		}

@@ -11,7 +11,7 @@ const inputSchema = gpt3BaseInputSchema.merge(
 	})
 );
 
-const outputSchema = z.object({ stream: z.instanceof(ReadableStream) });
+const outputSchema = z.object({ stream: z.instanceof(globalThis.ReadableStream ?? Object) });
 
 async function action(
 	input: z.input<typeof inputSchema>,

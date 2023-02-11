@@ -14,8 +14,6 @@ export interface PipelineEditorProps {
 	zoom?: number;
 	isHorizontal?: boolean;
 	className?: string;
-	inProgressNodeId: string;
-	doneProgressIds: string[];
 	pipeline: Pipeline<any, any>;
 }
 
@@ -25,14 +23,7 @@ const nodeTypes = {
 
 export function PipelineEditor(props: PipelineEditorProps) {
 	const [nodes] = useNodesState(
-		convertNodes(
-			props.nodes,
-			props.edges,
-			props.isHorizontal,
-			props.inProgressNodeId,
-			props.doneProgressIds,
-			props.pipeline
-		)
+		convertNodes(props.nodes, props.edges, props.isHorizontal, props.pipeline)
 	);
 	const [edges] = useEdgesState(props.edges);
 	const zoomLevel = props.zoom ?? 0.4;

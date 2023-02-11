@@ -3,10 +3,6 @@ import Image from 'next/image';
 
 import { ImageType, ImageUpload } from './ImageUpload';
 
-// jokeGptPipeline.onProgress((node, type) => {
-// 	console.log('progress', node, type);
-// });
-
 interface ImageToPoemProps {}
 
 export function ImageToPoem(props: ImageToPoemProps) {

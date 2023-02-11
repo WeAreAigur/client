@@ -34,7 +34,6 @@ export const createClient = (opts: AigurConfiguration): Aigur => {
 				const flow = conf.flow(
 					new Builder<typeof conf.input, typeof conf.output, [], null>(conf.input, [])
 				);
-				console.log(`creating a new pipeline`);
 				return new Pipeline(pipelineConf, flow, apiKeys);
 			},
 		},

@@ -1,9 +1,5 @@
 import { useState } from 'react';
 
-// jokeGptPipeline.onProgress((node, type) => {
-// 	console.log('progress', node, type);
-// });
-
 interface JokeFormProps {}
 
 export function JokeForm(props: JokeFormProps) {

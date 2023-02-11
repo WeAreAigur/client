@@ -91,7 +91,6 @@ export class Pipeline<
 
 	public onProgress(cb: (node: ConcreteNode<any, any>, type: ProgressType, index: number) => void) {
 		const id = makeid();
-		console.log(`listening to progress ${id}`);
 		this.progressListeners[id] = cb;
 		return () => {
 			delete this.progressListeners[id];
@@ -106,12 +105,10 @@ export class Pipeline<
 		) {
 			return;
 		}
-		console.log(`LISTENING TO PROGRESS EVENTS`);
 		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client-temp-channel&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
 		const eventSource = new EventSource(dataEndpoint);
 		eventSource.onmessage = (event) => {
 			const e = JSON.parse(event.data);
-			console.log(`GOT PROGRESS EVENT`, e);
 			if (e.name === 'progress') {
 				Object.values(this.progressListeners).forEach((listener) =>
 					listener(e.data.node, e.data.type, e.data.index)
@@ -169,11 +166,9 @@ export class Pipeline<
 	}
 
 	private notifyProgress(node: any, type: 'start' | 'end' | 'stream', index: number) {
-		console.log(`should notify progress?`);
 		if (!this.conf.updateProgress || !this.apiKeys.ablyPublish) {
 			return;
 		}
-		console.log(`notifying progress`, node.id, type);
 
 		return fetch(
 			'https://rest.ably.io/channels/aigur-client-temp-channel/messages?enveloped=false ',

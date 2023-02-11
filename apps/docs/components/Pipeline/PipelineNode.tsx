@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react';
 
 import type { Pipeline } from '@aigur/client/src/Pipeline';
 
-// import { useAigur } from '../services/Aigur';
-
 export interface PipelineNodeProps {
 	id: string;
 	data: {
@@ -15,8 +13,6 @@ export interface PipelineNodeProps {
 			type: 'target' | 'source';
 			position: Position;
 		}[];
-		isInProgress: boolean;
-		isDone: boolean;
 		pipeline: Pipeline<any, any>;
 	};
 }
@@ -27,32 +23,18 @@ function upperFirst(str: string) {
 
 export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
-	const [output, setOutput] = useState<any>(null);
-	// const aigur = useAigur();
 
 	useEffect(() => {
-		console.log('change detected');
-		if (props.data.isDone) {
-			console.log('changing status to done');
-			setStatus('done');
-		} else if (props.data.isInProgress) {
-			console.log('changing status to inProgress');
-			setStatus('inProgress');
-		}
-	}, [props.data.isInProgress, props.data.isDone]);
-
-	// useEffect(() => {
-	// 	return aigur.onPipelineProgress((progress) => {
-	// 		if (progress.nodeId.toString() === props.id) {
-	// 			if (progress.type === 'start') {
-	// 				setStatus('inProgress');
-	// 			} else if (progress.type === 'finish') {
-	// 				setStatus('done');
-	// 				setOutput(progress.output);
-	// 			}
-	// 		}
-	// 	});
-	// }, [aigur, props.id]);
+		props.data.pipeline.onProgress((node, type, index) => {
+			if (index.toString() === props.id) {
+				if (type === 'start') {
+					setStatus('inProgress');
+				} else if (type === 'end') {
+					setStatus('done');
+				}
+			}
+		});
+	}, [props.data.pipeline, props.id]);
 
 	const borderColor = props.data.type === 'provider' ? 'border-blue-600' : 'border-pink-600';
 	const ringColor = props.data.type === 'provider' ? 'ring-blue-900' : 'ring-pink-900';
@@ -71,8 +53,6 @@ export function PipelineNode(props: PipelineNodeProps) {
 		<div
 			className={`px-4 py-2 rounded-lg bg-stone-800 border ring-2 ring-offset-2 ring-offset-zinc-900 min-h-[9rem] min-w-[14rem] w-[15rem] ${borderColor} ${ringColor}`}
 		>
-			<div>*Prog-{JSON.stringify(props.data.isInProgress)}*</div>
-			<div>*Done-{JSON.stringify(props.data.isDone)}*</div>
 			<div className="flex flex-col space-y-2 text-left">
 				<div className="text-xs text-stone-500">
 					{upperFirst(props.data.type)}

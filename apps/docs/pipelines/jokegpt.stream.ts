@@ -1,5 +1,5 @@
-import { aigur } from '#/services/aigur';
 import { z } from 'zod';
+import { aigur } from '#/services/aigur';
 
 export const jokeGptPipelineStream = aigur.pipeline.create({
 	id: 'jokegptStream',
@@ -7,7 +7,7 @@ export const jokeGptPipelineStream = aigur.pipeline.create({
 	input: z.object({
 		subject: z.string(),
 	}),
-	output: z.instanceof(ReadableStream),
+	output: z.instanceof(globalThis.ReadableStream ?? Object),
 	flow: (flow) =>
 		flow.text.modify
 			.simple(({ input }) => ({

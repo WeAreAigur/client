@@ -69,7 +69,7 @@ async function action(
 }
 
 export const stabilityTextToImageNode = {
-	id: 'image.textToImage.stability',
+	id: 'image.textToImage.stableDiffusion.stability',
 	schema: {
 		input: inputSchema,
 		output: outputSchema,

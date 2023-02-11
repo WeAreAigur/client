@@ -8,13 +8,11 @@ export function convertNodes(
 	nodes: any[],
 	edges: Edge<any>[],
 	isHorizontal: boolean = false,
-	inProgressNode: string,
-	doneProgressNodes: string[],
 	pipeline: Pipeline<any, any>
 ): RFNode<any>[] {
 	const nodeMap: Record<string, any> = {};
 	for (let i = 0; i < nodes.length; i++) {
-		nodeMap[i.toString()] = nodes[i];
+		nodeMap[nodes[i].id] = nodes[i];
 	}
 
 	const convertedNodes: RFNode[] = [];
@@ -22,17 +20,10 @@ export function convertNodes(
 	let i = 0;
 	for (const edge of edges) {
 		const sourceNode = nodeMap[edge.source];
-		const isInProgress = inProgressNode === sourceNode.id;
-		const isDone = doneProgressNodes.includes(sourceNode.id);
-		console.log(`node ${edge.source}`, { isInProgress, isDone, id: edge.source });
-		convertedNodes.push(
-			convertNode(sourceNode, i === 0, false, isHorizontal, isInProgress, isDone, pipeline)
-		);
+		convertedNodes.push(convertNode(sourceNode, i === 0, false, isHorizontal, pipeline));
 		if (i === edges.length - 1) {
 			const targetNode = nodeMap[edge.target];
-			convertedNodes.push(
-				convertNode(targetNode, false, true, isHorizontal, isInProgress, isDone, pipeline)
-			);
+			convertedNodes.push(convertNode(targetNode, false, true, isHorizontal, pipeline));
 		}
 		i++;
 	}
@@ -44,8 +35,6 @@ export function convertNodes(
 		isFirst: boolean,
 		isLast: boolean,
 		isHorizontal: boolean,
-		isInProgress: boolean,
-		isDone: boolean,
 		pipeline: Pipeline<any, any>
 	): RFNode<any> {
 		return {
@@ -63,8 +52,6 @@ export function convertNodes(
 						? [{ position: isHorizontal ? Position.Right : Position.Bottom, type: 'source' }]
 						: []),
 				],
-				isInProgress,
-				isDone,
 				pipeline,
 			},
 			position: {

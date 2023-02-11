@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-// jokeGptPipeline.onProgress((node, type) => {
-// 	console.log('progress', node, type);
-// });
-
 interface SimplePromptToImageProps {}
 
 export function SimplePromptToImage(props: SimplePromptToImageProps) {

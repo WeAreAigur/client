@@ -37,9 +37,6 @@ async function action(
 	}
 
 	const data = await result.json();
-
-	console.log(`***data`, data);
-
 	return { text: data.text.trim() };
 }
 

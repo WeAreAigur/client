@@ -20,50 +20,56 @@ const inputSchema = z.object({
 		])
 		.optional()
 		.default('MP3'),
-	voice: z.object({
-		language: z.string().optional().default('en-US'),
-		name: z
-			.enum([
-				'en-US-Standard-A',
-				'en-US-Standard-C',
-				'en-US-Standard-D',
-				'en-US-Standard-E',
-				'en-US-Standard-F',
-				'en-US-Standard-G',
-				'en-US-Standard-H',
-				'en-US-Standard-I',
-				'en-US-Standard-J',
-				'en-US-Studio-M',
-				'en-US-Studio-O',
-				'en-US-Wavenet-A',
-				'en-US-Wavenet-B',
-				'en-US-Wavenet-C',
-				'en-US-Wavenet-D',
-				'en-US-Wavenet-E',
-				'en-US-Wavenet-F',
-				'en-US-Wavenet-G',
-				'en-US-Wavenet-H',
-				'en-US-Wavenet-I',
-				'en-US-Wavenet-J',
-				'en-US-News-K',
-				'en-US-News-L',
-				'en-US-News-M',
-				'en-US-News-N',
-				'en-US-Standard-A',
-				'en-US-Standard-B',
-				'en-US-Standard-C',
-				'en-US-Standard-D',
-				'en-US-Standard-E',
-				'en-US-Standard-F',
-				'en-US-Standard-G',
-				'en-US-Standard-H',
-				'en-US-Standard-I',
-				'en-US-Standard-J',
-			])
-			.or(z.string())
-			.optional()
-			.default('en-US-Neural2-C'),
-	}),
+	voice: z
+		.object({
+			language: z.string().optional().default('en-US'),
+			name: z
+				.enum([
+					'en-US-Standard-A',
+					'en-US-Standard-C',
+					'en-US-Standard-D',
+					'en-US-Standard-E',
+					'en-US-Standard-F',
+					'en-US-Standard-G',
+					'en-US-Standard-H',
+					'en-US-Standard-I',
+					'en-US-Standard-J',
+					'en-US-Studio-M',
+					'en-US-Studio-O',
+					'en-US-Wavenet-A',
+					'en-US-Wavenet-B',
+					'en-US-Wavenet-C',
+					'en-US-Wavenet-D',
+					'en-US-Wavenet-E',
+					'en-US-Wavenet-F',
+					'en-US-Wavenet-G',
+					'en-US-Wavenet-H',
+					'en-US-Wavenet-I',
+					'en-US-Wavenet-J',
+					'en-US-News-K',
+					'en-US-News-L',
+					'en-US-News-M',
+					'en-US-News-N',
+					'en-US-Standard-A',
+					'en-US-Standard-B',
+					'en-US-Standard-C',
+					'en-US-Standard-D',
+					'en-US-Standard-E',
+					'en-US-Standard-F',
+					'en-US-Standard-G',
+					'en-US-Standard-H',
+					'en-US-Standard-I',
+					'en-US-Standard-J',
+				])
+				.or(z.string())
+				.optional()
+				.default('en-US-Neural2-C'),
+		})
+		.optional()
+		.default({
+			language: 'en-US',
+			name: 'en-US-Neural2-C',
+		}),
 });
 
 const outputSchema = z.object({

@@ -1,4 +1,5 @@
 {
-	"split": "Split",
-	"condition": "Condition"
+	"split": "Split Node",
+	"condition": "Condition Node",
+	"combinepipelines": "Combine Pipelines"
 }

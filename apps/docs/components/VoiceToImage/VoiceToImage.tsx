@@ -42,7 +42,7 @@ export function VoiceToImage(props: VoiceToImageProps) {
 	}, [result]);
 
 	return (
-		<div className="flex flex-col space-y-8 md:space-y-0 md:space-x-8 md:flex-row">
+		<div className="flex flex-col pt-8 space-y-8 md:space-y-0 md:space-x-8 md:flex-row">
 			<div className="flex flex-col items-center flex-1 py-6 space-y-4 md:w-1/2">
 				<VoiceRecorder toggleRecording={toggleRecording} isRecording={isRecording} />
 				<div className="text-sm">
@@ -65,12 +65,7 @@ export function VoiceToImage(props: VoiceToImageProps) {
 				) : null}
 			</div>
 			<div className="flex-1 md:w-1/2">
-				<VoiceToImagePipelineView
-					isActive={inProgress}
-					pipeline={pipelines.voiceToImage}
-					doneProgressIds={doneNodes}
-					inProgressNodeId={inProgressNode}
-				/>
+				<VoiceToImagePipelineView isActive={inProgress} pipeline={pipelines.voiceToImage} />
 			</div>
 		</div>
 	);

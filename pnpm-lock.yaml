@@ -18,6 +18,7 @@ importers:
       '@aigur/helpers': workspace:*
       '@code-hike/mdx': ^0.8.0
       '@next/font': 13.1.6
+      '@tailwindcss/aspect-ratio': ^0.4.2
       '@types/node': 18.11.19
       '@types/react': 18.0.27
       '@types/react-dom': 18.0.10
@@ -40,6 +41,7 @@ importers:
       '@aigur/helpers': link:../../packages/helpers
       '@code-hike/mdx': 0.8.0_react@18.2.0
       '@next/font': 13.1.6
+      '@tailwindcss/aspect-ratio': 0.4.2_tailwindcss@3.2.4
       '@types/node': 18.11.19
       '@types/react': 18.0.27
       '@types/react-dom': 18.0.10
@@ -1013,6 +1015,14 @@ packages:
     resolution: {integrity: sha512-4C7nX/dvpzB7za4Ql9K81xK3HPxCpHMgwTZVyf+9JQ6VUbn9jjZVN7/Nkdz/Ugzs2CSjqnL/UPXroiVBVHUWUw==}
     dependencies:
       tslib: 2.5.0
+    dev: false
+
+  /@tailwindcss/aspect-ratio/0.4.2_tailwindcss@3.2.4:
+    resolution: {integrity: sha512-8QPrypskfBa7QIMuKHg2TA7BqES6vhBrDLOv8Unb6FcFyd3TjKbc6lcmb9UPQHxfl24sXoJ41ux/H7qQQvfaSQ==}
+    peerDependencies:
+      tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
+    dependencies:
+      tailwindcss: 3.2.4_postcss@8.4.21
     dev: false
 
   /@types/acorn/4.0.6:

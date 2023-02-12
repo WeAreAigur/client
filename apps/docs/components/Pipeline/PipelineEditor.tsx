@@ -27,18 +27,12 @@ export function PipelineEditor(props: PipelineEditorProps) {
 	);
 	const [edges] = useEdgesState(props.edges);
 	const zoomLevel = props.zoom ?? 0.4;
-	const isDesktop = typeof window !== 'undefined' && window.innerWidth > 768;
 
 	return (
 		<div className={`flex-1 ${props.className ?? ''}`}>
 			<ReactFlowProvider>
 				<div className="h-full rounded-lg bg-base-200">
 					<ReactFlow
-						onInit={(reactFlowInstance) => {
-							if (!props.isHorizontal) {
-								reactFlowInstance.setViewport({ x: isDesktop ? 150 : 120, y: 20, zoom: zoomLevel });
-							}
-						}}
 						preventScrolling={false}
 						panOnDrag={false}
 						maxZoom={zoomLevel}

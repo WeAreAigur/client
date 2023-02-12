@@ -3,8 +3,6 @@ import { PipelineEditor } from '../Pipeline/PipelineEditor';
 import type { Pipeline } from '@aigur/client/src/Pipeline';
 interface VoiceToImagePipelineViewProps {
 	isActive: boolean;
-	inProgressNodeId: string;
-	doneProgressIds: string[];
 	pipeline: Pipeline<any, any>;
 }
 

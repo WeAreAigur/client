@@ -1,7 +1,7 @@
 import { Callout } from 'nextra-theme-docs';
 import { VoiceToImage } from '#/components/VoiceToImage/VoiceToImage'
 import { VoiceToImagePipelineView } from '#/components/VoiceToImage/VoiceToImagePipelineView'
-import { ImageToPoem } from '#/components/ImageToPoem'
+import { ImageToPoem } from '#/components/ImageToPoem/ImageToPoem'
 
 # Aigur Client
 
@@ -23,6 +23,8 @@ This pipeline takes an audio recording of a prompt, transcribes it using Whisper
 <VoiceToImage />
 
 ## Image to Poem
+
+This pipeline takes an image, labels it with Google's Vision API and creates a poem according the labels it finds.
 
 <ImageToPoem />
 

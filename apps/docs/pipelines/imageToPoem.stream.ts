@@ -4,6 +4,7 @@ import { aigur } from '#/services/aigur';
 export const imageToPoemStreamPipeline = aigur.pipeline.create({
 	id: 'imageToPoemStream',
 	stream: true,
+	updateProgress: true,
 	input: z.object({
 		image: z.string(), // base64
 	}),

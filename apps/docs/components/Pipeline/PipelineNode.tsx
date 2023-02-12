@@ -26,6 +26,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 
 	useEffect(() => {
 		props.data.pipeline.onProgress((node, type, index) => {
+			console.log('progress event', type, index, props.id);
 			if (index.toString() === props.id) {
 				if (type === 'start') {
 					setStatus('inProgress');

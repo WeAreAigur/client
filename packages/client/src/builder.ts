@@ -4,8 +4,8 @@ import { ConcreteNode, NodeDefinition, ZodReadableStream } from './types';
 import { gpt3PredictionStreamNode } from './nodes/text/prediction/gpt3.stream';
 import { outputNode } from './nodes/output/output';
 import {
-    enhanceWithKeywordsNode, googleVisionNode, gpt3PredictionNode, simpleModificationNode,
-    stabilityTextToImageNode, stringToArrayBufferNode, whisperApiNode
+    enhanceWithKeywordsNode, googleTextToSpeechNode, googleVisionNode, gpt3PredictionNode,
+    simpleModificationNode, stabilityTextToImageNode, stringToArrayBufferNode, whisperApiNode
 } from './nodes/nodesDefinitions';
 
 export class Builder<
@@ -71,6 +71,9 @@ export class Builder<
 	}
 
 	voice = {
+		textToSpeech: {
+			google: this.nodeFactory(googleTextToSpeechNode),
+		},
 		transcribe: {
 			whisper: {
 				whisperapi: this.nodeFactory(whisperApiNode),

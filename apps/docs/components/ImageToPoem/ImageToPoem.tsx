@@ -24,7 +24,7 @@ export function ImageToPoem(props: ImageToPoemProps) {
 
 	return (
 		<div className="flex flex-col pt-8 space-y-8 md:space-y-0 md:space-x-8 md:flex-row">
-			<div className="flex flex-col items-center flex-1 py-6 space-y-4 md:w-1/2">
+			<div className="flex flex-col items-center flex-1 space-y-4 md:w-1/2">
 				<ImageUpload onSelect={setImage} />
 				<div className="relative w-40 h-40 overflow-hidden rounded-lg">
 					{image ? (

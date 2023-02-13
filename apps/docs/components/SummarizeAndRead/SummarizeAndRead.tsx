@@ -39,6 +39,7 @@ export function SummarizeAndRead(props: SummarizeAndReadProps) {
 		<div className="flex flex-col pt-8 space-y-8 md:space-y-0 md:space-x-8 md:flex-row">
 			<div className="flex flex-col flex-1 space-y-4 md:w-1/2 md:h-[32rem]">
 				<textarea
+					placeholder="Enter some text here"
 					className="flex-1 w-full textarea textarea-bordered"
 					value={text}
 					onChange={(e) => setText(e.currentTarget.value)}

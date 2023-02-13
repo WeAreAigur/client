@@ -22,6 +22,13 @@ export function PlayAudio(props: PlayAudioProps) {
 	}, [props.audioUrl]);
 
 	const play = () => audio?.play();
+
+	const getButtonLabel = () => {
+		if (props.inProgress) return '';
+		if (props.audioUrl && !audio) return 'Converting...';
+		if (audio) return 'Play';
+		return 'Waiting for audio';
+	};
 	return (
 		<button
 			className={`btn btn-secondary btn-lg flex-1 ${!audio ? 'btn-disabled' : ''} ${
@@ -29,7 +36,7 @@ export function PlayAudio(props: PlayAudioProps) {
 			}`}
 			onClick={play}
 		>
-			Play
+			{getButtonLabel()}
 		</button>
 	);
 }

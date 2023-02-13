@@ -25,12 +25,15 @@ export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
 
 	useEffect(() => {
-		props.data.pipeline.onProgress((node, type, index) => {
+		props.data.pipeline.onStart(() => {
+			setStatus('idle');
+		});
+		props.data.pipeline.onProgress(({ node, type, index }) => {
 			console.log('progress event', type, index, props.id);
 			if (index.toString() === props.id) {
-				if (type === 'start') {
+				if (type === 'node:start') {
 					setStatus('inProgress');
-				} else if (type === 'end') {
+				} else if (type === 'node:finish') {
 					setStatus('done');
 				}
 			}

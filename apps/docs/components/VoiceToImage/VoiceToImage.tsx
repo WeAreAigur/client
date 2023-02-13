@@ -21,13 +21,6 @@ export function VoiceToImage(props: VoiceToImageProps) {
 		if (result) {
 			setInProgress(true);
 
-			// voiceToImage.onProgress((node, type, index) => {
-			// 	if (type === 'start') {
-			// 		setInProgressNode(index.toString());
-			// 	} else if (type === 'end') {
-			// 		setDoneNodes((prev) => [...prev, index.toString()]);
-			// 	}
-			// });
 			pipelines.voiceToImage.vercel
 				.invoke({
 					audio: result,

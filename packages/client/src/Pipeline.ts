@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import { APIKeys, ConcreteNode, PipelineConf, ProgressType, ZodReadableStream } from './types';
+import {
+    APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType, ZodReadableStream
+} from './types';
 import { makeid } from './makeid';
 import { getInputByContext } from './getInputByContext';
 import { delay } from './delay';
@@ -13,21 +15,23 @@ export class Pipeline<
 	Input extends z.AnyZodObject,
 	Output extends z.AnyZodObject | ZodReadableStream
 > {
-	public readonly progressListeners: Map<
+	public readonly onProgressListeners: Map<
 		string,
-		(node: ConcreteNode<any, any>, type: ProgressType, index: number) => void
+		(args: { node: ConcreteNode<any, any>; type: ProgressEventType; index: number }) => void
 	> = new Map();
+	public readonly onStartListeners: Map<string, () => void> = new Map();
+	public readonly onFinishListeners: Map<string, () => void> = new Map();
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
 		public readonly flow: Builder<z.AnyZodObject, z.AnyZodObject, [], null>,
 		private readonly apiKeys: APIKeys
 	) {
-		this.listenToProgressEvents();
+		this.listenToEvents();
 	}
 
 	public invoke(input: z.input<Input>) {
-		return this.invokePipeline<Input, Output>(this.conf, input);
+		return this.processPipeline<Input, Output>(this.conf, input);
 	}
 
 	public invokeRemote(endpoint: string, input: z.input<Input>): Promise<z.output<Output>> {
@@ -89,15 +93,33 @@ export class Pipeline<
 		},
 	};
 
-	public onProgress(cb: (node: ConcreteNode<any, any>, type: ProgressType, index: number) => void) {
+	public onProgress(
+		cb: (args: { node: ConcreteNode<any, any>; type: ProgressEventType; index: number }) => void
+	) {
 		const id = makeid();
-		this.progressListeners[id] = cb;
+		this.onProgressListeners.set(id, cb);
 		return () => {
-			delete this.progressListeners[id];
+			this.onProgressListeners.delete(id);
 		};
 	}
 
-	private listenToProgressEvents() {
+	public onStart(cb: () => void) {
+		const id = makeid();
+		this.onStartListeners.set(id, cb);
+		return () => {
+			this.onStartListeners.delete(id);
+		};
+	}
+
+	public onFinish(cb: () => void) {
+		const id = makeid();
+		this.onFinishListeners.set(id, cb);
+		return () => {
+			this.onFinishListeners.delete(id);
+		};
+	}
+
+	private listenToEvents() {
 		if (
 			!this.conf.updateProgress ||
 			typeof window === 'undefined' ||
@@ -105,40 +127,50 @@ export class Pipeline<
 		) {
 			return;
 		}
-		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client-temp-channel&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
+		// TODO: move channel name to config
+		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
 		const eventSource = new EventSource(dataEndpoint);
 		eventSource.onmessage = (event) => {
-			const e = JSON.parse(event.data);
-			if (e.name === 'progress') {
-				Object.values(this.progressListeners).forEach((listener) =>
-					listener(e.data.node, e.data.type, e.data.index)
-				);
+			const e: { type: EventType; data: Record<any, any> } = JSON.parse(event.data);
+			if (e.type === 'pipeline:start') {
+				this.triggerListeners(this.onStartListeners);
+			} else if (e.type === 'pipeline:finish') {
+				this.triggerListeners(this.onFinishListeners);
+			} else if (e.type === 'node:start' || e.type === 'node:finish') {
+				this.triggerListeners(this.onProgressListeners, { ...e.data, type: e.type });
 			}
 		};
 	}
 
-	private async invokePipeline<
+	private triggerListeners(listeners: Map<string, (...args: any[]) => void>, ...args: any[]) {
+		for (let listener of listeners.values()) {
+			listener(...args);
+		}
+	}
+
+	private async processPipeline<
 		Input extends z.AnyZodObject,
 		Output extends z.AnyZodObject | ZodReadableStream
 	>(pipeline: PipelineConf<Input, Output>, input: z.input<Input>): Promise<z.output<Output>> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
+			await this.notifyEvent('pipeline:start');
 			pipeline.input.parse(input);
 			const values: any = { input };
-			let lastValue: any = {};
+			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();
 
 			let startProgressPromise;
 
 			for (let i = 0; i < nodes.length; i++) {
-				startProgressPromise = this.notifyProgress(nodes[i], 'start', i);
+				startProgressPromise = this.notifyEvent('node:start', { node: nodes[i], index: i });
 				let attemptCount = 0;
 				let isSuccess = false;
 				do {
 					attemptCount++;
 					try {
-						lastValue = await this.executeAction(nodes, i, values);
-						values[i] = lastValue;
+						output = await this.executeAction(nodes, i, values);
+						values[i] = output;
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {
@@ -149,10 +181,11 @@ export class Pipeline<
 				} while (!isSuccess && attemptCount <= retriesCount);
 				// we wait here as to not delay the execution itself
 				await startProgressPromise;
-				await this.notifyProgress(nodes[i], 'end', i);
+				await this.notifyEvent('node:finish', { node: nodes[i], index: i });
 			}
 
-			return lastValue;
+			await this.notifyEvent('pipeline:finish');
+			return output;
 		} catch (e) {
 			console.error(e);
 			throw e;
@@ -165,28 +198,21 @@ export class Pipeline<
 		return action(inputByContext, this.apiKeys) as typeof schema.output;
 	}
 
-	private notifyProgress(node: any, type: 'start' | 'end' | 'stream', index: number) {
+	private notifyEvent(type: EventType, data?: Record<any, any>) {
 		if (!this.conf.updateProgress || !this.apiKeys.ablyPublish) {
 			return;
 		}
 
-		return fetch(
-			'https://rest.ably.io/channels/aigur-client-temp-channel/messages?enveloped=false ',
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Basic ${btoa(this.apiKeys.ablyPublish)}`,
-				},
-				body: JSON.stringify({
-					name: 'progress',
-					data: {
-						node,
-						type,
-						index,
-					},
-				}),
-			}
-		);
+		return fetch('https://rest.ably.io/channels/aigur-client/messages?enveloped=false ', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Basic ${btoa(this.apiKeys.ablyPublish)}`,
+			},
+			body: JSON.stringify({
+				type,
+				data,
+			}),
+		});
 	}
 }

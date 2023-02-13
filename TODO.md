@@ -1,6 +1,5 @@
-- upload audio to supabase before running whisper
-- why isnt stability input typed?
-- complex flow, start from running it
+- visual pipeline - node id should consist of node id and index
+- input/output arent typed anymore
 - doctype for a node about the needed api key and usage
 - "attach" supabase upload to builder node tree (results.upload.supabase)
 - move progress to external package that attaches to Client

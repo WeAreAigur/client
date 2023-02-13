@@ -32,7 +32,9 @@ export type ConcreteNode<
 	output: z.output<Output>;
 };
 
-export type ProgressType = 'start' | 'end' | 'stream';
+export type EventType = PipelineEventType | ProgressEventType;
+export type PipelineEventType = 'pipeline:start' | 'pipeline:finish';
+export type ProgressEventType = 'node:start' | 'node:finish' | 'node:stream';
 
 export type ZodReadableStream = z.ZodType<
 	InstanceType<typeof ReadableStream>,

@@ -1,5 +1,9 @@
 export default {
-	logo: <span>Aigur Client</span>,
+	logo: (
+		<span className="text-lg font-bold">
+			<span style={{ color: '#d926aa' }}>AI</span>GUR
+		</span>
+	),
 	project: {
 		link: 'https://github.com/weareaigur/client',
 	},

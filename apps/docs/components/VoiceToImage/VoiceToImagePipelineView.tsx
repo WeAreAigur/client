@@ -13,21 +13,21 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 			pipeline={props.pipeline}
 			nodes={[
 				{
-					id: '0',
+					id: 'text.transformation.stringToArrayBuffer-0',
 					label: 'String to ArrayBuffer',
 					definition: {
 						type: 'transformation',
 					},
 				},
 				{
-					id: '1',
+					id: 'results.upload.supabase-1',
 					label: 'Supabase Upload Audio',
 					definition: {
 						type: 'custom',
 					},
 				},
 				{
-					id: '2',
+					id: 'voice.transcribe.whisper.whisperapi-2',
 					label: 'Whisper',
 					definition: {
 						type: 'provider',
@@ -35,14 +35,14 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 					},
 				},
 				{
-					id: '3',
+					id: 'text.modify.enhanceWithKeywords-3',
 					label: 'Enhance Prompt',
 					definition: {
-						type: 'text modification',
+						type: 'transformation',
 					},
 				},
 				{
-					id: '4',
+					id: 'text.prediction.gpt3-4',
 					label: 'Generate Keywords',
 					definition: {
 						type: 'provider',
@@ -50,29 +50,29 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 					},
 				},
 				{
-					id: '5',
+					id: 'text.modify.simple-5',
 					label: 'Add Styles',
 					definition: {
-						type: 'text modification',
+						type: 'transformation',
 					},
 				},
 				{
-					id: '6',
+					id: 'image.textToImage.stableDiffusion.stability-6',
 					label: 'Generate Image',
 					definition: {
 						type: 'provider',
-						label: 'Stable Diffusion',
+						label: 'Stability',
 					},
 				},
 				{
-					id: '7',
+					id: 'results.upload.supabase-7',
 					label: 'Supabase Upload Image',
 					definition: {
 						type: 'custom',
 					},
 				},
 				{
-					id: '8',
+					id: 'output-8',
 					label: 'Output',
 					definition: {
 						type: 'output',
@@ -80,14 +80,38 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 				},
 			]}
 			edges={[
-				{ id: '0-1', source: '0', target: '1' },
-				{ id: '1-2', source: '1', target: '2' },
-				{ id: '2-3', source: '2', target: '3' },
-				{ id: '3-4', source: '3', target: '4' },
-				{ id: '4-5', source: '4', target: '5' },
-				{ id: '5-6', source: '5', target: '6' },
-				{ id: '6-7', source: '6', target: '7' },
-				{ id: '7-8', source: '7', target: '8' },
+				{
+					id: '0-1',
+					source: 'text.transformation.stringToArrayBuffer-0',
+					target: 'results.upload.supabase-1',
+				},
+				{
+					id: '1-2',
+					source: 'results.upload.supabase-1',
+					target: 'voice.transcribe.whisper.whisperapi-2',
+				},
+				{
+					id: '2-3',
+					source: 'voice.transcribe.whisper.whisperapi-2',
+					target: 'text.modify.enhanceWithKeywords-3',
+				},
+				{
+					id: '3-4',
+					source: 'text.modify.enhanceWithKeywords-3',
+					target: 'text.prediction.gpt3-4',
+				},
+				{ id: '4-5', source: 'text.prediction.gpt3-4', target: 'text.modify.simple-5' },
+				{
+					id: '5-6',
+					source: 'text.modify.simple-5',
+					target: 'image.textToImage.stableDiffusion.stability-6',
+				},
+				{
+					id: '6-7',
+					source: 'image.textToImage.stableDiffusion.stability-6',
+					target: 'results.upload.supabase-7',
+				},
+				{ id: '7-8', source: 'results.upload.supabase-7', target: 'output-8' },
 			]}
 			isActive={props.isActive}
 		/>

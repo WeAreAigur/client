@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 export interface PlayAudioProps {
 	audioUrl: string | null;
+	inProgress: boolean;
 }
 
 export function PlayAudio(props: PlayAudioProps) {
@@ -23,7 +24,9 @@ export function PlayAudio(props: PlayAudioProps) {
 	const play = () => audio?.play();
 	return (
 		<button
-			className={`btn btn-secondary btn-lg flex-1 ${!audio ? 'btn-disabled' : ''}`}
+			className={`btn btn-secondary btn-lg flex-1 ${!audio ? 'btn-disabled' : ''} ${
+				props.inProgress ? 'loading' : ''
+			}`}
 			onClick={play}
 		>
 			Play

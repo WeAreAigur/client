@@ -59,7 +59,7 @@ export function SummarizeAndRead(props: SummarizeAndReadProps) {
 					>
 						{inProgress ? '' : 'GO'}
 					</button>
-					<PlayAudio audioUrl={audioUrl} />
+					<PlayAudio inProgress={inProgress} audioUrl={audioUrl} />
 				</div>
 			</div>
 			<div className="flex-1 md:w-1/2">

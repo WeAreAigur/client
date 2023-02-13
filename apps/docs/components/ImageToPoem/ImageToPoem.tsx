@@ -15,6 +15,7 @@ export function ImageToPoem(props: ImageToPoemProps) {
 	useEffect(() => {
 		if (image) {
 			setInProgress(true);
+			setPoem('');
 			pipelines.imageToPoemStream.vercel.invokeStream({ image: image.base64 }, (text) => {
 				setPoem((prev) => prev + text);
 				setInProgress(false);
@@ -29,9 +30,17 @@ export function ImageToPoem(props: ImageToPoemProps) {
 				<div className="relative w-40 h-40 overflow-hidden rounded-lg">
 					{image ? (
 						<Image src={`data:image/png;base64,${image.base64}`} fill alt="Uploaded Image" />
-					) : null}
+					) : (
+						<div className="flex items-center justify-center w-full h-full border rounded-lg border-accent">
+							Upload an Image
+						</div>
+					)}
 				</div>
-				{poem ? <pre className="text-lg">{poem}</pre> : <div>No poem yet :(</div>}
+				{poem ? (
+					<pre className="text-sm">{poem}</pre>
+				) : (
+					<div>{inProgress ? 'Generating poem...' : 'No poem yet :('}</div>
+				)}
 			</div>
 			<div className="flex-1 md:w-1/2">
 				<ImageToPoemPipelineView isActive={inProgress} pipeline={pipelines.imageToPoemStream} />

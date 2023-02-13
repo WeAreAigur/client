@@ -12,7 +12,7 @@ export const voiceToImagePipeline = aigur.pipeline.create({
 	output: z.object({
 		url: z.string().url(),
 		transcription: z.string(),
-		keywords: z.string(),
+		enhancedPrompt: z.string(),
 	}),
 	flow: (flow) =>
 		flow.transformation
@@ -57,7 +57,7 @@ export const voiceToImagePipeline = aigur.pipeline.create({
 			}))
 			.output(({ prev, nodes }) => ({
 				transcription: nodes[2].output.text,
-				keywords: nodes[5].output.text,
+				enhancedPrompt: nodes[5].output.text,
 				url: prev.url,
 			})),
 });

@@ -13,7 +13,7 @@ export function ImageToPoemPipelineView(props: ImageToPoemPipelineViewProps) {
 			pipeline={props.pipeline}
 			nodes={[
 				{
-					id: '0',
+					id: 'image.labeling.googleVision-0',
 					label: 'Image Labeling',
 					definition: {
 						type: 'provider',
@@ -21,14 +21,14 @@ export function ImageToPoemPipelineView(props: ImageToPoemPipelineViewProps) {
 					},
 				},
 				{
-					id: '1',
+					id: 'text.modify.simple-1',
 					label: 'Create Prompt',
 					definition: {
 						type: 'transformation',
 					},
 				},
 				{
-					id: '2',
+					id: 'text.prediction.gpt3.stream-2',
 					label: 'Generate Poem',
 					definition: {
 						type: 'provider',
@@ -36,7 +36,7 @@ export function ImageToPoemPipelineView(props: ImageToPoemPipelineViewProps) {
 					},
 				},
 				{
-					id: '3',
+					id: 'output-3',
 					label: 'Output',
 					definition: {
 						type: 'output',
@@ -44,9 +44,9 @@ export function ImageToPoemPipelineView(props: ImageToPoemPipelineViewProps) {
 				},
 			]}
 			edges={[
-				{ id: '0-1', source: '0', target: '1' },
-				{ id: '1-2', source: '1', target: '2' },
-				{ id: '2-3', source: '2', target: '3' },
+				{ id: '0-1', source: 'image.labeling.googleVision-0', target: 'text.modify.simple-1' },
+				{ id: '1-2', source: 'text.modify.simple-1', target: 'text.prediction.gpt3.stream-2' },
+				{ id: '2-3', source: 'text.prediction.gpt3.stream-2', target: 'output-3' },
 			]}
 			isActive={props.isActive}
 		/>

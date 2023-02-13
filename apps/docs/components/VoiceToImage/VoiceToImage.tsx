@@ -12,22 +12,22 @@ export function VoiceToImage(props: VoiceToImageProps) {
 	const { toggleRecording, isRecording, result } = useRecord();
 	const [inProgress, setInProgress] = useState<boolean>(false);
 	const [imageUrl, setImageUrl] = useState<string>('');
-	const [keywords, setKeywords] = useState<string>('');
-	const [transcription, setTranscription] = useState<string>('');
-	const [inProgressNode, setInProgressNode] = useState<string>('');
-	const [doneNodes, setDoneNodes] = useState<string[]>([]);
+	const [enhancedPrompt, setEnhancedPrompt] = useState<string | null>(null);
+	const [transcription, setTranscription] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (result) {
 			setInProgress(true);
+			setEnhancedPrompt(null);
+			setTranscription(null);
 
 			pipelines.voiceToImage.vercel
 				.invoke({
 					audio: result,
 				})
-				.then(({ url, keywords, transcription }) => {
+				.then(({ url, enhancedPrompt, transcription }) => {
 					setImageUrl(url);
-					setKeywords(keywords.trim());
+					setEnhancedPrompt(enhancedPrompt.trim());
 					setTranscription(transcription);
 					setInProgress(false);
 				});
@@ -41,21 +41,31 @@ export function VoiceToImage(props: VoiceToImageProps) {
 				<div className="text-sm">
 					Try saying things like: a small house, a red car, an ivory castle, an empty street
 				</div>
-				{imageUrl ? (
-					<div className="flex flex-col space-y-6">
-						<div className="text-lg">
-							<Image
-								className="rounded-lg"
-								width={512}
-								height={512}
-								src={imageUrl}
-								alt={`${transcription} - ${keywords}`}
-							/>
+				<div className="flex flex-col space-y-6">
+					{imageUrl ? (
+						<Image
+							className="rounded-lg"
+							width={512}
+							height={512}
+							src={imageUrl}
+							alt={`${transcription} - ${enhancedPrompt}`}
+						/>
+					) : (
+						<div className="flex items-center justify-center p-16 border rounded-lg border-accent">
+							<div className="text-sm text-accent">No image yet</div>
 						</div>
-						<div className="text-sm">Transcription: {transcription}</div>
-						<div className="text-sm">Enhanced Prompt: {keywords}</div>
+					)}
+					<div>
+						<div className="text-sm">
+							<span className="text-lg font-bold">Transcription: </span>
+							{transcription ?? 'N/A'}
+						</div>
+						<div className="text-sm">
+							<span className="text-lg font-bold">Enhanced Prompt: </span>
+							{enhancedPrompt ?? 'N/A'}
+						</div>
 					</div>
-				) : null}
+				</div>
 			</div>
 			<div className="flex-1 md:w-1/2">
 				<VoiceToImagePipelineView isActive={inProgress} pipeline={pipelines.voiceToImage} />

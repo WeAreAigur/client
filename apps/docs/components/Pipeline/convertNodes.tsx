@@ -10,19 +10,19 @@ export function convertNodes(
 	isHorizontal: boolean = false,
 	pipeline: Pipeline<any, any>
 ): RFNode<any>[] {
-	const nodeMap: Record<string, any> = {};
+	const nodeMap = new Map<string, any>();
 	for (let i = 0; i < nodes.length; i++) {
-		nodeMap[nodes[i].id] = nodes[i];
+		nodeMap.set(nodes[i].id, nodes[i]);
 	}
 
 	const convertedNodes: RFNode[] = [];
 
 	let i = 0;
 	for (const edge of edges) {
-		const sourceNode = nodeMap[edge.source];
+		const sourceNode = nodeMap.get(edge.source);
 		convertedNodes.push(convertNode(sourceNode, i === 0, false, isHorizontal, pipeline));
 		if (i === edges.length - 1) {
-			const targetNode = nodeMap[edge.target];
+			const targetNode = nodeMap.get(edge.target);
 			convertedNodes.push(convertNode(targetNode, false, true, isHorizontal, pipeline));
 		}
 		i++;

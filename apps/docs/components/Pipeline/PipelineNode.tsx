@@ -30,7 +30,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 		});
 		props.data.pipeline.onProgress(({ node, type, index }) => {
 			console.log('progress event', type, index, props.id);
-			if (index.toString() === props.id) {
+			if (`${node.id}-${index}` === props.id) {
 				if (type === 'node:start') {
 					setStatus('inProgress');
 				} else if (type === 'node:finish') {

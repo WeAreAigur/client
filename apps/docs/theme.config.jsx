@@ -1,4 +1,4 @@
-const siteUrl = `https://aigur-client.vercel.app`;
+const siteUrl = `https://client.aigur.dev`;
 
 export default {
 	logo: (
@@ -12,7 +12,7 @@ export default {
 	docsRepositoryBase: 'https://github.com/weareaigur/client',
 	editLink: false,
 	feedback: {
-		labels: ['documentation'],
+		labels: 'documentation',
 	},
 	footer: {
 		text: (

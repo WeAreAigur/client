@@ -3,9 +3,9 @@
 	"gettingstarted": "Getting Started",
 	"valuereferencing": "Value Referencing",
 	"invocation": "Invocation",
-	"remoteinvocation": "Remote Invocation",
 	"streaming": "Streaming Results",
 	"frameworks": "Frameworks",
+	"nodes": "Nodes",
 	"customnodes": "Custom Nodes",
 	"complexflows": "Complex Flows"
 }

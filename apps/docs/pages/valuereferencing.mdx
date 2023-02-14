@@ -8,7 +8,8 @@ Node builder functions receive a callback that accepts three arguments:
 
 The `input` argument references the values that were passed as arguments to the Pipeline itself with the `invoke` method.
 
-```ts
+<CH.Code lineNumbers={true}>
+```ts index.ts focus=1,6 mark=1[21:24],6[17:20]
 myPipeline.invoke({ name: 'Boopsy' });
 
 //...
@@ -19,47 +20,52 @@ flow.text.modify
   }))
 // ...
 ```
+</CH.Code>
 
 ### Prev
 
 The `prev` argument references the output of the immediately previous node.
 
-```ts
+<CH.Code lineNumbers={true}>
+```ts index.ts
 myPipeline.invoke({ name: 'Boopsy' });
 
 //...
 flow.text.modify
-			.simple(({ input }) => ({
-				text: input.subject,
-				modifier: 'tell me a joke about $(text)$',
-			}))
-			.text.prediction.gpt3(({ prev }) => ({
-				prompt: prev.text, // <-- 'tell me a joke about Boopsy'
-			}))
+  .simple(({ input }) => ({
+    text: input.subject,
+    modifier: 'tell me a joke about $(text)$',
+  }))
+  .text.prediction.gpt3(({ prev }) => ({
+    prompt: prev.text, // <-- 'tell me a joke about Boopsy'
+  }))
 // ...
 ```
+</CH.Code>
 
 ### Nodes
 
 The `nodes` argument gives you access to all previously executed nodes' outputs.
 The access is by their index in the pipeline definition.
 
-(Additional methods are planned in the future)
+> Additional access methods are planned for future versions.
 
-```ts
+<CH.Code lineNumbers={true}>
+```ts index.ts
 
 //...
 flow.text.modify
-			.simple(({ input }) => ({
-				text: 'aaa',
-				modifier: 'AAA $(text)$',
-			}))
-			.simple(({ prev }) => ({
-				text: 'bbb',
-				modifier: 'BBB $(text)$',
-			}))
-			.text.prediction.gpt3(({ nodes }) => ({
-				prompt: `${nodes[0].text} ${nodes[1].text}`, // <-- 'AAA aaa BBB bbb'
-			}))
+  .simple(({ input }) => ({
+    text: 'aaa',
+    modifier: 'AAA $(text)$',
+  }))
+  .simple(({ prev }) => ({
+    text: 'bbb',
+    modifier: 'BBB $(text)$',
+  }))
+  .text.prediction.gpt3(({ nodes }) => ({
+    prompt: `${nodes[0].text} ${nodes[1].text}`, // <-- 'AAA aaa BBB bbb'
+  }))
 // ...
 ```
+</CH.Code>

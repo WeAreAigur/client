@@ -1,0 +1,92 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+## Direct Invocation
+
+Once you create your pipeline you can invoke it by calling the `invoke` method.
+The input is your defined Pipeline input and the output is the defined Pipeline output.
+
+<CH.Code lineNumbers={true}>
+```ts index.ts focus=3:8,23:25 mark=4[3:9],7[3:6],23[9:12],24[3:9]
+export const jokeGptPipeline = aigur.pipeline.create({
+	id: 'jokegpt',
+	input: z.object({
+		subject: z.string(),
+	}),
+	output: z.object({
+		joke: z.string(),
+	}),
+	flow: (flow) =>
+		flow.text.modify
+			.simple(({ input }) => ({
+				text: input.subject,
+				modifier: 'tell me a joke about $(text)$',
+			}))
+			.text.prediction.gpt3(({ prev }) => ({
+				prompt: prev.text,
+			}))
+			.output(({ prev }) => ({
+				joke: prev.text,
+			})),
+});
+
+const { joke } = await jokeGptPipeline.invoke({
+  subject: 'cats',
+});
+
+```
+</CH.Code>
+
+## Remote Invocation
+
+Since pipelines can (should) run on the server you can easily invoke them from the client using the `invokeRemote` method.
+`invokeRemote` is just a typed wrapper around `fetch` which accepts the input of the pipeline and returns the output of the pipeline.
+It receives a `url` parameter which is the URL of the server API where the pipeline will run.
+
+Here are examples of the server side endpoint that will do the actual invocation:
+
+<Tabs items={['Vercel', 'Express']}>
+	<Tab>
+    <CH.Code>
+    ```ts
+    export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+      const input = req.body;
+      const output = await pipeline.invoke(input);
+      return res.json(output);
+    }
+    ```
+    </CH.Code>
+  </Tab>
+  <Tab>
+    <CH.Code>
+    ```ts
+    app.post('/api/jokePipeline', async (req, res) => {
+      const input = req.body;
+      const output = await pipeline.invoke(input);
+      res.json(output);
+    });
+    ```
+    </CH.Code>
+  </Tab>
+</Tabs>
+
+And here is an example of the client side code that will invoke the pipeline on the server:
+
+<CH.Code>
+```ts
+const { joke } = await jokePipeline.invokeRemote('/api/jokePipeline',
+  {
+    subject: 'cats',
+  },
+);
+```
+</CH.Code>
+
+
+## Invoke Stream
+
+If your pipeline has a stream output you need to use the `invokeStream` method to invoke it.
+Read about [streaming](/streaming) to learn more about streaming results.
+
+## Vercel Edge Functions
+
+If you're using Vercel check out the [dedicated page](/frameworks/vercel).

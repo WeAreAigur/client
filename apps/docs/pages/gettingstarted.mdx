@@ -111,7 +111,7 @@ export const jokeGptPipeline = aigur.pipeline
 ### Input/Output
 
 Pipelines have input and output that are defined using [zod](https://github.com/colinhacks/zod).
-Input and Output must be of type `z.object`.
+Input and Output must be of type `z.object` (unless you're [streaming](/streaming) your results).
 
 ```ts index.ts focus=2,13:18
 import { createClient } from '@aigur/client';

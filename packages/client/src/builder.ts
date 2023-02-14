@@ -18,7 +18,7 @@ export class Builder<
 
 	static create<
 		Input extends z.ZodObject<any, any, any>,
-		Output extends z.ZodObject<any, any, any>
+		Output extends z.ZodObject<any, any, any> | ZodReadableStream
 	>(input: Input) {
 		return new Builder<Input, Output, [], null>(input, []);
 	}

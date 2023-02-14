@@ -11,15 +11,9 @@ interface AigurConfiguration {
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
 
-export type Aigur = {
-	pipeline: {
-		create: <Input extends z.AnyZodObject, Output extends z.AnyZodObject | ZodReadableStream>(
-			conf: PipelineConf<Input, Output>
-		) => Pipeline<Input, Output>;
-	};
-};
+export type Aigur = ReturnType<typeof createClient>;
 
-export const createClient = (opts: AigurConfiguration): Aigur => {
+export const createClient = (opts: AigurConfiguration) => {
 	const { apiKeys } = opts;
 	return {
 		pipeline: {
@@ -31,9 +25,7 @@ export const createClient = (opts: AigurConfiguration): Aigur => {
 					retries: conf.retries ?? DEFAULT_RETRIES,
 					retryDelayInMs: conf.retryDelayInMs ?? RETRY_DELAY_IN_MS,
 				};
-				const flow = conf.flow(
-					new Builder<typeof conf.input, typeof conf.output, [], null>(conf.input, [])
-				);
+				const flow = conf.flow(new Builder<Input, Output, [], null>(conf.input, []));
 				return new Pipeline(pipelineConf, flow, apiKeys);
 			},
 		},

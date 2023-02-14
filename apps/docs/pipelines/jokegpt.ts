@@ -1,5 +1,5 @@
-import { aigur } from '#/services/aigur';
 import { z } from 'zod';
+import { aigur } from '#/services/aigur';
 
 export const jokeGptPipeline = aigur.pipeline.create({
 	id: 'jokegpt',

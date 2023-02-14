@@ -1,13 +1,21 @@
 {
 	"name": "@aigur/helpers",
-	"version": "1.0.0",
+	"version": "0.30.0",
 	"description": "",
+	"files": [
+		"dist"
+	],
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"pbl": "npm publish --access public",
+		"build": "tsc --p .",
+		"dev": "tsc --watch"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"publishConfig": {
+		"access": "public"
+	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.7.1",
 		"zod": "^3.20.2"

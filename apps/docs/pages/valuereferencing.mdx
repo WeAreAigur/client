@@ -1,0 +1,65 @@
+Composing a Pipeline consists of chaining different Nodes together.
+Each Node can reference a value from any previous executed nodes (all fully typed of course 🎉).
+
+Node builder functions receive a callback that accepts three arguments:
+`input`, `prev` and `nodes`
+
+### Input
+
+The `input` argument references the values that were passed as arguments to the Pipeline itself with the `invoke` method.
+
+```ts
+myPipeline.invoke({ name: 'Boopsy' });
+
+//...
+flow.text.modify
+  .simple(({ input }) => ({
+    text: input.name, // <-- 'Boopsy'
+    modifier: 'tell me a joke about $(text)$',
+  }))
+// ...
+```
+
+### Prev
+
+The `prev` argument references the output of the immediately previous node.
+
+```ts
+myPipeline.invoke({ name: 'Boopsy' });
+
+//...
+flow.text.modify
+			.simple(({ input }) => ({
+				text: input.subject,
+				modifier: 'tell me a joke about $(text)$',
+			}))
+			.text.prediction.gpt3(({ prev }) => ({
+				prompt: prev.text, // <-- 'tell me a joke about Boopsy'
+			}))
+// ...
+```
+
+### Nodes
+
+The `nodes` argument gives you access to all previously executed nodes' outputs.
+The access is by their index in the pipeline definition.
+
+(Additional methods are planned in the future)
+
+```ts
+
+//...
+flow.text.modify
+			.simple(({ input }) => ({
+				text: 'aaa',
+				modifier: 'AAA $(text)$',
+			}))
+			.simple(({ prev }) => ({
+				text: 'bbb',
+				modifier: 'BBB $(text)$',
+			}))
+			.text.prediction.gpt3(({ nodes }) => ({
+				prompt: `${nodes[0].text} ${nodes[1].text}`, // <-- 'AAA aaa BBB bbb'
+			}))
+// ...
+```

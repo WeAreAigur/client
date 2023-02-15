@@ -2,8 +2,10 @@ const siteUrl = `https://client.aigur.dev`;
 
 export default {
 	logo: (
-		<span className="text-2xl font-bold">
-			<span style={{ color: '#d926aa' }}>AI</span>GUR<span>client</span>
+		<span className="text-xl font-bold">
+			<span style={{ color: '#d926aa' }}>AI</span>
+			<span>GUR</span>
+			<span className="text-sm text-accent">client</span>
 		</span>
 	),
 	project: {

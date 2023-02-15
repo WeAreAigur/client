@@ -4,11 +4,20 @@ import type { APIKeys } from '../../../types';
 
 export const inputSchema = z.object({
 	prompt: z.string(),
-	model: z.string().default('text-davinci-003'),
-	temperature: z.number().default(0.7),
-	top_p: z.number().default(1),
-	frequency_penalty: z.number().default(0),
-	presence_penalty: z.number().default(0),
+	model: z
+		.enum([
+			'text-davinci-003',
+			'text-curie-001',
+			'text-babbage-001',
+			'text-ada-001',
+			'code-davinci-002',
+			'code-cushman-002',
+		])
+		.default('text-davinci-003'),
+	temperature: z.number().min(0).max(2).default(0.7),
+	top_p: z.number().min(0).max(1).default(1),
+	frequency_penalty: z.number().min(-2).max(2).default(0),
+	presence_penalty: z.number().min(-2).max(2).default(0),
 	max_tokens: z.number().default(200),
 	n: z.number().default(1),
 });

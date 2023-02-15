@@ -1,0 +1,73 @@
+## Path
+`flow.text.modify.enhanceWithKeywords`
+
+## Description
+Takes a simple string (`text`) and outputs a complex prompt for text prediction models (e.g. GPT-3) that will output a list of keywords that are relevant to the input text.
+
+## Example
+
+```ts index.ts mark=3[10:13],11[15:19]
+//...
+flow.text.modify.enhanceWithKeywords(() => ({
+  text: 'cars'
+})) // --> {text: `Write a maximum of 8 keywords in a csv list that describes the following
+    // Title: Colonial-style home
+    // Description: traditional, classic, historical, timeless, elegant, regal, grand, spacious
+    //
+    // Title: High-end penthouse apartment
+    // Description: upscale, contemporary, modern, stylish, designer, elite, high-rise, rooftop
+    //
+    // Title: cars
+    // Description: `} 
+    //`}
+```
+
+
+
+## Input
+
+{<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+      <th>Default Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>text</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The text you want a list of keywords for</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>amount</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Limit number of keywords in the result</td>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>}
+
+
+## Output
+
+{<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>text</td>
+      <td>string</td>
+    </tr>
+  </tbody>
+</table>}

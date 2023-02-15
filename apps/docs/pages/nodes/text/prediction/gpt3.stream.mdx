@@ -1,0 +1,96 @@
+## Path
+`flow.text.prediction.gpt3Stream`
+
+## Description
+
+Calls GPT3 and returns the result as a [Stream](/streaming)
+
+## Example
+
+```ts index.ts
+//...
+flow.text.prediction.gpt3Stream(() => ({
+  prompt: 'Hello, how are you?'
+})) // --> ReadableStream
+```
+
+
+## Input
+
+{<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+      <th>Default Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>prompt</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The prompt to pass GPT3</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td>enum('text-davinci-003',
+			'text-curie-001',
+			'text-babbage-001',
+			'text-ada-001',
+			'code-davinci-002',
+			'code-cushman-002')</td>
+      <td>No</td>
+      <td>ID of the model to use</td>
+      <td>text-davinci-003</td>
+    </tr>
+    <tr>
+      <td>max_tokens</td>
+      <td>number</td>
+      <td>No</td>
+      <td>The maximum number of tokens to generate in the completion.
+
+The token count of your prompt plus max_tokens cannot exceed the model's context length. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).</td>
+      <td>200</td>
+    </tr>
+    <tr>
+      <td>temperature</td>
+      <td>number</td>
+      <td>No</td>
+      <td>What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
+        We generally recommend altering this or `top_p` but not both.</td>
+      <td>0.7</td>
+    </tr>
+    <tr>
+      <td>top_p</td>
+      <td>number</td>
+      <td>No</td>
+      <td>An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. It is generally recommend altering this or `temperature` but not both. </td> 
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>frequency_penalty</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.</td> 
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>presence_penalty</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.</td> 
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>}
+
+
+## Output
+
+The output of this Node is not an `object`, rather a `ReadableStream`.
+
+Read more about Streaming [here](/streaming).

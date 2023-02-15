@@ -1,4 +1,4 @@
-import { Callout } from 'nextra-theme-docs'
+import { Callout, Tab, Tabs } from 'nextra-theme-docs'
 
 **All Pipeline Nodes support Vercel Edge Functions out of the box 🎉**
 
@@ -65,8 +65,30 @@ Next, create a generic Vercel Edge Function that will invoke the Pipeline based 
 Using this function you can call any Pipeline by its id.
 
 <Callout>
-	The helper function must be defined at /api/pipelines/[id].ts
+	The Generic Edge Function must be defined at /api/pipelines/[id].ts
 </Callout>
+
+1. Install the `@aigur/helpers` package:
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+	<Tab>
+		```fish
+		pnpm add @aigur/helpers
+		```
+	</Tab>
+	<Tab>
+		```fish
+		npm i @aigur/helpers
+		```
+	</Tab>
+	<Tab>
+		```fish
+		yarn add @aigur/helpers
+		```
+	</Tab>
+</Tabs>
+
+2. Define the Generic Edge Function:
 
 <CH.Code lineNumbers={true}>
 ```ts /api/[...pipeline].ts
@@ -98,14 +120,18 @@ export const config = {
 
 We use the `vercel.invoke` helper function to invoke the Pipeline. Behind the scenes it will access our generic Edge Function, invoke the Pipeline and return the result.
 
-```ts index.ts
+<CH.Code>
+```ts index.ts mark=1[17:29]
 jokeGptPipeline.vercel.invoke({ subject }).then(({text}) => {});
 ```
+</CH.Code>
 
 For streaming using the `vercel.invokeStream` helper function:
-```ts index.ts
+<CH.Code>
+```ts index.ts mark=2[23:41]
 let text = '';
 jokeGptStreamPipeline.vercel.invokeStream({ subject }, (res) => {
   text += res;
 });
 ```
+</CH.Code>

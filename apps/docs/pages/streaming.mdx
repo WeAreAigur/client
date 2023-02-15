@@ -56,7 +56,7 @@ const jokeGptPipelineStream = aigur.pipeline.create({
 </CH.Code>
 
 <Callout>
-NextJs might fail in build time with the error `ReadableStream is not defined`.
+Some frameworks might fail in build time with the error `ReadableStream is not defined`.
 To bypass the error you can define the output in the following way:
 
 `output: z.instanceof(globalThis.ReadableStream ?? Object)`
@@ -121,7 +121,7 @@ const jokeGptPipelineStream = aigur.pipeline.create({
 ## Invoking the Pipeline
 
 To invoke a streaming Pipeline on the server from the client you need to call the `invokeStream` function.
-It works in a similar way to [invokeRemote](invocation#remote-invocation) but since when using streams you don't receive a single value as an output, rather a stream of values the signature is slightly different - `invokeStream` the accepts a callback that will be called whenever a new value is emitted from the stream.
+It works in a similar way to [invokeRemote](invocation#remote-invocation) but since when using streams you don't receive a single value as an output, rather a stream of values the signature is slightly different - `invokeStream` accepts a callback that will be called whenever a new value is emitted from the stream.
 
 <CH.Code>
 ```ts

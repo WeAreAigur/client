@@ -38,9 +38,9 @@ const { joke } = await jokeGptPipeline.invoke({
 
 ## Remote Invocation
 
-Since pipelines can (should) run on the server you can easily invoke them from the client using the `invokeRemote` method.
-`invokeRemote` is just a typed wrapper around `fetch` which accepts the input of the pipeline and returns the output of the pipeline.
-It receives a `url` parameter which is the URL of the server API where the pipeline will run.
+Since pipelines can run on the server you can easily invoke them from the client using the `invokeRemote` method.
+`invokeRemote` is just a **typed** wrapper around `fetch` which accepts the input of the pipeline and returns the output of the pipeline.
+It receives a `url` parameter which is the URL of the server endpoint where the pipeline will run.
 
 Here are examples of the server side endpoint that will do the actual invocation:
 
@@ -50,7 +50,7 @@ Here are examples of the server side endpoint that will do the actual invocation
     ```ts
     export default async function handler(req: NextApiRequest, res: NextApiResponse) {
       const input = req.body;
-      const output = await pipeline.invoke(input);
+      const output = await pipeline.invoke(input); // <-- import your pipeline
       return res.json(output);
     }
     ```
@@ -61,7 +61,7 @@ Here are examples of the server side endpoint that will do the actual invocation
     ```ts
     app.post('/api/jokePipeline', async (req, res) => {
       const input = req.body;
-      const output = await pipeline.invoke(input);
+      const output = await pipeline.invoke(input); // <-- import your pipeline
       res.json(output);
     });
     ```

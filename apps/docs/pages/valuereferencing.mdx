@@ -64,7 +64,7 @@ flow.text.modify
     modifier: 'BBB $(text)$',
   }))
   .text.prediction.gpt3(({ nodes }) => ({
-    prompt: `${nodes[0].text} ${nodes[1].text}`, // <-- 'AAA aaa BBB bbb'
+    prompt: `${nodes[0].output.text} ${nodes[1].output.text}`, // <-- 'AAA aaa BBB bbb'
   }))
 // ...
 ```

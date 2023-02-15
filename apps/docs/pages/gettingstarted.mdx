@@ -1,4 +1,4 @@
-import { Tab, Tabs } from 'nextra-theme-docs';
+import { Callout, Tab, Tabs } from 'nextra-theme-docs';
 import { JokeForm } from '#/components/JokeForm';
 
 ## Installation
@@ -73,8 +73,6 @@ export const aigur = createClient();
 Pipelines use different services to generate your desired output. Define your API keys for those services in the `apiKeys` property.
 It is typed for specific services (OpenAI, Stability, Google etc) but you can add additional custom keys as well.
 
-It is recommended to instantiate the Aigur Client on the server side as to not leak your API keys to the client but it's not mandatory.
-
 Since we're using the OpenAI GPT-3 service in our example, we'll add our API key for that.
 
 ```ts index.ts focus=4:6
@@ -148,7 +146,7 @@ When we define a node (`flow.text.modify.simple` for example), we need to define
 
 In our first node, `flow.text.modify.simple`, which accepts `text` and `modifier` as input, we'll use the `input` parameter to access the pipeline's input and reference the `subject` property. This node takes our `subject` and prefixes it with the text "tell me a joke about".
 
-```ts index.ts focus=18:24
+```ts index.ts focus=14,19:24 mark=14[7:13],22[17:29]
 import { createClient } from '@aigur/client';
 import { z } from 'zod';
 
@@ -218,8 +216,11 @@ export const jokeGptPipeline =
 
 Last thing, we need to always return the pipeline's output. 
 We'll use the `output` node to map any values we want from our node to the properties defined in our Pipeline's output schema.
+<Callout>
+  Don't forget this step or your Pipeline won't return the expected output!
+</Callout>
 
-```ts index.ts focus=28:30
+```ts index.ts focus=17,28:30 mark=17[7:10],29[11:14]
 import { createClient } from '@aigur/client';
 import { z } from 'zod';
 
@@ -259,7 +260,7 @@ All that's left is to execute our pipeline. We can do that by calling the `invok
 
 The output `text` is typed by the pipeline's `output` property.
 
-```ts index.ts focus=33:35
+```ts index.ts focus=14,17,33:35 mark=14[7:13],17[7:10],33[9:12],34[3:9]
 import { createClient } from '@aigur/client';
 import { z } from 'zod';
 

@@ -64,8 +64,8 @@ export class Builder<
 		return placeholderedOutput;
 	}
 
-	custom<Input extends z.AnyZodObject, Output extends z.AnyZodObject>(
-		node: NodeDefinition<Input, Output>
+	custom<I extends z.AnyZodObject, O extends z.AnyZodObject | ZodReadableStream>(
+		node: NodeDefinition<I, O>
 	) {
 		return this.nodeFactory(node);
 	}

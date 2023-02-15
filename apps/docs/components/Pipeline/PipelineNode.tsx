@@ -1,7 +1,7 @@
 import { Handle, Position } from 'reactflow';
 import { useEffect, useState } from 'react';
 
-import type { Pipeline } from '@aigur/client/src/Pipeline';
+import type { Pipeline } from '@aigur/client';
 
 export interface PipelineNodeProps {
 	id: string;

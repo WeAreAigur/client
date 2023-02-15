@@ -24,7 +24,7 @@ export class Pipeline<
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
-		public readonly flow: Builder<z.AnyZodObject, z.AnyZodObject, [], any>,
+		public readonly flow: Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any, any>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToEvents();

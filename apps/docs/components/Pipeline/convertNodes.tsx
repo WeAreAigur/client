@@ -1,4 +1,4 @@
-import type { Pipeline } from '@aigur/client/src/Pipeline';
+import type { Pipeline } from '@aigur/client';
 import { Edge, Node as RFNode, Position } from 'reactflow';
 
 const nodeHeight = 200;

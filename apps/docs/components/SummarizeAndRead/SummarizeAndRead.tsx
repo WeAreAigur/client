@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { pipelines } from '#/pipelines/pipelines';
 
+import { SummarizeAndReadPipelineView } from './SummarizeAndReadPipelineView';
 import { PlayAudio } from './PlayAudio';
-import { SummarizeAndReadPipelineView } from './ImageToPoemPipelineView';
 
 interface SummarizeAndReadProps {}
 

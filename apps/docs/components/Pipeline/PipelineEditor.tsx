@@ -1,5 +1,4 @@
-'use client';
-import type { Pipeline } from '@aigur/client/src/Pipeline';
+import type { Pipeline } from '@aigur/client';
 import ReactFlow, {
     Background, BackgroundVariant, Edge, Panel, ReactFlowProvider, useEdgesState, useNodesState
 } from 'reactflow';

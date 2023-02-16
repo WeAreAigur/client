@@ -21,7 +21,7 @@ const aigur = createClient({
 
 ```ts index.ts
 //...
-flow.text.modify.simple(() => ({
+flow.image.textToImage.stability(() => ({
   text_prompts: [
     {
       text: 'a green apple'
@@ -49,13 +49,6 @@ flow.text.modify.simple(() => ({
       <td>`{ text: string, weight?: number }[]`</td>
       <td>Yes</td>
       <td>The prompt to create the image from. Weight is optional. If weight is negative the text becomes a "negative prompt". At least one array member with `text` is required.</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>modifier</td>
-      <td>string</td>
-      <td>Yes</td>
-      <td>The </td>
       <td></td>
     </tr>
   </tbody>

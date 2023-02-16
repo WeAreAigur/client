@@ -17,7 +17,7 @@ importers:
   apps/docs:
     specifiers:
       '@aigur/client': workspace:*
-      '@aigur/helpers': workspace:*
+      '@aigur/supabase': workspace:*
       '@code-hike/mdx': ^0.8.0
       '@next/font': 13.1.6
       '@tailwindcss/aspect-ratio': ^0.4.2
@@ -42,7 +42,7 @@ importers:
       zod: ^3.20.2
     dependencies:
       '@aigur/client': link:../../packages/client
-      '@aigur/helpers': link:../../packages/helpers
+      '@aigur/supabase': link:../../packages/supabase
       '@code-hike/mdx': 0.8.0_react@18.2.0
       '@next/font': 13.1.6
       '@tailwindcss/aspect-ratio': 0.4.2_tailwindcss@3.2.4
@@ -103,10 +103,11 @@ importers:
     devDependencies:
       typescript: 4.9.5
 
-  packages/helpers:
+  packages/supabase:
     specifiers:
       '@supabase/supabase-js': ^2.7.1
       tsconfig: workspace:*
+      tsup: ^6.6.3
       typescript: ^4.5.3
       zod: ^3.20.2
     dependencies:
@@ -114,6 +115,7 @@ importers:
       zod: 3.20.2
     devDependencies:
       tsconfig: link:../tsconfig
+      tsup: 6.6.3_typescript@4.9.5
       typescript: 4.9.5
 
   packages/tsconfig:

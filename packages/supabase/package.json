@@ -1,14 +1,13 @@
 {
-	"name": "@aigur/helpers",
+	"name": "@aigur/supabase",
 	"version": "0.30.1",
 	"description": "",
-	"files": [
-		"dist"
-	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"scripts": {
 		"pbl": "npm publish --access public",
-		"build": "tsc --p .",
-		"dev": "tsc --watch"
+		"build": "tsup src/index.ts --format cjs --dts --minify",
+		"dev": "tsup src/index.ts --format cjs --dts --watch"
 	},
 	"keywords": [],
 	"author": "",
@@ -22,6 +21,7 @@
 	},
 	"devDependencies": {
 		"tsconfig": "workspace:*",
-		"typescript": "^4.5.3"
+		"typescript": "^4.5.3",
+		"tsup": "^6.6.3"
 	}
 }

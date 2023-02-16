@@ -39,7 +39,7 @@ async function action(input: z.input<typeof inputSchema>) {
 }
 
 export const supabaseUpload = {
-	id: 'results.upload.supabase',
+	id: 'supabase.storage.upload',
 	schema: {
 		input: inputSchema,
 		output: outputSchema,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pipelines } from '#/pipelines/pipelines';
 
-import { vercelGenericEdge } from '@aigur/helpers/vercelGenericEdge';
+import { vercelGenericEdge } from '@aigur/client';
 
 export default async function handler(req: NextRequest) {
 	const result = await vercelGenericEdge(pipelines, req);

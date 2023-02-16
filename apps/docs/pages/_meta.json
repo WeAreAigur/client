@@ -6,6 +6,7 @@
 	"streaming": "Streaming Results",
 	"frameworks": "Frameworks",
 	"nodes": "Nodes",
+	"external-nodes": "External Nodes",
 	"customnodes": "Custom Nodes",
 	"complexflows": "Complex Flows"
 }

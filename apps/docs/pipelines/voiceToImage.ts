@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { aigur } from '#/services/aigur';
 
-import { supabaseUpload } from '@aigur/helpers/supabase';
+import { supabaseUpload } from '@aigur/supabase';
 
 export const voiceToImagePipeline = aigur.pipeline.create({
 	id: 'voiceToImage',

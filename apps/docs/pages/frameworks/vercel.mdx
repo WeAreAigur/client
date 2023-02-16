@@ -68,33 +68,11 @@ Using this function you can call any Pipeline by its id.
 	The Generic Edge Function must be defined at /api/pipelines/[id].ts
 </Callout>
 
-1. Install the `@aigur/helpers` package:
-
-<Tabs items={['pnpm', 'npm', 'yarn']}>
-	<Tab>
-		```fish
-		pnpm add @aigur/helpers
-		```
-	</Tab>
-	<Tab>
-		```fish
-		npm i @aigur/helpers
-		```
-	</Tab>
-	<Tab>
-		```fish
-		yarn add @aigur/helpers
-		```
-	</Tab>
-</Tabs>
-
-2. Define the Generic Edge Function:
-
 <CH.Code lineNumbers={true}>
 ```ts /api/[...pipeline].ts
 import { NextRequest, NextResponse } from 'next/server';
 import { pipelines } from '#/pipelines/pipelines'; // <-- import the pipelines
-import { vercelGenericEdge } from '@aigur/helpers/vercelGenericEdge'; // <-- import the helper
+import { vercelGenericEdge } from '@aigur/client'; // <-- import the helper
 
 export default async function handler(req: NextRequest) {
 	const result = await vercelGenericEdge(pipelines, req); // <-- invoke the helper

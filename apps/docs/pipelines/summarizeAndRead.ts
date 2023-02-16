@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { aigur } from '#/services/aigur';
 
-import { supabaseUpload } from '@aigur/helpers/supabase';
+import { supabaseUpload } from '@aigur/supabase';
 
 export const summarizeAndReadPipeline = aigur.pipeline.create({
 	id: 'summarizeAndRead',

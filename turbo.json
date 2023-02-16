@@ -12,7 +12,7 @@
 		"dev": {
 			"cache": false
 		},
-		"web#dev": {
+		"docs#dev": {
 			"dependsOn": ["^build"],
 			"env": [
 				"OPENAI_KEY",

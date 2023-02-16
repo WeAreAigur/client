@@ -1,4 +1,3 @@
-/** @type {import('next').NextConfig} */
 import nextra from 'nextra';
 import remarkMdxDisableExplicitJsx from 'remark-mdx-disable-explicit-jsx';
 
@@ -18,7 +17,7 @@ const withNextra = nextra({
 
 export default withNextra({
 	reactStrictMode: true,
-	transpilePackages: ['@aigur/client', '@aigur/helpers'],
+	transpilePackages: ['@aigur/client', '@aigur/supabase'],
 	images: {
 		domains: ['rxbcnsluyhrlazakjohf.supabase.co'],
 	},

@@ -3,7 +3,7 @@
 
 ## Description
 
-Takes a string (`text`) and a `modifier` and replaces the string `$(text)$` in the `modifier` with the `text` field.
+Returns an image generated from the given text prompt in the form of an `ArrayBuffer`.
 
 ## API Key
 
@@ -51,6 +51,108 @@ flow.image.textToImage.stability(() => ({
       <td>The prompt to create the image from. Weight is optional. If weight is negative the text becomes a "negative prompt". At least one array member with `text` is required.</td>
       <td></td>
     </tr>
+    <tr>
+      <td>model</td>
+      <td>enum('stable-diffusion-v1-5', 'stable-diffusion-512-v2-0', 'stable-diffusion-768-v2-0', 'stable-diffusion-512-v2-1', 'stable-diffusion-768-v2-1')</td>
+      <td>No</td>
+      <td>The model to use.</td>
+      <td>stable-diffusion-v1-5</td>
+    </tr>
+    <tr>
+      <td>clip_guidance_preset</td>
+      <td>enum('NONE', 'FAST_BLUE', 'FAST_GREEN', 'SIMPLE', 'SLOW', 'SLOWER', 'SLOWEST')</td>
+      <td>No</td>
+      <td>CLIP Guidance can be used to provide additional context while generating your image, which often results in improved coherency. CLIP Guidance is "guiding" the generation process of your image to be more in-line with your included prompt.</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>steps</td>
+      <td>number [10..150]</td>
+      <td>No</td>
+      <td>Amount of inference steps performed on image generation.</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <td>sampler</td>
+      <td>enum('DDIM',
+			'DDPM',
+			'K_DPMPP_2M',
+			'K_DPMPP_2S_ANCESTRAL',
+			'K_DPM_2',
+			'K_DPM_2_ANCESTRAL',
+			'K_EULER',
+			'K_EULER_ANCESTRAL',
+			'K_HEUN',
+			'K_LMS')</td>
+      <td>No</td>
+      <td>Which sampler to use for the diffusion process. If this value is omitted we'll automatically select an appropriate sampler for you.</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>cfg_scale</td>
+      <td>number [0..35]</td>
+      <td>No</td>
+      <td>How strictly the diffusion process adheres to the prompt text (higher values keep your image closer to your prompt).</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>seed</td>
+      <td>number [>0]</td>
+      <td>No</td>
+      <td>Random noise seed (omit this option or use 0 for a random seed)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>height</td>
+      <td>number [>128, multiples of 64]</td>
+      <td>No</td>
+      <td>The height of the generated image.<br/><br/>For 768 engines:
+589,824
+≤
+height * width
+≤
+1,048,576
+<br/><br/>All other engines:
+262,144
+≤
+height * width
+≤
+1,048,576</td>
+      <td>512</td>
+    </tr>
+    <tr>
+      <td>width</td>
+      <td>number [>128, multiples of 64]</td>
+      <td>No</td>
+      <td>The width of the generated image.<br/><br/>For 768 engines:
+589,824
+≤
+height * width
+≤
+1,048,576
+<br/><br/>All other engines:
+262,144
+≤
+height * width
+≤
+1,048,576</td>
+      <td>512</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    
   </tbody>
 </table>
 
@@ -66,8 +168,8 @@ flow.image.textToImage.stability(() => ({
   </thead>
   <tbody>
     <tr>
-      <td>text</td>
-      <td>string</td>
+      <td>result</td>
+      <td>ArrayBuffer</td>
     </tr>
   </tbody>
 </table>

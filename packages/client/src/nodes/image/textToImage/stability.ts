@@ -10,19 +10,40 @@ const inputSchema = z.object({
 				weight: z.number().min(-1).max(1).optional().default(1),
 			})
 		)
-		.refine((val) => val.length > 0, 'Must have at least one text prompt'),
+		.nonempty(),
+
 	model: z
-		.enum(['stable-diffusion-v1-5', 'stable-diffusion-512-v2-1', 'stable-diffusion-768-v2-1'])
+		.enum([
+			'stable-diffusion-v1-5',
+			'stable-diffusion-512-v2-0',
+			'stable-diffusion-768-v2-0',
+			'stable-diffusion-512-v2-1',
+			'stable-diffusion-768-v2-1',
+		])
 		.optional()
-		.default('stable-diffusion-v1-5'),
+		.default('stable-diffusion-v1-5')
+		.describe('beep boop'),
 	clip_guidance_preset: z
 		.enum(['NONE', 'FAST_BLUE', 'FAST_GREEN', 'SIMPLE', 'SLOW', 'SLOWER', 'SLOWEST'])
 		.optional(),
-	steps: z.number().optional(),
-	sampler: z.enum(['one', 'two']).optional(),
-	samples: z.number().optional(),
-	cfg_scale: z.number().optional(),
-	seed: z.number().optional(),
+	steps: z.number().min(0).max(150).optional(),
+	sampler: z
+		.enum([
+			'DDIM',
+			'DDPM',
+			'K_DPMPP_2M',
+			'K_DPMPP_2S_ANCESTRAL',
+			'K_DPM_2',
+			'K_DPM_2_ANCESTRAL',
+			'K_EULER',
+			'K_EULER_ANCESTRAL',
+			'K_HEUN',
+			'K_LMS',
+		])
+		.optional(),
+	// samples: z.number().optional(),
+	cfg_scale: z.number().min(0).max(35).optional(),
+	seed: z.number().min(0).optional(),
 	height: z
 		.number()
 		.min(128)

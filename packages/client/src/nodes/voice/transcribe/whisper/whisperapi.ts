@@ -6,6 +6,10 @@ const endpoint = 'https://transcribe.whisperapi.com';
 
 const inputSchema = z.object({
 	audioUrl: z.string().url(),
+	language: z.string().default('en'),
+	autoDetectLanguage: z.boolean().default(false),
+	fileType: z.string().default('mp3'),
+	task: z.enum(['transcribe', 'translate']).default('transcribe'),
 });
 
 const outputSchema = z.object({
@@ -19,9 +23,11 @@ async function action(
 	const payload = inputSchema.parse(input);
 	const form = new FormData();
 	form.append('url', payload.audioUrl);
-	form.append('language', 'en');
-	form.append('fileType', 'mp3');
-	form.append('task', 'transcribe');
+	if (!payload.autoDetectLanguage) {
+		form.append('language', payload.language);
+	}
+	form.append('fileType', payload.fileType);
+	form.append('task', payload.task);
 
 	const result = await fetch(endpoint, {
 		method: 'POST',

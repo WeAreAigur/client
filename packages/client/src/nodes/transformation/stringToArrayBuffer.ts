@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const inputSchema = z.object({
-	string: z.string(),
+	string: z.string(), // base64
 });
 
 const outputSchema = z.object({

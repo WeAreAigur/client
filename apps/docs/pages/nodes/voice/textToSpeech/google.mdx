@@ -1,0 +1,146 @@
+## Path
+`flow.voice.textToSpeech.google`
+
+## Description
+
+Uses Google Cloud Text-to-Speech to convert text to speech.
+
+## API Key
+
+Uses the `googleapis` API key:
+
+```ts index.ts
+const aigur = createClient({
+  apiKeys: {
+    googleapis: process.env.GOOGLE_API_KEY
+  }
+})
+```
+
+## Example
+
+```ts index.ts
+//...
+flow.voice.textToSpeech.google(() => ({
+  text: 'Hello world'
+})) // --> {audio: base64String}
+```
+
+
+## Input
+
+{<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+      <th>Default Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>text</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The text you want to turn to speech.</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>speakingRate</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Speaking rate/speed, in the range [0.25, 4.0]. 1.0 is the normal native speed supported by the specific voice. 2.0 is twice as fast, and 0.5 is half as fast. If unset(0.0), defaults to the native 1.0 speed. Any other values &lt; 0.25 or &gt; 4.0 will return an error.</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>pitch</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Speaking pitch, in the range [-20.0, 20.0]. 20 means increase 20 semitones from the original pitch. -20 means decrease 20 semitones from the original pitch.</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>encoding</td>
+      <td>enum('MP3',
+			'FLAC',
+			'LINEAR16',
+			'MULAW',
+			'AMR',
+			'AMR_WB',
+			'OGG_OPUS',
+			'SPEEX_WITH_HEADER_BYTE',
+			'WEBM_OPUS')</td>
+      <td>No</td>
+      <td>The encoding determines the output audio format that we'd like.</td>
+      <td>MP3</td>
+    </tr>
+    <tr>
+      <td>voice.language</td>
+      <td>string</td>
+      <td>No</td>
+      <td>The language (and potentially also the region) of the voice expressed as a BCP-47 language tag, e.g. "en-US".</td>
+      <td>en-US</td>
+    </tr>
+    <tr>
+      <td>voice.name</td>
+      <td>enum('en-US-Standard-A',
+					'en-US-Standard-C',
+					'en-US-Standard-D',
+					'en-US-Standard-E',
+					'en-US-Standard-F',
+					'en-US-Standard-G',
+					'en-US-Standard-H',
+					'en-US-Standard-I',
+					'en-US-Standard-J',
+					'en-US-Studio-M',
+					'en-US-Studio-O',
+					'en-US-Wavenet-A',
+					'en-US-Wavenet-B',
+					'en-US-Wavenet-C',
+					'en-US-Wavenet-D',
+					'en-US-Wavenet-E',
+					'en-US-Wavenet-F',
+					'en-US-Wavenet-G',
+					'en-US-Wavenet-H',
+					'en-US-Wavenet-I',
+					'en-US-Wavenet-J',
+					'en-US-News-K',
+					'en-US-News-L',
+					'en-US-News-M',
+					'en-US-News-N',
+					'en-US-Standard-A',
+					'en-US-Standard-B',
+					'en-US-Standard-C',
+					'en-US-Standard-D',
+					'en-US-Standard-E',
+					'en-US-Standard-F',
+					'en-US-Standard-G',
+					'en-US-Standard-H',
+					'en-US-Standard-I',
+					'en-US-Standard-J')</td>
+      <td>No</td>
+      <td>The name of the voice.</td>
+      <td>en-US-Neural2-C</td>
+    </tr>
+  </tbody>
+</table>}
+
+
+## Output
+
+{<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>audio</td>
+      <td>string (base64)</td>
+    </tr>
+  </tbody>
+</table>}

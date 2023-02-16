@@ -99,7 +99,7 @@ export class Builder<
 			},
 		},
 		labeling: {
-			googleVision: this.nodeFactory(googleVisionNode),
+			google: this.nodeFactory(googleVisionNode),
 		},
 	};
 

@@ -5,6 +5,18 @@
 
 Calls GPT3 and returns the result as a [Stream](/streaming)
 
+## API Key
+
+Uses the `openai` API key:
+
+```ts index.ts
+const aigur = createClient({
+  apiKeys: {
+    openai: process.env.OPENAI_API_KEY
+  }
+})
+```
+
 ## Example
 
 ```ts index.ts

@@ -28,6 +28,13 @@ export default {
 		),
 	},
 	faviconGlyph: '📖',
+	head: (
+		<>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+			<meta property="og:title" content="Aigur Client" />
+			<meta property="og:description" content="Compose and Invoke Generative AI Pipelines" />
+		</>
+	),
 
 	useNextSeoProps() {
 		return {

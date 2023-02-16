@@ -1,6 +1,6 @@
 {
 	"name": "@aigur/client",
-	"version": "0.30.2",
+	"version": "0.31.0",
 	"description": "",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",

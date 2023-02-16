@@ -1,0 +1,56 @@
+## Path
+`flow.output`
+
+## Description
+
+Used to map values to the Pipeline's output fields.
+
+Used as the last Node in the Pipeline.
+
+## Example
+
+```ts index.ts focus=6:8
+//...
+flow.text.modify.simple(() => ({
+  text: 'Boopsy',
+  modifier: 'Hello $(text)$',
+}))
+.output(({ prev }) => ({
+  name: prev.text, // <-- "name" is the Pipeline's output field
+}))
+```
+
+
+## Input
+
+The `output` Node is special in that its input is dynamic and set by the output of the Pipeline itself.
+
+```ts index.ts focus=8,19:21 mark=8[7:10],20[11:14]
+export const jokeGptPipeline = 
+  aigur.pipeline.create({
+    id: 'jokegpt',
+    input: z.object({
+      subject: z.string(),
+    }),
+    output: z.object({
+      joke: z.string(),
+    }),
+    flow: (flow) =>
+      flow.text.modify
+        .simple(({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .text.prediction.gpt3(({ prev }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => ({
+          joke: prev.text,
+        })
+  });
+```
+
+
+## Output
+
+The output of the `output` Node is the Pipeline's output.

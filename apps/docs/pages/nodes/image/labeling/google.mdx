@@ -1,3 +1,12 @@
+## Path
+`flow.image.labeling.google`
+
+## Description
+
+Uses Google Cloud Vision API to label an image.
+
+Takes an image (`base64 string`) and returns an array of labels (`string[]`).
+
 ## API Key
 
 Uses the `googleapis` API key:
@@ -9,3 +18,54 @@ const aigur = createClient({
   }
 })
 ```
+
+## Example
+
+```ts index.ts
+//...
+flow.image.labeling.google(() => ({
+  image: imageContent,
+})) // --> {labels: ['label1', 'label2']}
+```
+
+
+## Input
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+      <th>Default Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>image</td>
+      <td>string (base64)</td>
+      <td>Yes</td>
+      <td>The image to label.</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+
+## Output
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>labels</td>
+      <td>string[]</td>
+    </tr>
+  </tbody>
+</table>

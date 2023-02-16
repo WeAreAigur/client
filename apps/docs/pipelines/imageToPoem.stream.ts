@@ -11,7 +11,7 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create({
 	output: z.instanceof(globalThis.ReadableStream ?? Object),
 	flow: (flow) =>
 		flow.image.labeling
-			.googleVision(({ input }) => ({
+			.google(({ input }) => ({
 				image: input.image,
 			}))
 			.text.modify.simple(({ prev }) => ({

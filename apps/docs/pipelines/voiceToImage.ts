@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { aigur } from '#/services/aigur';
+import { z } from 'zod';
 
 import { supabaseUpload } from '@aigur/supabase';
 
@@ -45,9 +45,7 @@ export const voiceToImagePipeline = aigur.pipeline.create({
 						text: prev.text,
 					},
 				],
-				clip_guidance_preset: 'SLOW',
 				steps: 60,
-				model: 'stable-diffusion-768-v2-1',
 			}))
 			.custom(supabaseUpload)(({ prev }) => ({
 				bucket: 'results',

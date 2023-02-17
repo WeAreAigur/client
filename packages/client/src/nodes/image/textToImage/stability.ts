@@ -21,8 +21,7 @@ const inputSchema = z.object({
 			'stable-diffusion-768-v2-1',
 		])
 		.optional()
-		.default('stable-diffusion-v1-5')
-		.describe('beep boop'),
+		.default('stable-diffusion-v1-5'),
 	clip_guidance_preset: z
 		.enum(['NONE', 'FAST_BLUE', 'FAST_GREEN', 'SIMPLE', 'SLOW', 'SLOWER', 'SLOWEST'])
 		.optional(),

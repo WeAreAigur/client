@@ -17,7 +17,9 @@ const outputSchema = z.object({
 
 async function action(input: z.input<typeof inputSchema>) {
 	const payload = inputSchema.parse(input);
-	const supabase = createClient(payload.supabaseUrl, payload.supabaseServiceKey);
+	const supabase = createClient(payload.supabaseUrl, payload.supabaseServiceKey, {
+		global: { fetch },
+	});
 	const uploadedFile = await uploadFileToStorage(
 		payload.file,
 		`${payload.name ?? makeid(16)}.${payload.extension}`,

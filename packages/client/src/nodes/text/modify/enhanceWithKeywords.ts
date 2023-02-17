@@ -28,7 +28,9 @@ function getExamples(amountOfKeys: number) {
 		.join('\n');
 }
 
-async function action(input: z.input<typeof inputSchema>): Promise<z.infer<typeof outputSchema>> {
+export async function enhanceWithKeywords(
+	input: z.input<typeof inputSchema>
+): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
 	const enhancedText = `Write a maximum of ${
 		payload.amount
@@ -39,12 +41,3 @@ async function action(input: z.input<typeof inputSchema>): Promise<z.infer<typeo
 		text: enhancedText,
 	};
 }
-
-export const enhanceWithKeywordsNode = {
-	id: 'text.modify.enhanceWithKeywords',
-	schema: {
-		input: inputSchema,
-		output: outputSchema,
-	},
-	action,
-};

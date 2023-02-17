@@ -1,84 +1,52 @@
 import { Callout } from 'nextra-theme-docs';
 
-You can easily extend the base Node list by creating your own custom nodes.
+Creating a Node is easy - it's just an async function!
 
-Nodes consist of 3 parts: `id`, a `schema` consisting of an `input` and `output`, and an `action`.
+A Node function receives two parameters - `input` and `apiKeys`:
+
+- The `input` is either a `Record<string, any>` or a `ReadableStream`.
+- The `apiKeys` is a `Record<string, string>` that contains all API Keys that were passed into the Aigur Client instance. You can use them for your API calls.
 
 <Callout>
-The schema must be defined with `zod`.
+  The Node function must return a `Promise` that resolves to the output of the Node (`Record<string, any>` or a `ReadableStream`).
 </Callout>
 
-## Example
+## Simple Example
 
-Here is an example of the "simple text modification" Node:
+Here is an example of a Node that greets its input:
+
+```ts index.ts
+export async function greeter(input: { subject: string }): Promise<{greeting: string}> {
+  return {
+    greeting: `Hello, ${input.subject}!`,
+  }
+}
+
+```
+
+## Using Zod (Optional)
+
+You can use runtime schema validators such as [Zod](https://zod.dev/) to validate the input and output of your Node.
 
 ```ts index.ts
 import { z } from 'zod';
 
 const inputSchema = z.object({
-  text: z.string().or(z.array(z.string())),
-  modifier: z.string(),
+	subject: z.string().default('world'),
 });
 
 const outputSchema = z.object({
-  text: z.string(),
+	greeting: z.string(),
 });
 
-async function action(input: z.input<typeof inputSchema>): Promise<z.infer<typeof outputSchema>> {
-  // Ensure that the input is valid and complete the input with default values.
-  const payload = inputSchema.parse(input);
-  return {
-    text: payload.modifier.replace(
-      /\$\(text\)\$/gm,
-      Array.isArray(payload.text) ? payload.text.join(', ') : payload.text
-    ),
-  };
+export async function replaceString(
+	input: z.input<typeof inputSchema>
+): Promise<z.output<typeof outputSchema>> {
+  // parse the input and set default values if defined
+	const payload = inputSchema.parse(input);
+	return {
+		greeting: `Hello, ${payload.subject}!`,
+	};
 }
 
-export const simpleModificationNode = {
-	id: 'text.modify.simple',
-	schema: {
-		input: inputSchema,
-		output: outputSchema,
-	},
-	action,
-};
-
 ```
-
-<table>
-  <thead>
-    <tr>
-      <th>Property</th>
-      <th>Type</th>
-      <th>Required</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>id</td>
-      <td>string</td>
-      <td>Yes</td>
-      <td>A unique identifier of the Node.</td>
-    </tr>
-    <tr>
-      <td>schema.input</td>
-      <td>A `Zod` schema. Must be of type `z.object`.</td>
-      <td>Yes</td>
-      <td>The input of the Node.</td>
-    </tr>
-    <tr>
-      <td>schema.output</td>
-      <td>A `Zod` schema. Must be of type `z.object` or `z.instanceOf(ReadableStream)`.</td>
-      <td>Yes</td>
-      <td>The output of the Node.</td>
-    </tr>
-    <tr>
-      <td>action</td>
-      <td>`function (input: z.input<typeof inputSchema>, apiKeys: APIKeys): Promise<z.infer<typeof outputSchema>> {}`</td>
-      <td>Yes</td>
-      <td>A function that receives an `input` object (defined by `schema.input`) and `apiKeys`, a `Record<string, string>` that contains all API Keys that were passed into the Aigur Client instance.</td>
-    </tr>
-  </tbody>
-</table>

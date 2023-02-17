@@ -1,12 +1,17 @@
 import { z } from 'zod';
 
-import {
-    APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType, ZodReadableStream
-} from './types';
-import { makeid } from './makeid';
-import { getInputByContext } from './getInputByContext';
+import { FlowBuilder } from './builder';
 import { delay } from './delay';
-import { Builder } from './builder';
+import { getInputByContext } from './getInputByContext';
+import { makeid } from './makeid';
+import {
+	APIKeys,
+	ConcreteNode,
+	EventType,
+	PipelineConf,
+	ProgressEventType,
+	ZodReadableStream,
+} from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -24,7 +29,7 @@ export class Pipeline<
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
-		public readonly flow: Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any, any>,
+		public readonly flow: FlowBuilder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any, any>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToEvents();
@@ -131,7 +136,12 @@ export class Pipeline<
 		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
 		const eventSource = new EventSource(dataEndpoint);
 		eventSource.onmessage = (event) => {
-			const e: { type: EventType; data: Record<any, any> } = JSON.parse(event.data);
+			const e: { pipelineId: string; type: EventType; data: Record<any, any> } = JSON.parse(
+				event.data
+			);
+			if (e.pipelineId !== this.conf.id) {
+				return;
+			}
 			if (e.type === 'pipeline:start') {
 				this.triggerListeners(this.onStartListeners);
 			} else if (e.type === 'pipeline:finish') {
@@ -212,6 +222,7 @@ export class Pipeline<
 			body: JSON.stringify({
 				type,
 				data,
+				pipelineId: this.conf.id,
 			}),
 		});
 	}

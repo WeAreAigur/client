@@ -1,3 +1,11 @@
+import {
+	enhanceWithKeywords,
+	gpt3Prediction,
+	replaceString,
+	stabilityTextToImage,
+	stringToArrayBuffer,
+	whisperApi,
+} from '#/../../packages/client/dist';
 import { aigur } from '#/services/aigur';
 import { z } from 'zod';
 
@@ -15,31 +23,31 @@ export const voiceToImagePipeline = aigur.pipeline.create({
 		enhancedPrompt: z.string(),
 	}),
 	flow: (flow) =>
-		flow.transformation
-			.stringToArrayBuffer(({ input }) => ({
+		flow
+			.node(stringToArrayBuffer, ({ input }) => ({
 				string: input.audio,
 			}))
-			.custom(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload, ({ prev }) => ({
 				bucket: 'audio',
 				extension: 'mp3',
 				file: prev.arrayBuffer,
 				supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
 				supabaseUrl: process.env.SUPABASE_URL!,
 			}))
-			.voice.transcribe.whisper.whisperapi(({ prev }) => ({
+			.node(whisperApi, ({ prev }) => ({
 				audioUrl: prev.url,
 			}))
-			.text.modify.enhanceWithKeywords(({ prev }) => ({
+			.node(enhanceWithKeywords, ({ prev }) => ({
 				text: prev.text,
 			}))
-			.text.prediction.gpt3(({ prev }) => ({
+			.node(gpt3Prediction, ({ prev }) => ({
 				prompt: prev.text,
 			}))
-			.text.modify.simple(({ prev }) => ({
+			.node(replaceString, ({ prev }) => ({
 				text: prev.text,
 				modifier: `high resolution photography, magazine, $(text)$, cinematic composition, 8k, highly detailed, cinematography, mega scans, 35mm lens, god rays, pools of light`,
 			}))
-			.image.textToImage.stableDiffusion.stability(({ prev }) => ({
+			.node(stabilityTextToImage, ({ prev }) => ({
 				text_prompts: [
 					{
 						text: prev.text,
@@ -47,7 +55,7 @@ export const voiceToImagePipeline = aigur.pipeline.create({
 				],
 				steps: 60,
 			}))
-			.custom(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload, ({ prev }) => ({
 				bucket: 'results',
 				extension: 'png',
 				file: prev.result,

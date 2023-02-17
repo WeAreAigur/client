@@ -12,7 +12,7 @@ export function convertNodes(
 ): RFNode<any>[] {
 	const nodeMap = new Map<string, any>();
 	for (let i = 0; i < nodes.length; i++) {
-		nodeMap.set(nodes[i].id, nodes[i]);
+		nodeMap.set(i.toString(), nodes[i]);
 	}
 
 	const convertedNodes: RFNode[] = [];
@@ -20,10 +20,10 @@ export function convertNodes(
 	let i = 0;
 	for (const edge of edges) {
 		const sourceNode = nodeMap.get(edge.source);
-		convertedNodes.push(convertNode(sourceNode, i === 0, false, isHorizontal, pipeline));
+		convertedNodes.push(convertNode(i, sourceNode, i === 0, false, isHorizontal, pipeline));
 		if (i === edges.length - 1) {
 			const targetNode = nodeMap.get(edge.target);
-			convertedNodes.push(convertNode(targetNode, false, true, isHorizontal, pipeline));
+			convertedNodes.push(convertNode(i + 1, targetNode, false, true, isHorizontal, pipeline));
 		}
 		i++;
 	}
@@ -31,6 +31,7 @@ export function convertNodes(
 	return convertedNodes;
 
 	function convertNode(
+		index: number,
 		node: any,
 		isFirst: boolean,
 		isLast: boolean,
@@ -38,9 +39,10 @@ export function convertNodes(
 		pipeline: Pipeline<any, any>
 	): RFNode<any> {
 		return {
-			id: node.id.toString(),
+			id: index.toString(),
 			type: 'pipelineNode',
 			data: {
+				index,
 				type: node.definition.type,
 				label: node.label,
 				definitionLabel: node.definition.label,

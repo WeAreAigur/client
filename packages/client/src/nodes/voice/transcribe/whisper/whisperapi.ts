@@ -16,7 +16,12 @@ const outputSchema = z.object({
 	text: z.string(),
 });
 
-async function action(
+// const x: z.input<typeof inputSchema> = {
+// 	audioUrl: '',
+// 	task: y,
+// };
+
+export async function whisperApi(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
@@ -45,12 +50,3 @@ async function action(
 	const data = await result.json();
 	return { text: data.text.trim() };
 }
-
-export const whisperApiNode = {
-	id: 'voice.transcribe.whisper.whisperapi',
-	schema: {
-		input: inputSchema,
-		output: outputSchema,
-	},
-	action,
-};

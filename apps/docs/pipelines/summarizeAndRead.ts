@@ -2,6 +2,12 @@ import { z } from 'zod';
 import { aigur } from '#/services/aigur';
 
 import { supabaseUpload } from '@aigur/supabase';
+import {
+	googleTextToSpeech,
+	gpt3Prediction,
+	replaceString,
+	stringToArrayBuffer,
+} from '@aigur/client';
 
 export const summarizeAndReadPipeline = aigur.pipeline.create({
 	id: 'summarizeAndRead',
@@ -14,21 +20,21 @@ export const summarizeAndReadPipeline = aigur.pipeline.create({
 		summary: z.string(),
 	}),
 	flow: (flow) =>
-		flow.text.modify
-			.simple(({ input }) => ({
+		flow
+			.node(replaceString, ({ input }) => ({
 				text: input.text,
 				modifier: '$(text)$\n\nTl;dr',
 			}))
-			.text.prediction.gpt3(({ prev }) => ({
+			.node(gpt3Prediction, ({ prev }) => ({
 				prompt: prev.text,
 			}))
-			.voice.textToSpeech.google(({ prev }) => ({
+			.node(googleTextToSpeech, ({ prev }) => ({
 				text: prev.text,
 			}))
-			.transformation.stringToArrayBuffer(({ prev }) => ({
+			.node(stringToArrayBuffer, ({ prev }) => ({
 				string: prev.audio,
 			}))
-			.custom(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload, ({ prev }) => ({
 				bucket: 'audio',
 				extension: 'mp3',
 				file: prev.arrayBuffer,

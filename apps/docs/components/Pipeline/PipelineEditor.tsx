@@ -1,13 +1,19 @@
 import type { Pipeline } from '@aigur/client';
 import ReactFlow, {
-    Background, BackgroundVariant, Edge, Panel, ReactFlowProvider, useEdgesState, useNodesState
+	Background,
+	BackgroundVariant,
+	Edge,
+	Panel,
+	ReactFlowProvider,
+	useEdgesState,
+	useNodesState,
 } from 'reactflow';
 
 import { PipelineNode } from './PipelineNode';
 import { convertNodes } from './convertNodes';
 
 export interface PipelineEditorProps {
-	nodes: { id: string; label: string; definition: { type: string; label?: string } }[];
+	nodes: { label: string; definition: { type: string; label?: string } }[];
 	edges: Edge[];
 	isActive: boolean;
 	zoom?: number;

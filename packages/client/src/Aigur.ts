@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { APIKeys, PipelineConf, ZodReadableStream } from './types';
+import { FlowBuilder } from './builder';
 import { Pipeline } from './Pipeline';
-import { Builder } from './builder';
+import { APIKeys, PipelineConf, ZodReadableStream } from './types';
 
 interface AigurConfiguration {
 	apiKeys: APIKeys;
@@ -25,7 +25,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					retries: conf.retries ?? DEFAULT_RETRIES,
 					retryDelayInMs: conf.retryDelayInMs ?? RETRY_DELAY_IN_MS,
 				};
-				const flow = conf.flow(new Builder<Input, Output, [], null>(conf.input, []));
+				const flow = conf.flow(new FlowBuilder<Input, Output, [], null>(conf.input, []));
 				return new Pipeline(pipelineConf, flow, apiKeys);
 			},
 		},

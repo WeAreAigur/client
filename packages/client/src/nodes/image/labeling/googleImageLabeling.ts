@@ -10,7 +10,7 @@ const outputSchema = z.object({
 	labels: z.array(z.string()),
 });
 
-async function action(
+export async function googleImageLabeling(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
@@ -41,12 +41,3 @@ async function action(
 		labels: data.responses[0].labelAnnotations.map((label) => label.description),
 	};
 }
-
-export const googleVisionNode = {
-	id: 'image.labeling.googleVision',
-	schema: {
-		input: inputSchema,
-		output: outputSchema,
-	},
-	action,
-};

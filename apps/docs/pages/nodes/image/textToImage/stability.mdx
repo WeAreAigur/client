@@ -1,5 +1,5 @@
-## Path
-`flow.image.textToImage.stability`
+## Name
+`stabilityTextToImage`
 
 ## Description
 
@@ -20,8 +20,10 @@ const aigur = createClient({
 ## Example
 
 ```ts index.ts
+import { stabilityTextToImage } from '@aigur/client';
+
 //...
-flow.image.textToImage.stability(() => ({
+flow.node(stabilityTextToImage, () => ({
   text_prompts: [
     {
       text: 'a green apple'

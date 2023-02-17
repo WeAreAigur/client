@@ -1,5 +1,7 @@
-import { z } from 'zod';
 import { aigur } from '#/services/aigur';
+import { z } from 'zod';
+
+import { gpt3Prediction, replaceString } from '@aigur/client';
 
 export const jokeGptPipeline = aigur.pipeline.create({
 	id: 'jokegpt',
@@ -10,12 +12,12 @@ export const jokeGptPipeline = aigur.pipeline.create({
 		joke: z.string(),
 	}),
 	flow: (flow) =>
-		flow.text.modify
-			.simple(({ input }) => ({
+		flow
+			.node(replaceString, ({ input }) => ({
 				text: input.subject,
 				modifier: 'tell me a joke about $(text)$',
 			}))
-			.text.prediction.gpt3(({ prev }) => ({
+			.node(gpt3Prediction, ({ prev, input, nodes }) => ({
 				prompt: prev.text,
 			}))
 			.output(({ prev }) => ({

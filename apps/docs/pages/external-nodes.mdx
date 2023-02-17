@@ -1,4 +1,4 @@
-In order to reduce bundle size, installation time and clutter some nodes will not be in the core `@aigur/client` package. Instead, they will be in separate packages and will be used as [custom nodes](/customnodes).
+In order to reduce bundle size, installation time and clutter some nodes will not be in the core `@aigur/client` package. Instead, they will be in separate packages but they are no different than the packages in the core package.
 
 - `@aigur/supabase` - Nodes that interact with [Supabase](https://supabase.com) database.
 
@@ -6,7 +6,7 @@ In order to reduce bundle size, installation time and clutter some nodes will no
 import { supabaseUpload } from '@aigur/supabase';
 
 // ...
-flow.custom(supabaseUpload)(({ prev }) => ({
+flow.node(supabaseUpload, ({ prev }) => ({
   bucket: 'results',
   extension: 'png',
   file: prev.result,

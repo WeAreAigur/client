@@ -1,5 +1,5 @@
-## Path
-`flow.transformation.stringToArrayBuffer`
+## Name
+`stringToArrayBuffer`
 
 ## Description
 
@@ -8,8 +8,10 @@ Converts a base64 string to an ArrayBuffer
 ## Example
 
 ```ts index.ts
+import { stringToArrayBuffer } from '@aigur/client';
+
 //...
-flow.text.modify.simple(() => ({
+flow.node(stringToArrayBuffer, () => ({
   string: someBase64String,
 })) // --> {arrayBuffer: ArrayBuffer}
 ```

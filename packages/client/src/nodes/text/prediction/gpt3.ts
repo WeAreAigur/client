@@ -26,7 +26,7 @@ export const outputSchema = z.object({
 	text: z.string(),
 });
 
-export async function action(
+export async function gpt3Prediction(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
@@ -43,12 +43,3 @@ export async function action(
 	const output = await response.json();
 	return { text: output.choices[0]?.text.replace(/^(?:\n)+/gm, '') };
 }
-
-export const gpt3PredictionNode = {
-	id: 'text.prediction.gpt3',
-	schema: {
-		input: inputSchema,
-		output: outputSchema,
-	},
-	action,
-};

@@ -1,5 +1,5 @@
-## Path
-`flow.text.modify.simple`
+## Name
+`replaceString`
 
 ## Description
 
@@ -8,8 +8,10 @@ Takes a string (`text`) and a `modifier` and replaces the string `$(text)$` in t
 ## Example
 
 ```ts index.ts
+import { replaceString } from '@aigur/client';
+
 //...
-flow.text.modify.simple(() => ({
+flow.node(replaceString, () => ({
   text: 'Boopsy',
   modifier: 'Hello $(text)$',
 })) // --> {text: 'Hello Boopsy'}

@@ -16,31 +16,32 @@ const outputSchema = z.object({
 	text: z.string(),
 });
 
-export const whisperApiNode =
-	(input: z.input<typeof inputSchema>) =>
-	async (apiKeys: APIKeys): Promise<z.infer<typeof outputSchema>> => {
-		const payload = inputSchema.parse(input);
-		const form = new FormData();
-		form.append('url', payload.audioUrl);
-		if (!payload.autoDetectLanguage) {
-			form.append('language', payload.language);
-		}
-		form.append('fileType', payload.fileType);
-		form.append('task', payload.task);
+export async function whisperApiNode(
+	input: z.input<typeof inputSchema>,
+	apiKeys: APIKeys
+): Promise<z.infer<typeof outputSchema>> {
+	const payload = inputSchema.parse(input);
+	const form = new FormData();
+	form.append('url', payload.audioUrl);
+	if (!payload.autoDetectLanguage) {
+		form.append('language', payload.language);
+	}
+	form.append('fileType', payload.fileType);
+	form.append('task', payload.task);
 
-		const result = await fetch(endpoint, {
-			method: 'POST',
-			headers: {
-				contentType: 'application/json',
-				Authorization: 'Bearer ' + apiKeys.whisperapi,
-			},
-			body: form,
-		});
+	const result = await fetch(endpoint, {
+		method: 'POST',
+		headers: {
+			contentType: 'application/json',
+			Authorization: 'Bearer ' + apiKeys.whisperapi,
+		},
+		body: form,
+	});
 
-		if (!result.ok) {
-			throw new Error(result.statusText);
-		}
+	if (!result.ok) {
+		throw new Error(result.statusText);
+	}
 
-		const data = await result.json();
-		return { text: data.text.trim() };
-	};
+	const data = await result.json();
+	return { text: data.text.trim() };
+}

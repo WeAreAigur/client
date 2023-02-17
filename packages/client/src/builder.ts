@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { ConcreteNode, NodeAction, ZodReadableStream } from './types';
 import { outputNode } from './nodes/output/output';
+import { ConcreteNode, NodeAction, ZodReadableStream } from './types';
 
 export class Builder<
 	Input extends z.ZodObject<any, any, any>,
@@ -19,19 +19,17 @@ export class Builder<
 	}
 
 	private nodeFactory<NodeDef extends NodeAction<any, any>>(nodeDefinition: NodeDef) {
-		return <
-			NextNode extends ConcreteNode<
-				Parameters<NodeDef>['0'],
-				Awaited<ReturnType<ReturnType<NodeDef>>>
-			>
-		>(
+		// param 0 is the action input
+		return <NewNode extends ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>>(
 			getUserInput: (data: {
 				nodes: NodeDefinitions;
-				prev: PrevNode extends ConcreteNode<any, any> ? PrevNode['output'] : Input;
+				prev: PrevNode extends ConcreteNode<any, any>
+					? Awaited<ReturnType<PrevNode['action']>>
+					: Input;
 				input: z.output<Input>;
-			}) => z.input<Parameters<NodeDef>['0']>
-		): Builder<Input, Output, [...NodeDefinitions, NextNode], NextNode> => {
-			const input = this.setPlaceholderValues(this.input.keyof().options, 'input');
+			}) => Parameters<NodeDef>['0']
+		): Builder<Input, Output, [...NodeDefinitions, NewNode], NewNode> => {
+			const input = createDynamicOutputPlaceholders('input');
 			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 			const node = {
 				action: nodeDefinition,
@@ -41,7 +39,10 @@ export class Builder<
 					input,
 				}),
 				output: createDynamicOutputPlaceholders(this.nodes.length),
-			} as ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<ReturnType<NodeDef>>>>;
+			} as ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
+
+			this.nodes.push(node);
+			return this as unknown as Builder<Input, Output, [...NodeDefinitions, NewNode], NewNode>;
 
 			function createDynamicOutputPlaceholders(nodeIndex: number | 'input') {
 				const output = {};
@@ -55,9 +56,6 @@ export class Builder<
 
 				return dynamicOutput;
 			}
-
-			this.nodes.push(node);
-			return this as unknown as Builder<Input, Output, [...NodeDefinitions, NextNode], NextNode>;
 		};
 	}
 

@@ -33,7 +33,7 @@ export interface PipelineConf<
 export type NodeAction<
 	Input extends z.AnyZodObject | ZodReadableStream,
 	Output extends z.AnyZodObject | ZodReadableStream
-> = (input: z.output<Input>) => (apiKeys: Record<string, string>) => Promise<z.output<Output>>;
+> = (input: z.input<Input>, apiKeys: Record<string, string>) => Promise<z.output<Output>>;
 
 export type ConcreteNode<
 	Input extends z.AnyZodObject | ZodReadableStream,

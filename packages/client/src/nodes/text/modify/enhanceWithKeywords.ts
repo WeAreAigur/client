@@ -28,15 +28,16 @@ function getExamples(amountOfKeys: number) {
 		.join('\n');
 }
 
-export const enhanceWithKeywordsNode =
-	(input: z.input<typeof inputSchema>) => async (): Promise<z.infer<typeof outputSchema>> => {
-		const payload = inputSchema.parse(input);
-		const enhancedText = `Write a maximum of ${
-			payload.amount
-		} keywords in a csv list that describes the following\n${getExamples(payload.amount)}\nTitle: ${
-			payload.text
-		}\nDescription:`;
-		return {
-			text: enhancedText,
-		};
+export async function enhanceWithKeywordsNode(
+	input: z.input<typeof inputSchema>
+): Promise<z.infer<typeof outputSchema>> {
+	const payload = inputSchema.parse(input);
+	const enhancedText = `Write a maximum of ${
+		payload.amount
+	} keywords in a csv list that describes the following\n${getExamples(payload.amount)}\nTitle: ${
+		payload.text
+	}\nDescription:`;
+	return {
+		text: enhancedText,
 	};
+}

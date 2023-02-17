@@ -65,24 +65,25 @@ const outputSchema = z.object({
 	result: z.instanceof(ArrayBuffer),
 });
 
-export const stabilityTextToImageNode =
-	(input: z.input<typeof inputSchema>) =>
-	async (apiKeys: APIKeys): Promise<z.infer<typeof outputSchema>> => {
-		const payload = inputSchema.parse(input);
-		const endpoint = `https://api.stability.ai/v1beta/generation/${payload.model}/text-to-image`;
-		const response = await fetch(endpoint, {
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'image/png',
-				Authorization: apiKeys.stability!,
-			},
-			method: 'POST',
-			body: JSON.stringify(payload),
-		});
+export async function stabilityTextToImageNode(
+	input: z.input<typeof inputSchema>,
+	apiKeys: APIKeys
+): Promise<z.infer<typeof outputSchema>> {
+	const payload = inputSchema.parse(input);
+	const endpoint = `https://api.stability.ai/v1beta/generation/${payload.model}/text-to-image`;
+	const response = await fetch(endpoint, {
+		headers: {
+			'Content-Type': 'application/json',
+			Accept: 'image/png',
+			Authorization: apiKeys.stability!,
+		},
+		method: 'POST',
+		body: JSON.stringify(payload),
+	});
 
-		const image = await response.arrayBuffer();
+	const image = await response.arrayBuffer();
 
-		return {
-			result: image,
-		};
+	return {
+		result: image,
 	};
+}

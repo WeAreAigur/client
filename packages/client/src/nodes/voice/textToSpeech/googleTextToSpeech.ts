@@ -76,35 +76,36 @@ const outputSchema = z.object({
 	audio: z.string(), // base64
 });
 
-export const googleTextToSpeechNode =
-	(input: z.input<typeof inputSchema>) =>
-	async (apiKeys: APIKeys): Promise<z.infer<typeof outputSchema>> => {
-		const parsedInput = inputSchema.parse(input);
-		const endpoint = `https://us-central1-texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKeys.googleapis}`;
-		const payload = {
-			input: {
-				text: parsedInput.text,
-			},
-			voice: {
-				languageCode: parsedInput.voice.language,
-				name: parsedInput.voice.name,
-			},
-			audioConfig: {
-				audioEncoding: parsedInput.encoding,
-				speakingRate: parsedInput.speakingRate,
-				pitch: parsedInput.pitch,
-			},
-		};
-
-		const result = await fetch(endpoint, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(payload),
-		});
-		const data = await result.json();
-		return {
-			audio: data.audioContent,
-		};
+export async function googleTextToSpeechNode(
+	input: z.input<typeof inputSchema>,
+	apiKeys: APIKeys
+): Promise<z.infer<typeof outputSchema>> {
+	const parsedInput = inputSchema.parse(input);
+	const endpoint = `https://us-central1-texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKeys.googleapis}`;
+	const payload = {
+		input: {
+			text: parsedInput.text,
+		},
+		voice: {
+			languageCode: parsedInput.voice.language,
+			name: parsedInput.voice.name,
+		},
+		audioConfig: {
+			audioEncoding: parsedInput.encoding,
+			speakingRate: parsedInput.speakingRate,
+			pitch: parsedInput.pitch,
+		},
 	};
+
+	const result = await fetch(endpoint, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(payload),
+	});
+	const data = await result.json();
+	return {
+		audio: data.audioContent,
+	};
+}

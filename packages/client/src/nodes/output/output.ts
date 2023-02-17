@@ -1,4 +1,3 @@
-export const outputNode =
-	<InputOutput>(input: InputOutput) =>
-	async (): Promise<InputOutput> =>
-		input;
+export async function outputNode<InputOutput>(input: InputOutput): Promise<InputOutput> {
+	return input;
+}

@@ -15,12 +15,12 @@ const jokeGptPipelineStream = aigur.pipeline.create({
   }),
   output: z.instanceof(ReadableStream),
   flow: (flow) =>
-    flow.text.modify
-      .simple(({ input }) => ({
+    flow
+      .node(replaceString, ({ input }) => ({
         text: input.subject,
         modifier: 'tell me a joke about $(text)$',
       }))
-      .text.prediction.gpt3Stream(({ prev }) => ({
+      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
         prompt: prev.text,
       }))
       .output(({ prev }) => prev.stream),
@@ -42,12 +42,12 @@ const jokeGptPipelineStream = aigur.pipeline.create({
   }),
   output: z.instanceof(ReadableStream),
   flow: (flow) =>
-    flow.text.modify
-      .simple(({ input }) => ({
+    flow
+      .node(replaceString, ({ input }) => ({
         text: input.subject,
         modifier: 'tell me a joke about $(text)$',
       }))
-      .text.prediction.gpt3Stream(({ prev }) => ({
+      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
         prompt: prev.text,
       }))
       .output(({ prev }) => prev.stream),
@@ -65,10 +65,10 @@ To bypass the error you can define the output in the following way:
 ### Use Dedicated Stream Nodes
 
 Stream Nodes' are unique in that their output is a stream instead of an object.
-For streaming GPT3 results, use the `gpt3Stream` node instead of the `gpt3` node.
+For streaming GPT3 results, use the `gpt3PredictionStream` node instead of the `gpt3Prediction` node.
 
 <CH.Code lineNumbers={true}>
-```ts index.ts focus=14 mark=14[24:33]
+```ts index.ts focus=14 mark=14[13:32]
 const jokeGptPipelineStream = aigur.pipeline.create({
   id: 'jokegptStream',
   stream: true,
@@ -77,12 +77,12 @@ const jokeGptPipelineStream = aigur.pipeline.create({
   }),
   output: z.instanceof(ReadableStream),
   flow: (flow) =>
-    flow.text.modify
-      .simple(({ input }) => ({
+    flow
+      .node(replaceString, ({ input }) => ({
         text: input.subject,
         modifier: 'tell me a joke about $(text)$',
       }))
-      .text.prediction.gpt3Stream(({ prev }) => ({
+      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
         prompt: prev.text,
       }))
       .output(({ prev }) => prev.stream),
@@ -104,12 +104,12 @@ const jokeGptPipelineStream = aigur.pipeline.create({
   }),
   output: z.instanceof(ReadableStream),
   flow: (flow) =>
-    flow.text.modify
-      .simple(({ input }) => ({
+    flow
+      .node(replaceString, ({ input }) => ({
         text: input.subject,
         modifier: 'tell me a joke about $(text)$',
       }))
-      .text.prediction.gpt3Stream(({ prev }) => ({
+      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
         prompt: prev.text,
       }))
       .output(({ prev }) => prev.stream),

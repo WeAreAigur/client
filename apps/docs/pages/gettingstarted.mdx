@@ -144,7 +144,7 @@ We add a new Node using the `flow` builder with the `node` method. The `node` me
 
 In our first Node, `flow.node(replaceString)`, which accepts `text` and `modifier` as input and does a simple string replacement (replaces the string `$(text)$` with the value of the `text` input property).
 
-We'll configure our Node's input using the second argument, the input function. The input function is a function that returns the Node's input (an Object or a `ReadableStream`). The input function accepts an object with three properties: `prev`, `nodes` and `input`:
+We'll configure our Node's input using the second argument, the input function. The input function is a function that returns the Node's input (an Object or a `ReadableStream`). [The input function accepts an object with three properties](/valuereferencing): `prev`, `nodes` and `input`:
 
 - `prev` is an object that contains the output of the previous Node. 
 - `nodes` is an array of all previous Nodes. 

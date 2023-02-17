@@ -31,13 +31,13 @@ export interface PipelineConf<
 // };
 
 export type NodeAction<
-	Input extends Record<string, any> | ReadableStream,
-	Output extends Record<string, any> | ReadableStream
+	Input extends Record<string, unknown> | ReadableStream,
+	Output extends Record<string, unknown> | ReadableStream
 > = (input: Input, apiKeys: Record<string, string>) => Promise<Output>;
 
 export type ConcreteNode<
-	Input extends Record<string, any> | ReadableStream,
-	Output extends Record<string, any> | ReadableStream
+	Input extends Record<string, unknown> | ReadableStream,
+	Output extends Record<string, unknown> | ReadableStream
 > = {
 	action: NodeAction<Input, Output>;
 	input: Input;

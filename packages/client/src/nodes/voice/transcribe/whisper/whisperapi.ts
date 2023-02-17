@@ -16,6 +16,11 @@ const outputSchema = z.object({
 	text: z.string(),
 });
 
+// const x: z.input<typeof inputSchema> = {
+// 	audioUrl: '',
+// 	task: y,
+// };
+
 export async function whisperApi(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys

@@ -79,10 +79,3 @@ export function PipelineNode(props: PipelineNodeProps) {
 		</div>
 	);
 }
-
-function ellipsis(str: string, length: number = 100) {
-	if (str.length > length) {
-		return str.substring(0, length) + '...';
-	}
-	return str;
-}

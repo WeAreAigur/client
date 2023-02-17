@@ -137,14 +137,16 @@ export const jokeGptPipeline =
 ### Go with the Flow
 
 Now that we know what our pipeline accepts and returns, we need to define the flow of the pipeline itself.
-The flow is comprised of `nodes` that are chained together.
-Each node also has an input and an output, where the output of one node is the input of the next node.
+The flow is comprised of `Nodes` that are chained together.
+Each Node also has an input and an output, where the output of one Node is the input of the next Node.
 
-We can access our different nodes using the `flow` builder, where they are organized by namespaces according to their type.
+We add a new Node using the `flow` builder with the `node` method. The `node` method accepts a Node (which is just a function, more on this later) and returns a function that will let you configure that Node's input (which is fully typed of course 🎉). We can enter hardcoded values in the input's properties or access previous Nodes or the pipeline's input parameters.
 
-When we define a node (`flow.text.modify.simple` for example), we need to define its input (which is fully typed of course). We can enter hardcoded values in the input's properties or access previous nodes or the pipeline's input parameters.
+In our first Node, `flow.node(replaceString)`, which accepts `text` and `modifier` as input and does a simple string replacement (replaces the string `$(text)$` with the value of the `text` input property).
 
-In our first node, `flow.text.modify.simple`, which accepts `text` and `modifier` as input, we'll use the `input` parameter to access the pipeline's input and reference the `subject` property. This node takes our `subject` and prefixes it with the text "tell me a joke about".
+We'll configure our Node's input -  We want to reference our Pipeline's input (the `subject` property) so we'll use the `input` parameter which gives us access to the Pipeline's input.
+
+The Node eventually takes our `subject` and prefixes it with the text "tell me a joke about".
 
 ```ts index.ts focus=14,19:24 mark=14[7:13],22[17:29]
 import { createClient } from '@aigur/client';
@@ -166,8 +168,7 @@ export const jokeGptPipeline =
       joke: z.string(),
     }),
     flow: (flow) =>
-      flow.text.modify
-        .simple(({ input }) => ({
+      flow.node(replaceString)(({ input }) => ({
           text: input.subject,
           modifier: 'tell me a joke about $(text)$',
         }))
@@ -178,7 +179,7 @@ export const jokeGptPipeline =
 ### GPT
 
 Next, we'll call OpenAI's GPT3 and pass the modified text as the prompt.
-The `text.prediction.gpt3` node accepts `prompt` as input and returns `text` as output.
+The `text.prediction.gpt3` Node accepts `prompt` as input and returns `text` as output.
 
 ```ts index.ts focus=25:27
 import { createClient } from '@aigur/client';

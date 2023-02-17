@@ -1,13 +1,13 @@
-import {
-	googleTextToSpeechNode,
-	gpt3PredictionNode,
-	simpleModificationNode,
-	stringToArrayBufferNode,
-} from '#/../../packages/client/dist';
-import { aigur } from '#/services/aigur';
 import { z } from 'zod';
+import { aigur } from '#/services/aigur';
 
 import { supabaseUpload } from '@aigur/supabase';
+import {
+	googleTextToSpeech,
+	gpt3Prediction,
+	replaceString,
+	stringToArrayBuffer,
+} from '@aigur/client';
 
 export const summarizeAndReadPipeline = aigur.pipeline.create({
 	id: 'summarizeAndRead',
@@ -21,20 +21,20 @@ export const summarizeAndReadPipeline = aigur.pipeline.create({
 	}),
 	flow: (flow) =>
 		flow
-			.node(simpleModificationNode)(({ input }) => ({
+			.node(replaceString, ({ input }) => ({
 				text: input.text,
 				modifier: '$(text)$\n\nTl;dr',
 			}))
-			.node(gpt3PredictionNode)(({ prev }) => ({
+			.node(gpt3Prediction, ({ prev }) => ({
 				prompt: prev.text,
 			}))
-			.node(googleTextToSpeechNode)(({ prev }) => ({
+			.node(googleTextToSpeech, ({ prev }) => ({
 				text: prev.text,
 			}))
-			.node(stringToArrayBufferNode)(({ prev }) => ({
+			.node(stringToArrayBuffer, ({ prev }) => ({
 				string: prev.audio,
 			}))
-			.node(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload, ({ prev }) => ({
 				bucket: 'audio',
 				extension: 'mp3',
 				file: prev.arrayBuffer,

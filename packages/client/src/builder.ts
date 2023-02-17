@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { output } from './nodes/output/output';
 import { ConcreteNode, NodeAction, ZodReadableStream } from './types';
+import { output } from './nodes/output/output';
 
 export class FlowBuilder<
 	Input extends z.ZodObject<any, any, any>,
@@ -18,35 +18,45 @@ export class FlowBuilder<
 		return new FlowBuilder<Input, Output, [], null>(input, []);
 	}
 
-	private nodeFactory<NodeDef extends NodeAction<any, any>>(nodeDefinition: NodeDef) {
+	public node<NodeDef extends NodeAction<any, any>>(
+		nodeDefinition: NodeDef,
+		getUserInput: (data: {
+			nodes: NodeDefinitions;
+			prev: PrevNode extends ConcreteNode<any, any>
+				? Awaited<ReturnType<PrevNode['action']>>
+				: Input;
+			input: z.output<Input>;
+		}) => Parameters<NodeDef>['0']
+	) {
 		// param 0 is the action input
-		return <NewNode extends ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>>(
-			getUserInput: (data: {
-				nodes: NodeDefinitions;
-				prev: PrevNode extends ConcreteNode<any, any>
-					? Awaited<ReturnType<PrevNode['action']>>
-					: Input;
-				input: z.output<Input>;
-			}) => Parameters<NodeDef>['0']
-		): FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode> => {
-			const input = this.createDynamicOutputPlaceholders('input');
-			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
-			const node = {
-				action: nodeDefinition,
-				input: getUserInput({
-					nodes: this.nodes,
-					prev: prev.output,
-					input,
-				}),
-				output: this.createDynamicOutputPlaceholders(this.nodes.length),
-			} as ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
+		// return <NewNode extends ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>>(
+		// 	getUserInput: (data: {
+		// 		nodes: NodeDefinitions;
+		// 		prev: PrevNode extends ConcreteNode<any, any>
+		// 			? Awaited<ReturnType<PrevNode['action']>>
+		// 			: Input;
+		// 		input: z.output<Input>;
+		// 	}) => Parameters<NodeDef>['0']
+		// ): FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode> => {
 
-			this.nodes.push(node);
-			return this as unknown as FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode>;
-		};
+		type NewNode = ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
+		const input = this.createDynamicPlaceholders('input');
+		const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
+		const node = {
+			action: nodeDefinition,
+			input: getUserInput({
+				nodes: this.nodes,
+				prev: prev.output,
+				input,
+			}),
+			output: this.createDynamicPlaceholders(this.nodes.length),
+		} as NewNode;
+
+		this.nodes.push(node);
+		return this as unknown as FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode>;
 	}
 
-	private createDynamicOutputPlaceholders(nodeIndex: number | 'input') {
+	private createDynamicPlaceholders(nodeIndex: number | 'input') {
 		const output = {};
 		const safeNotInstanciatedWarningProxy = {
 			get: function (object, prop) {
@@ -70,14 +80,14 @@ export class FlowBuilder<
 		return placeholderedOutput;
 	}
 
-	node<
-		I extends Record<string, any> | ReadableStream,
-		O extends Record<string, any> | ReadableStream
-	>(node: NodeAction<I, O>) {
-		return this.nodeFactory(node);
-	}
+	// node2<
+	// 	I extends Record<string, any> | ReadableStream,
+	// 	O extends Record<string, any> | ReadableStream
+	// >(node: NodeAction<I, O>) {
+	// 	return this.nodeFactory(node);
+	// }
 
-	output = this.nodeFactory(output<Output>);
+	output = this.node.bind(this, output<Output>);
 
 	getNodes() {
 		return this.nodes;

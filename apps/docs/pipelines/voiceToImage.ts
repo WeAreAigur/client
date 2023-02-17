@@ -1,10 +1,10 @@
 import {
-	enhanceWithKeywordsNode,
-	gpt3PredictionNode,
-	simpleModificationNode,
-	stabilityTextToImageNode,
-	stringToArrayBufferNode,
-	whisperApiNode,
+	enhanceWithKeywords,
+	gpt3Prediction,
+	replaceString,
+	stabilityTextToImage,
+	stringToArrayBuffer,
+	whisperApi,
 } from '#/../../packages/client/dist';
 import { aigur } from '#/services/aigur';
 import { z } from 'zod';
@@ -24,30 +24,30 @@ export const voiceToImagePipeline = aigur.pipeline.create({
 	}),
 	flow: (flow) =>
 		flow
-			.node(stringToArrayBufferNode)(({ input }) => ({
+			.node(stringToArrayBuffer, ({ input }) => ({
 				string: input.audio,
 			}))
-			.node(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload, ({ prev }) => ({
 				bucket: 'audio',
 				extension: 'mp3',
 				file: prev.arrayBuffer,
 				supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
 				supabaseUrl: process.env.SUPABASE_URL!,
 			}))
-			.node(whisperApiNode)(({ prev }) => ({
+			.node(whisperApi, ({ prev }) => ({
 				audioUrl: prev.url,
 			}))
-			.node(enhanceWithKeywordsNode)(({ prev }) => ({
+			.node(enhanceWithKeywords, ({ prev }) => ({
 				text: prev.text,
 			}))
-			.node(gpt3PredictionNode)(({ prev }) => ({
+			.node(gpt3Prediction, ({ prev }) => ({
 				prompt: prev.text,
 			}))
-			.node(simpleModificationNode)(({ prev }) => ({
+			.node(replaceString, ({ prev }) => ({
 				text: prev.text,
 				modifier: `high resolution photography, magazine, $(text)$, cinematic composition, 8k, highly detailed, cinematography, mega scans, 35mm lens, god rays, pools of light`,
 			}))
-			.node(stabilityTextToImageNode)(({ prev }) => ({
+			.node(stabilityTextToImage, ({ prev }) => ({
 				text_prompts: [
 					{
 						text: prev.text,
@@ -55,7 +55,7 @@ export const voiceToImagePipeline = aigur.pipeline.create({
 				],
 				steps: 60,
 			}))
-			.node(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload, ({ prev }) => ({
 				bucket: 'results',
 				extension: 'png',
 				file: prev.result,

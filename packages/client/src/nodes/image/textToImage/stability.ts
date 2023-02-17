@@ -2,29 +2,36 @@ import { z } from 'zod';
 
 import type { APIKeys } from '../../../types';
 
+export const stabilityModel = z.enum([
+	'stable-diffusion-v1-5',
+	'stable-diffusion-512-v2-0',
+	'stable-diffusion-768-v2-0',
+	'stable-diffusion-512-v2-1',
+	'stable-diffusion-768-v2-1',
+]);
+
+export const stabilityClipGuidancePreset = z.enum([
+	'NONE',
+	'FAST_BLUE',
+	'FAST_GREEN',
+	'SIMPLE',
+	'SLOW',
+	'SLOWER',
+	'SLOWEST',
+]);
+
 const inputSchema = z.object({
 	text_prompts: z
 		.array(
 			z.object({
 				text: z.string(),
-				weight: z.number().min(-1).max(1).optional().default(1),
+				weight: z.number().min(-1).max(1).default(1),
 			})
 		)
-		.nonempty(),
+		.refine((val) => val.length > 0, 'Must have at least one text prompt'),
 
-	model: z
-		.enum([
-			'stable-diffusion-v1-5',
-			'stable-diffusion-512-v2-0',
-			'stable-diffusion-768-v2-0',
-			'stable-diffusion-512-v2-1',
-			'stable-diffusion-768-v2-1',
-		])
-		.optional()
-		.default('stable-diffusion-v1-5'),
-	clip_guidance_preset: z
-		.enum(['NONE', 'FAST_BLUE', 'FAST_GREEN', 'SIMPLE', 'SLOW', 'SLOWER', 'SLOWEST'])
-		.optional(),
+	model: stabilityModel.default('stable-diffusion-v1-5'),
+	clip_guidance_preset: stabilityClipGuidancePreset.optional(),
 	steps: z.number().min(0).max(150).optional(),
 	sampler: z
 		.enum([

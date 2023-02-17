@@ -1,12 +1,17 @@
 import { z } from 'zod';
 
-import {
-    APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType, ZodReadableStream
-} from './types';
-import { makeid } from './makeid';
-import { getInputByContext } from './getInputByContext';
+import { FlowBuilder } from './builder';
 import { delay } from './delay';
-import { Builder } from './builder';
+import { getInputByContext } from './getInputByContext';
+import { makeid } from './makeid';
+import {
+	APIKeys,
+	ConcreteNode,
+	EventType,
+	PipelineConf,
+	ProgressEventType,
+	ZodReadableStream,
+} from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -24,7 +29,7 @@ export class Pipeline<
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
-		public readonly flow: Builder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any, any>,
+		public readonly flow: FlowBuilder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any, any>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToEvents();

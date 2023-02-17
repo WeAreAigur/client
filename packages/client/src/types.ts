@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { Builder } from './builder';
+import { FlowBuilder } from './builder';
 
 export interface PipelineConf<
 	Input extends z.AnyZodObject,
@@ -10,8 +10,8 @@ export interface PipelineConf<
 	input: Input;
 	output: Output;
 	flow: (
-		builder: Builder<Input, Output, [], null>
-	) => Builder<Input, Output, any, ConcreteNode<Output, Output>>;
+		builder: FlowBuilder<Input, Output, [], null>
+	) => FlowBuilder<Input, Output, any, ConcreteNode<Output, Output>>;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;
@@ -31,17 +31,17 @@ export interface PipelineConf<
 // };
 
 export type NodeAction<
-	Input extends z.AnyZodObject | ZodReadableStream,
-	Output extends z.AnyZodObject | ZodReadableStream
-> = (input: z.input<Input>, apiKeys: Record<string, string>) => Promise<z.output<Output>>;
+	Input extends Record<string, any> | ReadableStream,
+	Output extends Record<string, any> | ReadableStream
+> = (input: Input, apiKeys: Record<string, string>) => Promise<Output>;
 
 export type ConcreteNode<
-	Input extends z.AnyZodObject | ZodReadableStream,
-	Output extends z.AnyZodObject | ZodReadableStream
+	Input extends Record<string, any> | ReadableStream,
+	Output extends Record<string, any> | ReadableStream
 > = {
 	action: NodeAction<Input, Output>;
-	input: z.output<Input>;
-	output: z.output<Output>;
+	input: Input;
+	output: Output;
 };
 
 export type EventType = PipelineEventType | ProgressEventType;

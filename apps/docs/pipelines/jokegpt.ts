@@ -17,13 +17,9 @@ export const jokeGptPipeline = aigur.pipeline.create({
 				modifier: 'tell me a joke about $(text)$',
 			}))
 			.node(gpt3PredictionNode)(({ prev, input, nodes }) => ({
-				prompt: nodes[0].output.
+				prompt: prev.text,
 			}))
-
 			.output(({ prev }) => ({
 				joke: prev.text,
 			})),
 });
-
-
-simpleModificationNode({text: 'bla', modifier: 'a'}).then(({text}) => console.log({text}))

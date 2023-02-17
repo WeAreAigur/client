@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-import { voiceToImagePipeline } from './voiceToImage';
-import { summarizeAndReadPipeline } from './summarizeAndRead';
-import { simplePromptToImagePipeline } from './simplePromptToImage';
-import { jokeGptPipelineStream } from './jokegpt.stream';
-import { jokeGptPipeline } from './jokegpt';
 import { imageToPoemStreamPipeline } from './imageToPoem.stream';
+import { jokeGptPipeline } from './jokegpt';
+import { jokeGptPipelineStream } from './jokegpt.stream';
+import { simplePromptToImagePipeline } from './simplePromptToImage';
+import { summarizeAndReadPipeline } from './summarizeAndRead';
+import { voiceToImagePipeline } from './voiceToImage';
 
 const x = z;
 

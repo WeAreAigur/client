@@ -1,6 +1,7 @@
-import { z } from 'zod';
 import { aigur } from '#/services/aigur';
-import { gpt3PredictionNode, simpleModificationNode } from '#/../../packages/client/dist';
+import { z } from 'zod';
+
+import { gpt3PredictionNode, simpleModificationNode } from '@aigur/client';
 
 export const jokeGptPipeline = aigur.pipeline.create({
 	id: 'jokegpt',

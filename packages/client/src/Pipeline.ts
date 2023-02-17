@@ -136,7 +136,12 @@ export class Pipeline<
 		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
 		const eventSource = new EventSource(dataEndpoint);
 		eventSource.onmessage = (event) => {
-			const e: { type: EventType; data: Record<any, any> } = JSON.parse(event.data);
+			const e: { pipelineId: string; type: EventType; data: Record<any, any> } = JSON.parse(
+				event.data
+			);
+			if (e.pipelineId !== this.conf.id) {
+				return;
+			}
 			if (e.type === 'pipeline:start') {
 				this.triggerListeners(this.onStartListeners);
 			} else if (e.type === 'pipeline:finish') {
@@ -217,6 +222,7 @@ export class Pipeline<
 			body: JSON.stringify({
 				type,
 				data,
+				pipelineId: this.conf.id,
 			}),
 		});
 	}

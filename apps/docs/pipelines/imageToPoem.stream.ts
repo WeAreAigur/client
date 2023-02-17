@@ -1,5 +1,10 @@
-import { z } from 'zod';
+import {
+	googleVisionNode,
+	gpt3PredictionStreamNode,
+	simpleModificationNode,
+} from '#/../../packages/client/dist';
 import { aigur } from '#/services/aigur';
+import { z } from 'zod';
 
 export const imageToPoemStreamPipeline = aigur.pipeline.create({
 	id: 'imageToPoemStream',
@@ -10,15 +15,15 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create({
 	}),
 	output: z.instanceof(globalThis.ReadableStream ?? Object),
 	flow: (flow) =>
-		flow.image.labeling
-			.google(({ input }) => ({
+		flow
+			.node(googleVisionNode)(({ input }) => ({
 				image: input.image,
 			}))
-			.text.modify.simple(({ prev }) => ({
+			.node(simpleModificationNode)(({ prev }) => ({
 				text: prev.labels,
 				modifier: 'Write a very short poem about an image with the following entities:\n$(text)$\n',
 			}))
-			.text.prediction.gpt3Stream(({ prev }) => ({
+			.node(gpt3PredictionStreamNode)(({ prev }) => ({
 				prompt: prev.text,
 			}))
 			.output(({ prev }) => prev.stream),

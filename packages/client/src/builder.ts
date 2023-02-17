@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { outputNode } from './nodes/output/output';
 import { ConcreteNode, NodeAction, ZodReadableStream } from './types';
+import { outputNode } from './nodes/output/output';
 
 export class FlowBuilder<
 	Input extends z.ZodObject<any, any, any>,
@@ -29,7 +29,7 @@ export class FlowBuilder<
 				input: z.output<Input>;
 			}) => Parameters<NodeDef>['0']
 		): FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode> => {
-			const input = createDynamicOutputPlaceholders('input');
+			const input = this.createDynamicOutputPlaceholders('input');
 			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 			const node = {
 				action: nodeDefinition,
@@ -38,25 +38,25 @@ export class FlowBuilder<
 					prev: prev.output,
 					input,
 				}),
-				output: createDynamicOutputPlaceholders(this.nodes.length),
+				output: this.createDynamicOutputPlaceholders(this.nodes.length),
 			} as ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
 
 			this.nodes.push(node);
 			return this as unknown as FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode>;
-
-			function createDynamicOutputPlaceholders(nodeIndex: number | 'input') {
-				const output = {};
-				const safeNotInstanciatedWarningProxy = {
-					get: function (object, prop) {
-						return `$context.${nodeIndex}.${prop}$`;
-					},
-				};
-
-				const dynamicOutput = new Proxy(output, safeNotInstanciatedWarningProxy);
-
-				return dynamicOutput;
-			}
 		};
+	}
+
+	private createDynamicOutputPlaceholders(nodeIndex: number | 'input') {
+		const output = {};
+		const safeNotInstanciatedWarningProxy = {
+			get: function (object, prop) {
+				return `$context.${nodeIndex}.${prop}$`;
+			},
+		};
+
+		const dynamicOutput = new Proxy(output, safeNotInstanciatedWarningProxy);
+
+		return dynamicOutput;
 	}
 
 	private setPlaceholderValues<T extends ConcreteNode<any, any>>(
@@ -77,7 +77,7 @@ export class FlowBuilder<
 		return this.nodeFactory(node);
 	}
 
-	output = this.nodeFactory(outputNode<z.input<Output>>);
+	output = this.nodeFactory(outputNode<Output>);
 
 	getNodes() {
 		return this.nodes;

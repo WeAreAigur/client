@@ -11,7 +11,7 @@ export interface PipelineConf<
 	output: Output;
 	flow: (
 		builder: FlowBuilder<Input, Output, [], null>
-	) => FlowBuilder<Input, Output, any, ConcreteNode<Output, Output>>;
+	) => FlowBuilder<Input, Output, any, ConcreteNode<z.input<Output>, z.output<Output>>>;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;

@@ -2,6 +2,12 @@ import { z } from 'zod';
 import { aigur } from '#/services/aigur';
 
 import { supabaseUpload } from '@aigur/supabase';
+import {
+	enhanceWithKeywordsNode,
+	gpt3PredictionNode,
+	simpleModificationNode,
+	stabilityTextToImageNode,
+} from '@aigur/client';
 
 export const simplePromptToImagePipeline = aigur.pipeline.create({
 	id: 'simplePromptToImage',
@@ -13,18 +19,18 @@ export const simplePromptToImagePipeline = aigur.pipeline.create({
 		keywords: z.string(),
 	}),
 	flow: (flow) =>
-		flow.text.modify
-			.enhanceWithKeywords(({ input }) => ({
+		flow
+			.node(enhanceWithKeywordsNode)(({ input }) => ({
 				text: input.prompt,
 			}))
-			.text.prediction.gpt3(({ prev }) => ({
+			.node(gpt3PredictionNode)(({ prev }) => ({
 				prompt: prev.text,
 			}))
-			.text.modify.simple(({ prev }) => ({
+			.node(simpleModificationNode)(({ prev }) => ({
 				text: prev.text,
 				modifier: `high resolution photography interior design, interior design magazine, $(text)$, cinematic composition, 8k, highly detailed, cinematography, mega scans, 35mm lens, god rays, pools of light`,
 			}))
-			.image.textToImage.stableDiffusion.stability(({ prev }) => ({
+			.node(stabilityTextToImageNode)(({ prev }) => ({
 				text_prompts: [
 					{
 						text: prev.text,
@@ -33,7 +39,7 @@ export const simplePromptToImagePipeline = aigur.pipeline.create({
 				clip_guidance_preset: 'SLOW',
 				steps: 60,
 			}))
-			.custom(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload)(({ prev }) => ({
 				bucket: 'results',
 				extension: 'png',
 				file: prev.result,

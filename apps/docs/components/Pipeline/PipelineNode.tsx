@@ -1,11 +1,12 @@
-import { Handle, Position } from 'reactflow';
 import { useEffect, useState } from 'react';
+import { Handle, Position } from 'reactflow';
 
 import type { Pipeline } from '@aigur/client';
 
 export interface PipelineNodeProps {
 	id: string;
 	data: {
+		index: number;
 		type: string;
 		label: string;
 		definitionLabel: string;
@@ -29,7 +30,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 			setStatus('idle');
 		});
 		props.data.pipeline.onProgress(({ node, type, index }) => {
-			if (`${node.id}-${index}` === props.id) {
+			if (index === props.data.index) {
 				if (type === 'node:start') {
 					setStatus('inProgress');
 				} else if (type === 'node:finish') {
@@ -37,7 +38,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 				}
 			}
 		});
-	}, [props.data.pipeline, props.id]);
+	}, [props.data.pipeline, props.data.index]);
 
 	const borderColor = props.data.type === 'provider' ? 'border-blue-600' : 'border-pink-600';
 	const ringColor = props.data.type === 'provider' ? 'ring-blue-900' : 'ring-pink-900';
@@ -72,7 +73,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 					type={handle.type}
 					position={handle.position}
 					className="h-2.5 w-2.5 bg-secondary"
-					id={`${props.id}-${handle.position}`}
+					id={`${props.data.index}-${handle.position}`}
 				/>
 			))}
 		</div>

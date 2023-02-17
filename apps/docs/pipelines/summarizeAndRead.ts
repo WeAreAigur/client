@@ -1,5 +1,11 @@
-import { z } from 'zod';
+import {
+	googleTextToSpeechNode,
+	gpt3PredictionNode,
+	simpleModificationNode,
+	stringToArrayBufferNode,
+} from '#/../../packages/client/dist';
 import { aigur } from '#/services/aigur';
+import { z } from 'zod';
 
 import { supabaseUpload } from '@aigur/supabase';
 
@@ -14,21 +20,21 @@ export const summarizeAndReadPipeline = aigur.pipeline.create({
 		summary: z.string(),
 	}),
 	flow: (flow) =>
-		flow.text.modify
-			.simple(({ input }) => ({
+		flow
+			.node(simpleModificationNode)(({ input }) => ({
 				text: input.text,
 				modifier: '$(text)$\n\nTl;dr',
 			}))
-			.text.prediction.gpt3(({ prev }) => ({
+			.node(gpt3PredictionNode)(({ prev }) => ({
 				prompt: prev.text,
 			}))
-			.voice.textToSpeech.google(({ prev }) => ({
+			.node(googleTextToSpeechNode)(({ prev }) => ({
 				text: prev.text,
 			}))
-			.transformation.stringToArrayBuffer(({ prev }) => ({
+			.node(stringToArrayBufferNode)(({ prev }) => ({
 				string: prev.audio,
 			}))
-			.custom(supabaseUpload)(({ prev }) => ({
+			.node(supabaseUpload)(({ prev }) => ({
 				bucket: 'audio',
 				extension: 'mp3',
 				file: prev.arrayBuffer,

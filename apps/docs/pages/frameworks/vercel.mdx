@@ -62,7 +62,7 @@ export const pipelines = {
 
 ### Generic Vercel Edge Function
 Next, create a generic Vercel Edge Function that will invoke the Pipeline based on the request path.
-Using this function you can call any Pipeline by its id.
+You can now invoke any Pipeline and it will automatically run on Vercel Edge Functions (see below how).
 
 <Callout>
 	The Generic Edge Function must be defined at /api/pipelines/[id].ts

@@ -1,11 +1,6 @@
-The Pipeline Node definitions are organized in a tree structure by their respective functionality, for example:
+Pipelines are composed of Nodes which are simple functions.
 
-- `flow.text.modify.simple` - modifies a text
-- `flow.text.prediction.gpt3` - calls gpt3 to predict a text
-- `flow.image.textToImage.stability` - calls Stability (Stable Diffusion) to create an image from a text
-
-The tree structure in the API is mirrored in the docs.
-
+The `@aigur/client` package comes with a set of predefined Nodes, which can be used to create Pipelines.
 More Nodes are being added all the time, so check back often!
 
-[Contributions](https://github.com/weareaigur/client) are also welcomed!
+[Contribute](https://github.com/weareaigur/client) to `@aigur/client` or [create your own Nodes](/customnodes) and share them with the community!

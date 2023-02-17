@@ -1,12 +1,7 @@
 import { z } from 'zod';
 
-import { ConcreteNode, NodeDefinition, ZodReadableStream } from './types';
-import { gpt3PredictionStreamNode } from './nodes/text/prediction/gpt3.stream';
+import { ConcreteNode, NodeAction, ZodReadableStream } from './types';
 import { outputNode } from './nodes/output/output';
-import {
-    enhanceWithKeywordsNode, googleTextToSpeechNode, googleVisionNode, gpt3PredictionNode,
-    simpleModificationNode, stabilityTextToImageNode, stringToArrayBufferNode, whisperApiNode
-} from './nodes/nodesDefinitions';
 
 export class Builder<
 	Input extends z.ZodObject<any, any, any>,
@@ -23,30 +18,43 @@ export class Builder<
 		return new Builder<Input, Output, [], null>(input, []);
 	}
 
-	private nodeFactory<NodeDef extends NodeDefinition<any, any>>(nodeDefinition: NodeDef) {
-		return <NextNode extends ConcreteNode<NodeDef['schema']['input'], NodeDef['schema']['output']>>(
+	private nodeFactory<NodeDef extends NodeAction<any, any>>(nodeDefinition: NodeDef) {
+		return <
+			NextNode extends ConcreteNode<
+				Parameters<NodeDef>['0'],
+				Awaited<ReturnType<ReturnType<NodeDef>>>
+			>
+		>(
 			getUserInput: (data: {
 				nodes: NodeDefinitions;
 				prev: PrevNode extends ConcreteNode<any, any> ? PrevNode['output'] : Input;
 				input: z.output<Input>;
-			}) => z.input<NextNode['schema']['input']>
+			}) => z.input<Parameters<NodeDef>['0']>
 		): Builder<Input, Output, [...NodeDefinitions, NextNode], NextNode> => {
 			const input = this.setPlaceholderValues(this.input.keyof().options, 'input');
 			const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 			const node = {
-				...nodeDefinition,
+				action: nodeDefinition,
 				input: getUserInput({
 					nodes: this.nodes,
 					prev: prev.output,
 					input,
 				}),
-				output: nodeDefinition.schema.output.keyof
-					? this.setPlaceholderValues<NextNode>(
-							nodeDefinition.schema.output.keyof().options,
-							this.nodes.length
-					  )
-					: nodeDefinition.schema.output,
-			} as ConcreteNode<NodeDef['schema']['input'], NodeDef['schema']['output']>;
+				output: createDynamicOutputPlaceholders(this.nodes.length),
+			} as ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<ReturnType<NodeDef>>>>;
+
+			function createDynamicOutputPlaceholders(nodeIndex: number | 'input') {
+				const output = {};
+				const safeNotInstanciatedWarningProxy = {
+					get: function (object, prop) {
+						return `$context.${nodeIndex}.${prop}$`;
+					},
+				};
+
+				const dynamicOutput = new Proxy(output, safeNotInstanciatedWarningProxy);
+
+				return dynamicOutput;
+			}
 
 			this.nodes.push(node);
 			return this as unknown as Builder<Input, Output, [...NodeDefinitions, NextNode], NextNode>;
@@ -64,50 +72,50 @@ export class Builder<
 		return placeholderedOutput;
 	}
 
-	custom<I extends z.AnyZodObject, O extends z.AnyZodObject | ZodReadableStream>(
-		node: NodeDefinition<I, O>
+	node<I extends z.AnyZodObject, O extends z.AnyZodObject | ZodReadableStream>(
+		node: NodeAction<I, O>
 	) {
 		return this.nodeFactory(node);
 	}
 
-	voice = {
-		textToSpeech: {
-			google: this.nodeFactory(googleTextToSpeechNode),
-		},
-		transcribe: {
-			whisper: {
-				whisperapi: this.nodeFactory(whisperApiNode),
-			},
-		},
-	};
+	// voice = {
+	// 	textToSpeech: {
+	// 		google: this.nodeFactory(googleTextToSpeechNode),
+	// 	},
+	// 	transcribe: {
+	// 		whisper: {
+	// 			whisperapi: this.nodeFactory(whisperApiNode),
+	// 		},
+	// 	},
+	// };
 
-	text = {
-		modify: {
-			enhanceWithKeywords: this.nodeFactory(enhanceWithKeywordsNode),
-			simple: this.nodeFactory(simpleModificationNode),
-		},
-		prediction: {
-			gpt3: this.nodeFactory(gpt3PredictionNode),
-			gpt3Stream: this.nodeFactory(gpt3PredictionStreamNode),
-		},
-	};
+	// text = {
+	// 	modify: {
+	// 		enhanceWithKeywords: this.nodeFactory(enhanceWithKeywordsNode),
+	// 		simple: this.nodeFactory(simpleModificationNode),
+	// 	},
+	// 	prediction: {
+	// 		gpt3: this.nodeFactory(gpt3PredictionNode),
+	// 		gpt3Stream: this.nodeFactory(gpt3PredictionStreamNode),
+	// 	},
+	// };
 
-	image = {
-		textToImage: {
-			stableDiffusion: {
-				stability: this.nodeFactory(stabilityTextToImageNode),
-			},
-		},
-		labeling: {
-			google: this.nodeFactory(googleVisionNode),
-		},
-	};
+	// image = {
+	// 	textToImage: {
+	// 		stableDiffusion: {
+	// 			stability: this.nodeFactory(stabilityTextToImageNode),
+	// 		},
+	// 	},
+	// 	labeling: {
+	// 		google: this.nodeFactory(googleVisionNode),
+	// 	},
+	// };
 
-	output = this.nodeFactory(outputNode<Output>());
+	output = this.nodeFactory(outputNode<Output>);
 
-	transformation = {
-		stringToArrayBuffer: this.nodeFactory(stringToArrayBufferNode),
-	};
+	// transformation = {
+	// 	stringToArrayBuffer: this.nodeFactory(stringToArrayBufferNode),
+	// };
 
 	getNodes() {
 		return this.nodes;

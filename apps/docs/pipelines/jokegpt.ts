@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { aigur } from '#/services/aigur';
+import { simpleModificationNode } from '#/../../packages/client/dist';
 
 export const jokeGptPipeline = aigur.pipeline.create({
 	id: 'jokegpt',
@@ -10,8 +11,14 @@ export const jokeGptPipeline = aigur.pipeline.create({
 		joke: z.string(),
 	}),
 	flow: (flow) =>
-		flow.text.modify
-			.simple(({ input }) => ({
+		flow
+			.node(
+				simpleModificationNode(({ input }) => ({
+					text: input.subject,
+					modifier: 'tell me a joke about $(text)$',
+				}))
+			)
+			.text.modify.simple(({ input, prev }) => ({
 				text: input.subject,
 				modifier: 'tell me a joke about $(text)$',
 			}))

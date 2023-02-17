@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { z } from 'zod';
 
 import { inputSchema as gpt3BaseInputSchema } from './gpt3';
 
@@ -13,34 +13,24 @@ const inputSchema = gpt3BaseInputSchema.merge(
 
 const outputSchema = z.object({ stream: z.instanceof(globalThis.ReadableStream ?? Object) });
 
-async function action(
-	input: z.input<typeof inputSchema>,
-	apiKeys: APIKeys
-): Promise<z.infer<typeof outputSchema>> {
-	const payload = inputSchema.parse(input);
-	const response = await fetch('https://api.openai.com/v1/completions', {
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${apiKeys.openai}`,
-		},
-		method: 'POST',
-		body: JSON.stringify(payload),
-	});
+export const gpt3PredictionStreamNode =
+	(input: z.input<typeof inputSchema>) =>
+	async (apiKeys: APIKeys): Promise<z.infer<typeof outputSchema>> => {
+		const payload = inputSchema.parse(input);
+		const response = await fetch('https://api.openai.com/v1/completions', {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${apiKeys.openai}`,
+			},
+			method: 'POST',
+			body: JSON.stringify(payload),
+		});
 
-	const stream = await OpenAIStream(response);
-	return { stream };
-}
+		const stream = await OpenAIStream(response);
+		return { stream };
+	};
 
-export const gpt3PredictionStreamNode = {
-	id: 'text.prediction.gpt3.stream',
-	schema: {
-		input: inputSchema,
-		output: outputSchema,
-	},
-	action,
-};
-
-export async function OpenAIStream(response: Response) {
+async function OpenAIStream(response: Response) {
 	const encoder = new TextEncoder();
 	const decoder = new TextDecoder();
 

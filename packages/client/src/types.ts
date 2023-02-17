@@ -18,22 +18,28 @@ export interface PipelineConf<
 	updateProgress?: boolean;
 }
 
-export type NodeDefinition<
+// export type NodeDefinition<
+// 	Input extends z.AnyZodObject | ZodReadableStream,
+// 	Output extends z.AnyZodObject | ZodReadableStream
+// > = {
+// 	id: string;
+// 	schema: {
+// 		input: Input;
+// 		output: Output;
+// 	};
+// 	action: (input: z.output<Input>, apiKeys: Record<string, string>) => Promise<z.output<Output>>;
+// };
+
+export type NodeAction<
 	Input extends z.AnyZodObject | ZodReadableStream,
 	Output extends z.AnyZodObject | ZodReadableStream
-> = {
-	id: string;
-	schema: {
-		input: Input;
-		output: Output;
-	};
-	action: (input: z.output<Input>, apiKeys: Record<string, string>) => Promise<z.output<Output>>;
-};
+> = (input: z.output<Input>) => (apiKeys: Record<string, string>) => Promise<z.output<Output>>;
 
 export type ConcreteNode<
 	Input extends z.AnyZodObject | ZodReadableStream,
 	Output extends z.AnyZodObject | ZodReadableStream
-> = NodeDefinition<Input, Output> & {
+> = {
+	action: NodeAction<Input, Output>;
 	input: z.output<Input>;
 	output: z.output<Output>;
 };

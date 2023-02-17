@@ -1,5 +1,5 @@
-## Path
-`flow.voice.textToSpeech.google`
+## Name
+`googleTextToSpeech`
 
 ## Description
 
@@ -20,8 +20,10 @@ const aigur = createClient({
 ## Example
 
 ```ts index.ts
+import { googleTextToSpeech } from '@aigur/client';
+
 //...
-flow.voice.textToSpeech.google(() => ({
+flow.node(googleTextToSpeech, () => ({
   text: 'Hello world'
 })) // --> {audio: base64String}
 ```

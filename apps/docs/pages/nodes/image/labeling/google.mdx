@@ -1,5 +1,5 @@
-## Path
-`flow.image.labeling.google`
+## Name
+`googleVision`
 
 ## Description
 
@@ -22,8 +22,10 @@ const aigur = createClient({
 ## Example
 
 ```ts index.ts
+import { googleImageLabeling } from '@aigur/client';
+
 //...
-flow.image.labeling.google(() => ({
+flow.node(googleImageLabeling, () => ({
   image: imageContent,
 })) // --> {labels: ['label1', 'label2']}
 ```

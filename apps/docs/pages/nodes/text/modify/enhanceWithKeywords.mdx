@@ -1,14 +1,16 @@
-## Path
-`flow.text.modify.enhanceWithKeywords`
+## Name
+`enhanceWithKeywords`
 
 ## Description
 Takes a simple string (`text`) and outputs a complex prompt for text prediction models (e.g. GPT-3) that will output a list of keywords that are relevant to the input text.
 
 ## Example
 
-```ts index.ts mark=3[10:13],11[15:19]
+```ts index.ts mark=5[10:13],13[15:19]
+import { enhanceWithKeywords } from '@aigur/client';
+
 //...
-flow.text.modify.enhanceWithKeywords(() => ({
+flow.node(enhanceWithKeywords, () => ({
   text: 'cars'
 })) // --> {text: `Write a maximum of 8 keywords in a csv list that describes the following
     // Title: Colonial-style home

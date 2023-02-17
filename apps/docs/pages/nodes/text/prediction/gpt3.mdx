@@ -1,5 +1,5 @@
-## Path
-`flow.text.prediction.gpt3`
+## Name
+`gpt3Prediction`
 
 ## Description
 
@@ -20,8 +20,10 @@ const aigur = createClient({
 ## Example
 
 ```ts index.ts
+import { gpt3Prediction } from '@aigur/client';
+
 //...
-flow.text.prediction.gpt3(() => ({
+flow.node(gpt3Prediction, () => ({
   prompt: 'Hello, how are you?'
 })) // --> {text: 'I'm doing well, thank you. How about you?'}
 ```

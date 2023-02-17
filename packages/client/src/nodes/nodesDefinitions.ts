@@ -1,4 +1,4 @@
-export * from './image/labeling/googleVision';
+export * from './image/labeling/googleImageLabeling';
 export * from './image/textToImage/stability';
 export * from './output/output';
 export * from './text/modify/enhanceWithKeywords';

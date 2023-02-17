@@ -1,7 +1,7 @@
 whisperapi
 
-## Path
-`flow.voice.whisper.whisperapi`
+## Name
+`whisperApi`
 
 ## Description
 
@@ -24,8 +24,10 @@ const aigur = createClient({
 ## Example
 
 ```ts index.ts
+import { whisperApi } from '@aigur/client';
+
 //...
-flow.voice.whisper.whisperapi(() => ({
+flow.node(whisperApi, () => ({
   audioUrl: 'https://...',
 })) // --> {text: 'Hello Boopsy'}
 ```

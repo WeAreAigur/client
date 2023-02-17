@@ -1,7 +1,7 @@
-import { z } from 'zod';
 import { aigur } from '#/services/aigur';
+import { z } from 'zod';
 
-import { googleVision, gpt3PredictionStream, replaceString } from '@aigur/client';
+import { googleImageLabeling, gpt3PredictionStream, replaceString } from '@aigur/client';
 
 export const imageToPoemStreamPipeline = aigur.pipeline.create({
 	id: 'imageToPoemStream',
@@ -13,7 +13,7 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create({
 	output: z.instanceof(globalThis.ReadableStream ?? Object),
 	flow: (flow) =>
 		flow
-			.node(googleVision, ({ input }) => ({
+			.node(googleImageLabeling, ({ input }) => ({
 				image: input.image,
 			}))
 			.node(replaceString, ({ prev }) => ({

@@ -20,7 +20,7 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 					},
 				},
 				{
-					id: 'results.upload.supabase-1',
+					id: 'supabase.storage.upload-1',
 					label: 'Supabase Upload Audio',
 					definition: {
 						type: 'custom',
@@ -65,7 +65,7 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 					},
 				},
 				{
-					id: 'results.upload.supabase-7',
+					id: 'supabase.storage.upload-7',
 					label: 'Supabase Upload Image',
 					definition: {
 						type: 'custom',
@@ -83,11 +83,11 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 				{
 					id: '0-1',
 					source: 'text.transformation.stringToArrayBuffer-0',
-					target: 'results.upload.supabase-1',
+					target: 'supabase.storage.upload-1',
 				},
 				{
 					id: '1-2',
-					source: 'results.upload.supabase-1',
+					source: 'supabase.storage.upload-1',
 					target: 'voice.transcribe.whisper.whisperapi-2',
 				},
 				{
@@ -109,9 +109,9 @@ export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 				{
 					id: '6-7',
 					source: 'image.textToImage.stableDiffusion.stability-6',
-					target: 'results.upload.supabase-7',
+					target: 'supabase.storage.upload-7',
 				},
-				{ id: '7-8', source: 'results.upload.supabase-7', target: 'output-8' },
+				{ id: '7-8', source: 'supabase.storage.upload-7', target: 'output-8' },
 			]}
 			isActive={props.isActive}
 		/>

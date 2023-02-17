@@ -43,7 +43,7 @@ export function SummarizeAndReadPipelineView(props: SummarizeAndReadPipelineView
 					},
 				},
 				{
-					id: 'results.upload.supabase-4',
+					id: 'supabase.storage.upload-4',
 					label: 'Upload Audio to Supabase',
 					definition: {
 						type: 'custom',
@@ -68,9 +68,9 @@ export function SummarizeAndReadPipelineView(props: SummarizeAndReadPipelineView
 				{
 					id: '3-4',
 					source: 'text.transformation.stringToArrayBuffer-3',
-					target: 'results.upload.supabase-4',
+					target: 'supabase.storage.upload-4',
 				},
-				{ id: '4-5', source: 'results.upload.supabase-4', target: 'output-5' },
+				{ id: '4-5', source: 'supabase.storage.upload-4', target: 'output-5' },
 			]}
 			isActive={props.isActive}
 		/>

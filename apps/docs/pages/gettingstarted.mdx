@@ -144,12 +144,21 @@ We add a new Node using the `flow` builder with the `node` method. The `node` me
 
 In our first Node, `flow.node(replaceString)`, which accepts `text` and `modifier` as input and does a simple string replacement (replaces the string `$(text)$` with the value of the `text` input property).
 
-We'll configure our Node's input -  We want to reference our Pipeline's input (the `subject` property) so we'll use the `input` parameter which gives us access to the Pipeline's input.
+We'll configure our Node's input using the second argument, the input function. The input function is a function that returns the Node's input (an Object or a `ReadableStream`). The input function accepts an object with three properties: `prev`, `nodes` and `input`:
+
+- `prev` is an object that contains the output of the previous Node. 
+- `nodes` is an array of all previous Nodes. 
+- `input` is the pipeline's input.
+
+We want to reference our Pipeline's input (the `subject` property) so we'll use the `input` parameter which gives us access to the Pipeline's input.
 
 The Node eventually takes our `subject` and prefixes it with the text "tell me a joke about".
 
-```ts index.ts focus=14,19:24 mark=14[7:13],22[17:29]
-import { createClient } from '@aigur/client';
+```ts index.ts focus=3,17,22:27 mark=3[3:15],17[4:10],23[14:26],24[11:23]
+import {
+  createClient,
+  replaceString
+} from '@aigur/client';
 import { z } from 'zod';
 
 export const aigur = createClient({
@@ -159,30 +168,34 @@ export const aigur = createClient({
 });
 
 export const jokeGptPipeline = 
-  aigur.pipeline.create({
-    id: 'jokegpt',
-    input: z.object({
-      subject: z.string(),
-    }),
-    output: z.object({
-      joke: z.string(),
-    }),
-    flow: (flow) =>
-      flow.node(replaceString)(({ input }) => ({
-          text: input.subject,
-          modifier: 'tell me a joke about $(text)$',
-        }))
-  });
+ aigur.pipeline.create({
+  id: 'jokegpt',
+  input: z.object({
+   subject: z.string(),
+  }),
+  output: z.object({
+   joke: z.string(),
+  }),
+  flow: (flow) =>
+   flow.node(replaceString, ({ input }) => ({
+    text: input.subject,
+    modifier: 'tell me a joke about $(text)$',
+   }))
+ });
 ```
 
 --- 
 ### GPT
 
 Next, we'll call OpenAI's GPT3 and pass the modified text as the prompt.
-The `text.prediction.gpt3` Node accepts `prompt` as input and returns `text` as output.
+The `gpt3Prediction` Node accepts `prompt` as input and returns `text` as output.
 
-```ts index.ts focus=25:27
-import { createClient } from '@aigur/client';
+```ts index.ts focus=4,28:30 mark=4[3:16],28[10:23]
+import {
+  createClient,
+  replaceString,
+  gpt3Prediction
+} from '@aigur/client';
 import { z } from 'zod';
 
 export const aigur = createClient({
@@ -192,23 +205,22 @@ export const aigur = createClient({
 });
 
 export const jokeGptPipeline = 
-  aigur.pipeline.create({
-    id: 'jokegpt',
-    input: z.object({
-      subject: z.string(),
-    }),
-    output: z.object({
-      joke: z.string(),
-    }),
-    flow: (flow) =>
-      flow.text.modify
-        .simple(({ input }) => ({
-          text: input.subject,
-          modifier: 'tell me a joke about $(text)$',
-        }))
-        .text.prediction.gpt3(({ prev }) => ({
-          prompt: prev.text,
-        }))
+ aigur.pipeline.create({
+  id: 'jokegpt',
+  input: z.object({
+   subject: z.string(),
+  }),
+  output: z.object({
+   joke: z.string(),
+  }),
+  flow: (flow) =>
+   flow.node(replaceString, ({ input }) => ({
+    text: input.subject,
+    modifier: 'tell me a joke about $(text)$',
+   }))
+   .node(gpt3Prediction, ({ prev }) => ({
+    prompt: prev.text,
+   }))
   });
 ```
 
@@ -221,8 +233,12 @@ We'll use the `output` node to map any values we want from our node to the prope
   Don't forget this step or your Pipeline won't return the expected output!
 </Callout>
 
-```ts index.ts focus=17,28:30 mark=17[7:10],29[11:14]
-import { createClient } from '@aigur/client';
+```ts index.ts focus=21,31:33 mark=21[4:7],32[5:8]
+import {
+  createClient,
+  replaceString,
+  gpt3Prediction
+} from '@aigur/client';
 import { z } from 'zod';
 
 export const aigur = createClient({
@@ -232,27 +248,26 @@ export const aigur = createClient({
 });
 
 export const jokeGptPipeline = 
-  aigur.pipeline.create({
-    id: 'jokegpt',
-    input: z.object({
-      subject: z.string(),
-    }),
-    output: z.object({
-      joke: z.string(),
-    }),
-    flow: (flow) =>
-      flow.text.modify
-        .simple(({ input }) => ({
-          text: input.subject,
-          modifier: 'tell me a joke about $(text)$',
-        }))
-        .text.prediction.gpt3(({ prev }) => ({
-          prompt: prev.text,
-        }))
-        .output(({ prev }) => ({
-          joke: prev.text,
-        })
-  });
+ aigur.pipeline.create({
+  id: 'jokegpt',
+  input: z.object({
+   subject: z.string(),
+  }),
+  output: z.object({
+   joke: z.string(),
+  }),
+  flow: (flow) =>
+   flow.node(replaceString, ({ input }) => ({
+    text: input.subject,
+    modifier: 'tell me a joke about $(text)$',
+   }))
+   .node(gpt3Prediction, ({ prev }) => ({
+    prompt: prev.text,
+   }))
+   .output(({ prev }) => ({
+    joke: prev.text,
+   })
+});
 ```
 
 --- 
@@ -261,8 +276,12 @@ All that's left is to execute our pipeline. We can do that by calling the `invok
 
 The output `text` is typed by the pipeline's `output` property.
 
-```ts index.ts focus=14,17,33:35 mark=14[7:13],17[7:10],33[9:12],34[3:9]
-import { createClient } from '@aigur/client';
+```ts index.ts focus=18,21,36:38 mark=18[4:10],21[4:7],36[9:12],37[3:9]
+import {
+  createClient,
+  replaceString,
+  gpt3Prediction
+} from '@aigur/client';
 import { z } from 'zod';
 
 export const aigur = createClient({
@@ -272,27 +291,26 @@ export const aigur = createClient({
 });
 
 export const jokeGptPipeline = 
-  aigur.pipeline.create({
-    id: 'jokegpt',
-    input: z.object({
-      subject: z.string(),
-    }),
-    output: z.object({
-      joke: z.string(),
-    }),
-    flow: (flow) =>
-      flow.text.modify
-        .simple(({ input }) => ({
-          text: input.subject,
-          modifier: 'tell me a joke about $(text)$',
-        }))
-        .text.prediction.gpt3(({ prev }) => ({
-          prompt: prev.text,
-        }))
-        .output(({ prev }) => ({
-          joke: prev.text,
-        })
-  });
+ aigur.pipeline.create({
+  id: 'jokegpt',
+  input: z.object({
+   subject: z.string(),
+  }),
+  output: z.object({
+   joke: z.string(),
+  }),
+  flow: (flow) =>
+   flow.node(replaceString, ({ input }) => ({
+    text: input.subject,
+    modifier: 'tell me a joke about $(text)$',
+   }))
+   .node(gpt3Prediction, ({ prev }) => ({
+    prompt: prev.text,
+   }))
+   .output(({ prev }) => ({
+    joke: prev.text,
+   })
+});
 
 const { joke } = await jokeGptPipeline.invoke({
   subject: 'a car'

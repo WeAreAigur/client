@@ -65,7 +65,7 @@ const outputSchema = z.object({
 	result: z.instanceof(ArrayBuffer),
 });
 
-export async function stabilityTextToImageNode(
+export async function stabilityTextToImage(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {

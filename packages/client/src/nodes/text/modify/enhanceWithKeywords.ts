@@ -28,7 +28,7 @@ function getExamples(amountOfKeys: number) {
 		.join('\n');
 }
 
-export async function enhanceWithKeywordsNode(
+export async function enhanceWithKeywords(
 	input: z.input<typeof inputSchema>
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);

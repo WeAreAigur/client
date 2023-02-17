@@ -10,7 +10,7 @@ const outputSchema = z.object({
 	labels: z.array(z.string()),
 });
 
-export async function googleVisionNode(
+export async function googleVision(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {

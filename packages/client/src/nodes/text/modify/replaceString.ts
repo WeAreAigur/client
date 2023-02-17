@@ -9,7 +9,7 @@ const outputSchema = z.object({
 	text: z.string(),
 });
 
-export async function simpleModificationNode(
+export async function replaceString(
 	input: z.input<typeof inputSchema>
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
+import { output } from './nodes/output/output';
 import { ConcreteNode, NodeAction, ZodReadableStream } from './types';
-import { outputNode } from './nodes/output/output';
 
 export class FlowBuilder<
 	Input extends z.ZodObject<any, any, any>,
@@ -77,7 +77,7 @@ export class FlowBuilder<
 		return this.nodeFactory(node);
 	}
 
-	output = this.nodeFactory(outputNode<Output>);
+	output = this.nodeFactory(output<Output>);
 
 	getNodes() {
 		return this.nodes;

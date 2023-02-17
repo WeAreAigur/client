@@ -76,7 +76,7 @@ const outputSchema = z.object({
 	audio: z.string(), // base64
 });
 
-export async function googleTextToSpeechNode(
+export async function googleTextToSpeech(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {

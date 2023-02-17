@@ -16,7 +16,7 @@ const outputSchema = z.object({
 	text: z.string(),
 });
 
-export async function whisperApiNode(
+export async function whisperApi(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {

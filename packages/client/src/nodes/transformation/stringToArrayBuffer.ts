@@ -8,7 +8,7 @@ const outputSchema = z.object({
 	arrayBuffer: z.instanceof(ArrayBuffer),
 });
 
-export async function stringToArrayBufferNode(
+export async function stringToArrayBuffer(
 	input: z.input<typeof inputSchema>
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);

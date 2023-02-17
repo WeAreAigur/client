@@ -1,6 +1,6 @@
 {
 	"name": "@aigur/supabase",
-	"version": "0.30.4",
+	"version": "0.31.0",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",

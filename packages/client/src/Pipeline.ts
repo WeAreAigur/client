@@ -165,8 +165,9 @@ export class Pipeline<
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
 			await this.notifyEvent('pipeline:start');
-			pipeline.input.parse(input);
-			const values: any = { input };
+			const parsedInput = pipeline.input.parse(input);
+			console.log(`***parsedInput`, parsedInput);
+			const values: any = { input: parsedInput };
 			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();
 

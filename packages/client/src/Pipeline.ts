@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-import { FlowBuilder } from './builder';
-import { delay } from './delay';
-import { getInputByContext } from './getInputByContext';
-import { makeid } from './makeid';
 import {
 	APIKeys,
 	ConcreteNode,
@@ -12,6 +8,10 @@ import {
 	ProgressEventType,
 	ZodReadableStream,
 } from './types';
+import { makeid } from './makeid';
+import { getInputByContext } from './getInputByContext';
+import { delay } from './delay';
+import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -197,7 +197,6 @@ export class Pipeline<
 			}
 
 			await this.notifyEvent('pipeline:finish');
-			console.log(`***pipeline output`, output);
 			return output;
 		} catch (e) {
 			console.error(e);

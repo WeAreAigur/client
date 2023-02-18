@@ -29,7 +29,6 @@ export async function dalleUrlTextToImage(
 
 	const { data } = await response.json();
 
-	console.log(`***url`, data);
 	return {
 		url: data[0].url,
 	};

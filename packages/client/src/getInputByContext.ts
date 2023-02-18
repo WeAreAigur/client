@@ -13,10 +13,11 @@ export function getInputByContext(
 	return getInputContextInner(input);
 
 	function getInputContextInner(input: Record<string, any>) {
+		const newInput = {};
 		for (const key in input) {
-			input[key] = handleSingleValue(input[key]);
+			newInput[key] = handleSingleValue(input[key]);
 		}
-		return input;
+		return newInput;
 	}
 
 	function handleSingleValue(value) {

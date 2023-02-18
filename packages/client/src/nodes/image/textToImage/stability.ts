@@ -77,6 +77,7 @@ export async function stabilityTextToImage(
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
+	console.log(`***payload`, payload);
 	const endpoint = `https://api.stability.ai/v1beta/generation/${payload.model}/text-to-image`;
 	const response = await fetch(endpoint, {
 		headers: {

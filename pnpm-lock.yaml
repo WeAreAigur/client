@@ -28,6 +28,7 @@ importers:
       autoprefixer: ^10.4.13
       compressorjs: ^1.1.1
       daisyui: ^2.50.0
+      logsnag: ^0.1.6
       next: 13.1.6
       nextra: 2.2.12
       nextra-theme-docs: 2.2.12
@@ -54,6 +55,7 @@ importers:
       '@types/react-dom': 18.0.10
       compressorjs: 1.1.1
       daisyui: 2.50.0_gbtt6ss3tbiz4yjtvdr6fbrj44
+      logsnag: 0.1.6
       next: 13.1.6_biqbaboplfbrettd7655fr4n2y
       nextra: 2.2.12_3vryta7zmbcsw4rrqf4axjqggm
       nextra-theme-docs: 2.2.12_3get2v4hiihtvxtj3efiyufd2u
@@ -4118,6 +4120,15 @@ packages:
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
+  /isomorphic-fetch/3.0.0:
+    resolution: {integrity: sha512-qvUtwJ3j6qwsF3jLxkZ72qCgjMysPzDfeV240JHiGZsANBYd+EEuu35v7dfrJ9Up0Ak07D7GGSkGhCHTqg/5wA==}
+    dependencies:
+      node-fetch: 2.6.7
+      whatwg-fetch: 3.6.2
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
   /joycon/3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
@@ -4297,6 +4308,14 @@ packages:
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
+
+  /logsnag/0.1.6:
+    resolution: {integrity: sha512-87n8OiVNSNIJfg/HiIfpu2X5gM55XWKMbpa/aGNbjOxblZqZTQjCWfpce6HXGpDcC7svD0j4tEIzZe+l7YtPsg==}
+    dependencies:
+      isomorphic-fetch: 3.0.0
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /longest-streak/3.1.0:
@@ -7081,6 +7100,10 @@ packages:
       yaeti: 0.0.6
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /whatwg-fetch/3.6.2:
+    resolution: {integrity: sha512-bJlen0FcuU/0EMLrdbJ7zOnW6ITZLrZMIarMUVmdKtsGvZna8vxKYaexICWPfZ8qwf9fzNq+UEIZrnSaApt6RA==}
     dev: false
 
   /whatwg-url/5.0.0:

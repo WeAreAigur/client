@@ -1,13 +1,12 @@
 import { useRecord } from '#/hooks/useRecord';
 import { pipelines } from '#/pipelines/pipelines';
+import { logsnag } from '#/services/logsnag';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { premadeAudio } from './premadeAudio';
 import { VoiceRecorder } from './VoiceRecorder';
 import { VoiceToImagePipelineView } from './VoiceToImagePipelineView';
-
-// import { premadeAudio } from './premadeAudio';
 
 interface VoiceToImageProps {}
 
@@ -25,6 +24,11 @@ export function VoiceToImage(props: VoiceToImageProps) {
 	}, [result]);
 
 	function invokePipeline(audio: string) {
+		logsnag.publish({
+			channel: 'client',
+			notify: true,
+			event: 'VoiceToImage',
+		});
 		setInProgress(true);
 		setEnhancedPrompt(null);
 		setTranscription(null);

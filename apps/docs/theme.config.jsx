@@ -33,6 +33,10 @@ export default {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			<meta property="og:title" content="Aigur Client" />
 			<meta property="og:description" content="Compose and Invoke Generative AI Pipelines" />
+			<meta name="description" content="Compose and Invoke Generative AI Pipelines" />
+			<meta property="og:url" content="https://client.aigur.dev" />
+			<meta property="og:image" content="https://client.aigur.dev/aigurlogo.png" />
+			<meta property="og:type" content="website" />
 		</>
 	),
 

@@ -165,12 +165,11 @@ export class Pipeline<
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
 			await this.notifyEvent('pipeline:start');
-			console.log(`before`);
-			console.log(`***input`, JSON.stringify(input));
+			console.log(`***input`, input.audio.slice(-10));
+			console.log(`***Object.keys(input)`, Object.keys(input));
 			const parsedInput = pipeline.input.parse(input);
-			console.log(`***parsedInput bool`, !!parsedInput);
-			console.log(`***parsedInput`, JSON.stringify(parsedInput));
-			console.log(`after`);
+			console.log(`***parsedInput`, parsedInput.audio.slice(-10));
+			console.log(`***Object.keys(parsedInput)`, Object.keys(parsedInput));
 			const values: any = { input: parsedInput };
 			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();
@@ -186,6 +185,7 @@ export class Pipeline<
 					try {
 						output = await this.executeAction(nodes, i, values);
 						values[i] = output;
+						console.log(`***Object.keys(values)`, Object.keys(values));
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {
@@ -212,6 +212,11 @@ export class Pipeline<
 
 	private async executeAction(nodes, index, values) {
 		const { action, input } = nodes[index];
+		if (index === 6) {
+			console.log(`***input`, input);
+			delete values.input;
+			console.log(`***values`, values);
+		}
 		const inputByContext = getInputByContext(input, values);
 		return action(inputByContext, this.apiKeys);
 	}

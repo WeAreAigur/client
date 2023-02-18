@@ -1,3 +1,4 @@
+import reduce from 'image-blob-reduce';
 import { FileUploader } from 'react-drag-drop-files';
 
 export interface ImageType {
@@ -11,15 +12,17 @@ export interface ImageUploadProps {
 
 export function ImageUpload(props: ImageUploadProps) {
 	const onSelect = (file: File) => {
-		const reader = new FileReader();
-		reader.readAsDataURL(file);
-		reader.onloadend = () => {
-			const base64 = (reader.result as string).split('base64,')[1];
-			props.onSelect({
-				base64,
-				name: file.name,
-			});
-		};
+		reduceImage(file).then((blob) => {
+			const reader = new FileReader();
+			reader.readAsDataURL(blob);
+			reader.onloadend = () => {
+				const base64 = (reader.result as string).split('base64,')[1];
+				props.onSelect({
+					base64,
+					name: file.name,
+				});
+			};
+		});
 	};
 	return (
 		<FileUploader
@@ -29,4 +32,8 @@ export function ImageUpload(props: ImageUploadProps) {
 			types={['PNG', 'JPG', 'JPEG', 'GIF']}
 		/>
 	);
+}
+
+function reduceImage(image: File) {
+	return reduce().toBlob(image, { max: 512 });
 }

@@ -108,7 +108,7 @@ export const jokeGptPipeline = aigur.pipeline
 --- 
 ### Input/Output
 
-Pipelines have input and output that are defined using Typescript Generics (and can be [validated](/runtimevalidation) using runtime validation/parsing libraries).
+Pipelines have input and output that are defined using Typescript Generics (and can be [validated](/pipelinevalidation) using runtime validation/parsing libraries).
 The signature is `create<Input, Output>(options)`.
 
 `Input` and `Output` must be an Object (unless you're [streaming](/streaming) your results).

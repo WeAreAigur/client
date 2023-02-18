@@ -166,9 +166,10 @@ export class Pipeline<
 		try {
 			await this.notifyEvent('pipeline:start');
 			console.log(`before`);
-			console.log(`***input`, input);
+			console.log(`***input`, JSON.stringify(input));
 			const parsedInput = pipeline.input.parse(input);
-			console.log(`***parsedInput`, parsedInput);
+			console.log(`***parsedInput bool`, !!parsedInput);
+			console.log(`***parsedInput`, JSON.stringify(parsedInput));
 			console.log(`after`);
 			const values: any = { input: parsedInput };
 			let output: any = {};

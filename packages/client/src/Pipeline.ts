@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { getInputByContext } from './getInputByContext';
+import { makeid } from './makeid';
 import {
 	APIKeys,
 	ConcreteNode,
@@ -8,10 +12,6 @@ import {
 	ProgressEventType,
 	ZodReadableStream,
 } from './types';
-import { makeid } from './makeid';
-import { getInputByContext } from './getInputByContext';
-import { delay } from './delay';
-import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -184,10 +184,8 @@ export class Pipeline<
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {
-							console.log(`Failed retrying action ${nodes[i].action.name}, failing`);
 							throw e;
 						}
-						console.log(`Failed executing action ${nodes[i].action.name}, retrying`);
 						await delay((this.conf.retryDelayInMs ?? RETRY_DELAY_IN_MS) * attemptCount);
 					}
 				} while (!isSuccess && attemptCount <= retriesCount);
@@ -206,11 +204,6 @@ export class Pipeline<
 
 	private async executeAction(nodes, index, values) {
 		const { action, input } = nodes[index];
-		if (index === 6) {
-			console.log(`***input`, input);
-			delete values.input;
-			console.log(`***values`, values);
-		}
 		const inputByContext = getInputByContext(input, values);
 		return action(inputByContext, this.apiKeys);
 	}

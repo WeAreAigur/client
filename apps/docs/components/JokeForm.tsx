@@ -11,16 +11,9 @@ export function JokeForm(props: JokeFormProps) {
 	const submit = async (e: any) => {
 		e.preventDefault();
 		setInProgress(true);
-		// const { jokegptStream, jokegpt } = await import('#/pipelines/pipelines').then(
-		// 	(mod) => mod.pipelines
-		// );
-		const { joke } = await jokeGptPipeline.vercel.invoke({ subject: 123 });
+		const { joke } = await jokeGptPipeline.vercel.invoke({ subject });
 		setJoke(joke);
 		setInProgress(false);
-		// jokegptStream.vercel.invokeStream({ subject }, (res) => {
-		// 	setJoke((prev) => prev + res);
-		// 	setInProgress(false);
-		// });
 	};
 
 	return (

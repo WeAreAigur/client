@@ -140,9 +140,44 @@ Now that we know what our pipeline accepts and returns, we need to define the fl
 The flow is comprised of `Nodes` that are chained together.
 Each Node also has an input and an output, where the output of one Node is the input of the next Node.
 
-We add a new Node using the `flow` builder with the `node` method. The `node` method accepts a Node (which is just a function, more on this later) and returns a function that will let you configure that Node's input (which is fully typed of course 🎉). We can enter hardcoded values in the input's properties or access previous Nodes or the pipeline's input parameters.
+We add a new Node using the `flow` builder with the `node` method. The `node` method accepts a Node (which is just a function, more on this later) and a function that will let you configure that Node's input (which is fully typed of course 🎉). We can enter hardcoded values in the input's properties or access previous Nodes or the pipeline's input parameters.
 
-In our first Node, `flow.node(replaceString)`, which accepts `text` and `modifier` as input and does a simple string replacement (replaces the string `$(text)$` with the value of the `text` input property).
+Let's start with a GPT3 Node with hardcoded values.
+
+```ts index.ts focus=3,22:26 mark=3[3:16],24[11:24]
+import {
+  createClient,
+  gpt3Prediction
+} from '@aigur/client';
+import { z } from 'zod';
+
+export const aigur = createClient({
+  apiKeys: {
+    openai: process.env.OPENAI_KEY!,
+  },
+});
+
+export const jokeGptPipeline = 
+ aigur.pipeline.create({
+  id: 'jokegpt',
+  input: z.object({
+   subject: z.string(),
+  }),
+  output: z.object({
+   joke: z.string(),
+  }),
+  flow: (flow) =>
+   flow
+    .node(gpt3Prediction, () => ({
+     prompt: 'this is a hardcoded prompt',
+    }))
+ });
+```
+---
+
+### Chain Nodes
+Let's add another Node that will ready our prompt for GPT3.
+We'll add the `replaceString` Node which accepts `text` and `modifier` as input and does a simple string replacement (replaces the string `$(text)$` with the value of the `text` input property).
 
 We'll configure our Node's input using the second argument, the input function. The input function is a function that returns the Node's input (an Object or a `ReadableStream`). [The input function accepts an object with three properties](/valuereferencing): `prev`, `nodes` and `input`:
 
@@ -154,7 +189,9 @@ We want to reference our Pipeline's input (the `subject` property) so we'll use 
 
 The Node eventually takes our `subject` and prefixes it with the text "tell me a joke about".
 
-```ts index.ts focus=3,17,22:27 mark=3[3:15],17[4:10],23[14:26],24[11:23]
+Our GPT3 Node still has hardcoded values, let's change that.
+
+```ts index.ts focus=3,17,22:27 mark=3[3:15],17[4:10],24[11:23],25[12:24]
 import {
   createClient,
   replaceString
@@ -177,20 +214,23 @@ export const jokeGptPipeline =
    joke: z.string(),
   }),
   flow: (flow) =>
-   flow.node(replaceString, ({ input }) => ({
-    text: input.subject,
-    modifier: 'tell me a joke about $(text)$',
-   }))
+   flow
+    .node(replaceString, ({ input }) => ({
+     text: input.subject,
+     modifier: 'tell me a joke about $(text)$',
+    }))
+    .node(gpt3Prediction, () => ({
+     prompt: 'this is a hardcoded prompt',
+    }))
  });
 ```
 
 --- 
 ### GPT
 
-Next, we'll call OpenAI's GPT3 and pass the modified text as the prompt.
-The `gpt3Prediction` Node accepts `prompt` as input and returns `text` as output.
+We'll now configure the GPT3 Node to use the previous Node's output (`text`) as the prompt.
 
-```ts index.ts focus=4,28:30 mark=4[3:16],28[10:23]
+```ts index.ts focus=29,30 mark=29[30:33],30[14:22]
 import {
   createClient,
   replaceString,
@@ -214,13 +254,14 @@ export const jokeGptPipeline =
    joke: z.string(),
   }),
   flow: (flow) =>
-   flow.node(replaceString, ({ input }) => ({
-    text: input.subject,
-    modifier: 'tell me a joke about $(text)$',
-   }))
-   .node(gpt3Prediction, ({ prev }) => ({
-    prompt: prev.text,
-   }))
+   flow
+    .node(replaceString, ({ input }) => ({
+     text: input.subject,
+     modifier: 'tell me a joke about $(text)$',
+    }))
+    .node(gpt3Prediction, ({ prev }) => ({
+     prompt: prev.text,
+    }))
   });
 ```
 
@@ -233,7 +274,7 @@ We'll use the `output` node to map any values we want from our node to the prope
   Don't forget this step or your Pipeline won't return the expected output!
 </Callout>
 
-```ts index.ts focus=21,31:33 mark=21[4:7],32[5:8]
+```ts index.ts focus=21,32:34 mark=21[4:7],33[6:9]
 import {
   createClient,
   replaceString,
@@ -257,16 +298,17 @@ export const jokeGptPipeline =
    joke: z.string(),
   }),
   flow: (flow) =>
-   flow.node(replaceString, ({ input }) => ({
-    text: input.subject,
-    modifier: 'tell me a joke about $(text)$',
-   }))
-   .node(gpt3Prediction, ({ prev }) => ({
-    prompt: prev.text,
-   }))
-   .output(({ prev }) => ({
-    joke: prev.text,
-   })
+   flow
+    .node(replaceString, ({ input }) => ({
+     text: input.subject,
+     modifier: 'tell me a joke about $(text)$',
+    }))
+    .node(gpt3Prediction, ({ prev }) => ({
+     prompt: prev.text,
+    }))
+    .output(({ prev }) => ({
+     joke: prev.text,
+    })
 });
 ```
 
@@ -276,7 +318,7 @@ All that's left is to execute our pipeline. We can do that by calling the `invok
 
 The output `text` is typed by the pipeline's `output` property.
 
-```ts index.ts focus=18,21,36:38 mark=18[4:10],21[4:7],36[9:12],37[3:9]
+```ts index.ts focus=18,21,36:38 mark=18[4:10],21[4:7],37[9:12],38[3:9]
 import {
   createClient,
   replaceString,
@@ -300,16 +342,17 @@ export const jokeGptPipeline =
    joke: z.string(),
   }),
   flow: (flow) =>
-   flow.node(replaceString, ({ input }) => ({
-    text: input.subject,
-    modifier: 'tell me a joke about $(text)$',
-   }))
-   .node(gpt3Prediction, ({ prev }) => ({
-    prompt: prev.text,
-   }))
-   .output(({ prev }) => ({
-    joke: prev.text,
-   })
+   flow
+    .node(replaceString, ({ input }) => ({
+     text: input.subject,
+     modifier: 'tell me a joke about $(text)$',
+    }))
+    .node(gpt3Prediction, ({ prev }) => ({
+     prompt: prev.text,
+    }))
+    .output(({ prev }) => ({
+     joke: prev.text,
+    })
 });
 
 const { joke } = await jokeGptPipeline.invoke({

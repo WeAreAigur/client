@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pipelines } from '#/pipelines/pipelines';
 
 import { vercelGenericEdge } from '@aigur/client';
 
 export default async function handler(req: NextRequest) {
+	const { pipelines } = await import('#/pipelines/pipelines');
 	const result = await vercelGenericEdge(pipelines, req);
 	if (result instanceof Response) {
 		return result;

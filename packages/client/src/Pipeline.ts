@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { getInputByContext } from './getInputByContext';
+import { makeid } from './makeid';
 import {
 	APIKeys,
 	ConcreteNode,
@@ -8,10 +12,6 @@ import {
 	ProgressEventType,
 	ZodReadableStream,
 } from './types';
-import { makeid } from './makeid';
-import { getInputByContext } from './getInputByContext';
-import { delay } from './delay';
-import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -165,8 +165,11 @@ export class Pipeline<
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
 			await this.notifyEvent('pipeline:start');
+			console.log(`before`);
+			console.log(`***input`, input);
 			const parsedInput = pipeline.input.parse(input);
 			console.log(`***parsedInput`, parsedInput);
+			console.log(`after`);
 			const values: any = { input: parsedInput };
 			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();

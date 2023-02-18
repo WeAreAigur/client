@@ -8,5 +8,6 @@
 	"nodes": "Nodes",
 	"external-nodes": "External Nodes",
 	"customnodes": "Custom Nodes",
+	"hooks": "Hooks",
 	"complexflows": "Complex Flows"
 }

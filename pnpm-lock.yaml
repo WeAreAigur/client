@@ -18,6 +18,7 @@ importers:
     specifiers:
       '@aigur/client': workspace:*
       '@aigur/supabase': workspace:*
+      '@aigur/validate': workspace:*
       '@code-hike/mdx': ^0.8.0
       '@next/font': 13.1.6
       '@tailwindcss/aspect-ratio': ^0.4.2
@@ -40,10 +41,10 @@ importers:
       tsconfig: workspace:*
       typescript: 4.9.5
       zod: ^3.20.2
-      zod-validation-error: ^0.3.1
     dependencies:
       '@aigur/client': link:../../packages/client
       '@aigur/supabase': link:../../packages/supabase
+      '@aigur/validate': link:../../packages/validate
       '@code-hike/mdx': 0.8.0_react@18.2.0
       '@next/font': 13.1.6
       '@tailwindcss/aspect-ratio': 0.4.2_tailwindcss@3.2.4
@@ -62,7 +63,6 @@ importers:
       shiki: 0.14.1
       typescript: 4.9.5
       zod: 3.20.2
-      zod-validation-error: 0.3.1_zod@3.20.2
     devDependencies:
       autoprefixer: 10.4.13_postcss@8.4.21
       postcss: 8.4.21
@@ -100,7 +100,7 @@ importers:
       eslint: 7.32.0
       eslint-config-next: 13.0.0_jofidmxrjzhj7l6vknpw5ecvfe
       eslint-config-prettier: 8.6.0_eslint@7.32.0
-      eslint-config-turbo: 0.0.7_eslint@7.32.0
+      eslint-config-turbo: 0.0.8_eslint@7.32.0
       eslint-plugin-react: 7.31.8_eslint@7.32.0
     devDependencies:
       typescript: 4.9.5
@@ -122,6 +122,21 @@ importers:
 
   packages/tsconfig:
     specifiers: {}
+
+  packages/validate:
+    specifiers:
+      tsconfig: workspace:*
+      tsup: ^6.6.3
+      typescript: ^4.5.3
+      zod: ^3.20.2
+      zod-validation-error: ^0.3.1
+    dependencies:
+      zod: 3.20.2
+      zod-validation-error: 0.3.1_zod@3.20.2
+    devDependencies:
+      tsconfig: link:../tsconfig
+      tsup: 6.6.3_typescript@4.9.5
+      typescript: 4.9.5
 
 packages:
 
@@ -2941,13 +2956,13 @@ packages:
       eslint: 7.32.0
     dev: false
 
-  /eslint-config-turbo/0.0.7_eslint@7.32.0:
-    resolution: {integrity: sha512-WbrGlyfs94rOXrhombi1wjIAYGdV2iosgJRndOZtmDQeq5GLTzYmBUCJQZWtLBEBUPCj96RxZ2OL7Cn+xv/Azg==}
+  /eslint-config-turbo/0.0.8_eslint@7.32.0:
+    resolution: {integrity: sha512-ijj6uv0QX2kWahg3OYnTK1/q4MueXsqY2uE4MP9yeUA5CzVhL7GU+biKlv1BfMMqPltixHUcpZoW4yyNLCnMiw==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
       eslint: 7.32.0
-      eslint-plugin-turbo: 0.0.7_eslint@7.32.0
+      eslint-plugin-turbo: 0.0.8_eslint@7.32.0
     dev: false
 
   /eslint-import-resolver-node/0.3.7:
@@ -3098,8 +3113,8 @@ packages:
       string.prototype.matchall: 4.0.8
     dev: false
 
-  /eslint-plugin-turbo/0.0.7_eslint@7.32.0:
-    resolution: {integrity: sha512-iajOH8eD4jha3duztGVBD1BEmvNrQBaA/y3HFHf91vMDRYRwH7BpHSDFtxydDpk5ghlhRxG299SFxz7D6z4MBQ==}
+  /eslint-plugin-turbo/0.0.8_eslint@7.32.0:
+    resolution: {integrity: sha512-pExSCmjWw/KFKb3/0PVqxiWb30FbcwDEf6kKv3alvNBSVEzDHalyAGHc9klbLSG+nFmbkfNE3Ky/UHDryCqt8g==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:

@@ -154,16 +154,11 @@ export class Pipeline<
 		try {
 			await this.notifyEvent('pipeline:start');
 			if (this.conf.validateInput) {
-				console.log(`***validating input`);
 				const result = this.conf.validateInput(input);
-				console.log(`***result`, result);
 				if (!result.valid) {
 					throw new Error(result.message);
 				}
-			} else {
-				console.log(`***no input validation`);
 			}
-			// const parsedInput = pipeline.input.parse(input);
 			const values: any = { input };
 			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();

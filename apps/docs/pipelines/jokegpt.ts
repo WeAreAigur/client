@@ -1,8 +1,8 @@
-import { fromZodError } from 'zod-validation-error';
-import { z } from 'zod';
 import { aigur } from '#/services/aigur';
+import { z } from 'zod';
 
 import { gpt3Prediction, replaceString } from '@aigur/client';
+import { validateInput } from '@aigur/validate';
 
 const inputSchema = z.object({
 	subject: z.string(),
@@ -10,16 +10,7 @@ const inputSchema = z.object({
 
 export const jokeGptPipeline = aigur.pipeline.create<{ subject: string }, { joke: string }>({
 	id: 'jokegpt',
-	validateInput: (input) => {
-		try {
-			inputSchema.parse(input);
-			return { valid: true };
-		} catch (err) {
-			const validationError = fromZodError(err);
-
-			return { valid: false, error: validationError.message };
-		}
-	},
+	validateInput: validateInput(inputSchema),
 	flow: (flow) =>
 		flow
 			.node(replaceString, ({ input }) => ({

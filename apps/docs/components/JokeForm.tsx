@@ -14,7 +14,7 @@ export function JokeForm(props: JokeFormProps) {
 		// const { jokegptStream, jokegpt } = await import('#/pipelines/pipelines').then(
 		// 	(mod) => mod.pipelines
 		// );
-		const { joke } = await jokeGptPipeline.vercel.invoke({ subject });
+		const { joke } = await jokeGptPipeline.vercel.invoke({ subject: 123 });
 		setJoke(joke);
 		setInProgress(false);
 		// jokegptStream.vercel.invokeStream({ subject }, (res) => {

@@ -25,6 +25,7 @@ importers:
       '@types/node': 18.11.19
       '@types/react': 18.0.27
       '@types/react-dom': 18.0.10
+      '@vercel/analytics': ^0.1.10
       autoprefixer: ^10.4.13
       compressorjs: ^1.1.1
       daisyui: ^2.50.0
@@ -53,6 +54,7 @@ importers:
       '@types/node': 18.11.19
       '@types/react': 18.0.27
       '@types/react-dom': 18.0.10
+      '@vercel/analytics': 0.1.10_react@18.2.0
       compressorjs: 1.1.1
       daisyui: 2.50.0_gbtt6ss3tbiz4yjtvdr6fbrj44
       logsnag: 0.1.6
@@ -1809,6 +1811,14 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.50.0
       eslint-visitor-keys: 3.3.0
+    dev: false
+
+  /@vercel/analytics/0.1.10_react@18.2.0:
+    resolution: {integrity: sha512-jjJ8GzcPnQp0cMxpfYoUycMRBtDiaIeyVjZPiEPe99Dj1PdjMzAFYEASiV/hpNsXHkpcNYCveDFh6jnmh0YSDQ==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /@vitest/expect/0.28.4:

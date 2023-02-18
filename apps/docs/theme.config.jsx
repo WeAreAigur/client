@@ -39,6 +39,9 @@ export default {
 			<meta property="og:type" content="website" />
 		</>
 	),
+	chat: {
+		link: 'https://discord.gg/pZ9PGKVB',
+	},
 
 	useNextSeoProps() {
 		return {

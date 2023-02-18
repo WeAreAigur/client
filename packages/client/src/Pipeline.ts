@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { getInputByContext } from './getInputByContext';
+import { makeid } from './makeid';
 import {
 	APIKeys,
 	ConcreteNode,
@@ -8,10 +12,6 @@ import {
 	ProgressEventType,
 	ZodReadableStream,
 } from './types';
-import { makeid } from './makeid';
-import { getInputByContext } from './getInputByContext';
-import { delay } from './delay';
-import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -90,11 +90,11 @@ export class Pipeline<
 	public vercel = {
 		invoke: (input: z.input<Input>): Promise<z.output<Output>> => {
 			// TODO: move base url to "create" optional param
-			return this.invokeRemote(`/api/pipelines/${this.conf.id}`, input);
+			return this.invokeRemote(`/api/pipelines/${this.conf.id}?_vercel_no_cache=1`, input);
 		},
 		invokeStream: (input: z.input<Input>, cb: (chunk: string) => void) => {
 			// TODO: move base url to "create" optional param
-			return this.invokeStream(`/api/pipelines/${this.conf.id}`, input, cb);
+			return this.invokeStream(`/api/pipelines/${this.conf.id}?_vercel_no_cache=1`, input, cb);
 		},
 	};
 
@@ -173,7 +173,7 @@ export class Pipeline<
 			let startProgressPromise;
 
 			for (let i = 0; i < nodes.length; i++) {
-				startProgressPromise = this.notifyEvent('node:start', { node: nodes[i], index: i });
+				startProgressPromise = this.notifyEvent('node:start', { node: nodes[i].name, index: i });
 				let attemptCount = 0;
 				let isSuccess = false;
 				do {
@@ -185,14 +185,16 @@ export class Pipeline<
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {
+							console.log(`Failed retrying action ${nodes[i].action.name}, failing`);
 							throw e;
 						}
+						console.log(`Failed executing action ${nodes[i].action.name}, retrying`);
 						await delay((this.conf.retryDelayInMs ?? RETRY_DELAY_IN_MS) * attemptCount);
 					}
 				} while (!isSuccess && attemptCount <= retriesCount);
 				// we wait here as to not delay the execution itself
 				await startProgressPromise;
-				await this.notifyEvent('node:finish', { node: nodes[i], index: i });
+				await this.notifyEvent('node:finish', { node: nodes[i].name, index: i });
 			}
 
 			await this.notifyEvent('pipeline:finish');
@@ -204,9 +206,9 @@ export class Pipeline<
 	}
 
 	private async executeAction(nodes, index, values) {
-		const { action, schema, input } = nodes[index];
+		const { action, input } = nodes[index];
 		const inputByContext = getInputByContext(input, values);
-		return action(inputByContext, this.apiKeys) as typeof schema.output;
+		return action(inputByContext, this.apiKeys);
 	}
 
 	private notifyEvent(type: EventType, data?: Record<any, any>) {

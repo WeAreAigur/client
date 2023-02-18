@@ -42,7 +42,7 @@ Create an object that holds references to your Pipelines where the key is their 
 
 <CH.Code lineNumbers={true}>
 ```ts jokegpt.ts focus=2 mark=2[8:14]
-export const jokeGptPipeline = aigur.pipeline.create({
+export const jokeGptPipeline = aigur.pipeline.create<..., ...>({
   id: 'jokegpt',
   ...
 ```
@@ -69,7 +69,7 @@ You can now invoke any Pipeline and it will automatically run on Vercel Edge Fun
 </Callout>
 
 <CH.Code lineNumbers={true}>
-```ts /api/[...pipeline].ts
+```ts /api/pipelines/[...id].ts
 import { NextRequest, NextResponse } from 'next/server';
 import { pipelines } from '#/pipelines/pipelines'; // <-- import the pipelines
 import { vercelGenericEdge } from '@aigur/client'; // <-- import the helper

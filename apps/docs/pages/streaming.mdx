@@ -5,117 +5,98 @@ There are multiple (simple) steps you need to take in order to stream your Pipel
 ### Define the Pipeline as Streaming
 Define the pipeline as streaming by adding the `stream` property to the pipeline definition.
 
-<CH.Code lineNumbers={true}>
-```ts index.ts focus=3 mark=3
-const jokeGptPipelineStream = aigur.pipeline.create({
-  id: 'jokegptStream',
-  stream: true,
-  input: z.object({
-    subject: z.string(),
-  }),
-  output: z.instanceof(ReadableStream),
-  flow: (flow) =>
-    flow
-      .node(replaceString, ({ input }) => ({
-        text: input.subject,
-        modifier: 'tell me a joke about $(text)$',
-      }))
-      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
-        prompt: prev.text,
-      }))
-      .output(({ prev }) => prev.stream),
+
+```ts index.ts focus=4 mark=4
+const jokeGptPipelineStream = aigur.pipeline
+  .create<{ subject:string }, ReadableStream>({
+    id: 'jokegptStream',
+    stream: true,
+    flow: (flow) =>
+      flow
+        .node(replaceString, ({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => prev.stream),
   });
 ```
-</CH.Code>
 
-### Define the Output as an Instance of ReadableStream
 
-The output of a streaming pipeline needs to be an instance of `ReadableStream`. This is done by using the `z.instanceof` function.
+### Define the Output as a ReadableStream
 
-<CH.Code lineNumbers={true}>
-```ts index.ts focus=7 mark=7
-const jokeGptPipelineStream = aigur.pipeline.create({
-  id: 'jokegptStream',
-  stream: true,
-  input: z.object({
-    subject: z.string(),
-  }),
-  output: z.instanceof(ReadableStream),
-  flow: (flow) =>
-    flow
-      .node(replaceString, ({ input }) => ({
-        text: input.subject,
-        modifier: 'tell me a joke about $(text)$',
-      }))
-      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
-        prompt: prev.text,
-      }))
-      .output(({ prev }) => prev.stream),
+The output of a streaming pipeline needs to be `ReadableStream`.
+
+
+```ts index.ts focus=2 mark=2[31:44]
+const jokeGptPipelineStream = aigur.pipeline
+  .create<{ subject:string }, ReadableStream>({
+    id: 'jokegptStream',
+    stream: true,
+    flow: (flow) =>
+      flow
+        .node(replaceString, ({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => prev.stream),
   });
 ```
-</CH.Code>
 
-<Callout>
-Some frameworks might fail in build time with the error `ReadableStream is not defined`.
-To bypass the error you can define the output in the following way:
-
-`output: z.instanceof(globalThis.ReadableStream ?? Object)`
-</Callout>
 
 ### Use Dedicated Stream Nodes
 
 Stream Nodes' are unique in that their output is a stream instead of an object.
 For streaming GPT3 results, use the `gpt3PredictionStream` node instead of the `gpt3Prediction` node.
 
-<CH.Code lineNumbers={true}>
-```ts index.ts focus=14 mark=14[13:32]
-const jokeGptPipelineStream = aigur.pipeline.create({
-  id: 'jokegptStream',
-  stream: true,
-  input: z.object({
-    subject: z.string(),
-  }),
-  output: z.instanceof(ReadableStream),
-  flow: (flow) =>
-    flow
-      .node(replaceString, ({ input }) => ({
-        text: input.subject,
-        modifier: 'tell me a joke about $(text)$',
-      }))
-      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
-        prompt: prev.text,
-      }))
-      .output(({ prev }) => prev.stream),
-  });
-```
-</CH.Code>
+
+```ts index.ts focus=11 mark=11[15:34]
+const jokeGptPipelineStream = aigur.pipeline
+  .create<{ subject:string }, ReadableStream>({
+    id: 'jokegptStream',
+    stream: true,
+    flow: (flow) =>
+      flow
+        .node(replaceString, ({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => prev.stream),
+    });
+  ```
+
 
 ### Return the Stream from the Pipeline
 
 The pipeline's `output` node should return the stream that was created in the flow.
 
-<CH.Code lineNumbers={true}>
-```ts index.ts focus=17 mark=17[29:39]
-const jokeGptPipelineStream = aigur.pipeline.create({
-  id: 'jokegptStream',
-  stream: true,
-  input: z.object({
-    subject: z.string(),
-  }),
-  output: z.instanceof(ReadableStream),
-  flow: (flow) =>
-    flow
-      .node(replaceString, ({ input }) => ({
-        text: input.subject,
-        modifier: 'tell me a joke about $(text)$',
-      }))
-      .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
-        prompt: prev.text,
-      }))
-      .output(({ prev }) => prev.stream),
-  });
+
+```ts index.ts focus=14 mark=14[31:41]
+const jokeGptPipelineStream = aigur.pipeline
+  .create<{ subject:string }, ReadableStream>({
+    id: 'jokegptStream',
+    stream: true,
+    flow: (flow) =>
+      flow
+        .node(replaceString, ({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .node(gpt3PredictionStream, ({ prev, input, nodes }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => prev.stream),
+    });
 ```
-</CH.Code>
+
 
 
 ## Invoking the Pipeline
@@ -123,8 +104,7 @@ const jokeGptPipelineStream = aigur.pipeline.create({
 To invoke a streaming Pipeline on the server from the client you need to call the `invokeStream` function.
 It works in a similar way to [invokeRemote](invocation#remote-invocation) but since when using streams you don't receive a single value as an output, rather a stream of values the signature is slightly different - `invokeStream` accepts a callback that will be called whenever a new value is emitted from the stream.
 
-<CH.Code>
-```ts
+```ts index.ts
 let text = '';
 jokePipeline.invokeStream('/api/jokePipeline',
   {
@@ -135,4 +115,4 @@ jokePipeline.invokeStream('/api/jokePipeline',
   },
 );
 ```
-</CH.Code>
+

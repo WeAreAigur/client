@@ -1,4 +1,7 @@
 - hooks, node can register (on start pipeline, on start node etc)
 - "lazy" for all examples
 - fix enum in pipelines (cant set string)
--
+- nodes
+  - dalle
+  - image to image
+  - more gpt3 apis

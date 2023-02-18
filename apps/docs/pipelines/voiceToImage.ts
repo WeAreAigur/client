@@ -1,3 +1,6 @@
+import { aigur } from '#/services/aigur';
+import { z } from 'zod';
+
 import {
 	enhanceWithKeywords,
 	gpt3Prediction,
@@ -5,10 +8,7 @@ import {
 	stabilityTextToImage,
 	stringToArrayBuffer,
 	whisperApi,
-} from '#/../../packages/client/dist';
-import { aigur } from '#/services/aigur';
-import { z } from 'zod';
-
+} from '@aigur/client';
 import { supabaseUpload } from '@aigur/supabase';
 
 export const voiceToImagePipeline = aigur.pipeline.create({

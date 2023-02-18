@@ -19,6 +19,6 @@ export default withNextra({
 	reactStrictMode: true,
 	transpilePackages: ['@aigur/client', '@aigur/supabase'],
 	images: {
-		domains: ['rxbcnsluyhrlazakjohf.supabase.co'],
+		domains: ['rxbcnsluyhrlazakjohf.supabase.co', 'oaidalleapiprodscus.blob.core.windows.net'],
 	},
 });

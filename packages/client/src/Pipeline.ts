@@ -165,11 +165,7 @@ export class Pipeline<
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
 			await this.notifyEvent('pipeline:start');
-			console.log(`***input`, input.audio.slice(-10));
-			console.log(`***Object.keys(input)`, Object.keys(input));
 			const parsedInput = pipeline.input.parse(input);
-			console.log(`***parsedInput`, parsedInput.audio.slice(-10));
-			console.log(`***Object.keys(parsedInput)`, Object.keys(parsedInput));
 			const values: any = { input: parsedInput };
 			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();
@@ -185,7 +181,6 @@ export class Pipeline<
 					try {
 						output = await this.executeAction(nodes, i, values);
 						values[i] = output;
-						console.log(`***Object.keys(values)`, Object.keys(values));
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {

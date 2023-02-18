@@ -1,5 +1,4 @@
 import { aigur } from '#/services/aigur';
-import { z } from 'zod';
 
 import {
 	enhanceWithKeywords,
@@ -11,17 +10,12 @@ import {
 } from '@aigur/client';
 import { supabaseUpload } from '@aigur/supabase';
 
-export const voiceToImagePipeline = aigur.pipeline.create({
+export const voiceToImagePipeline = aigur.pipeline.create<
+	{ audio: string },
+	{ url: string; transcription: string; enhancedPrompt: string }
+>({
 	id: 'voiceToImage',
 	updateProgress: true,
-	input: z.object({
-		audio: z.string(),
-	}),
-	output: z.object({
-		url: z.string().url(),
-		transcription: z.string(),
-		enhancedPrompt: z.string(),
-	}),
 	flow: (flow) =>
 		flow
 			.node(stringToArrayBuffer, ({ input }) => ({

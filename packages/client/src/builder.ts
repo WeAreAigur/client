@@ -1,21 +1,19 @@
-import { z } from 'zod';
-
-import { ConcreteNode, NodeAction, ZodReadableStream } from './types';
+import { ConcreteNode, NodeAction } from './types';
 import { output } from './nodes/output/output';
 
 export class FlowBuilder<
-	Input extends z.ZodObject<any, any, any>,
-	Output extends z.ZodObject<any, any, any> | ZodReadableStream,
+	Input extends Record<string, unknown>,
+	Output extends Record<string, unknown> | ReadableStream,
 	NodeDefinitions extends ConcreteNode<any, any>[],
 	PrevNode extends ConcreteNode<any, any> | null
 > {
-	constructor(private input: Input, private nodes: NodeDefinitions) {}
+	constructor(private nodes: NodeDefinitions) {}
 
 	static create<
-		Input extends z.ZodObject<any, any, any>,
-		Output extends z.ZodObject<any, any, any> | ZodReadableStream
-	>(input: Input) {
-		return new FlowBuilder<Input, Output, [], null>(input, []);
+		Input extends Record<string, unknown>,
+		Output extends Record<string, unknown> | ReadableStream
+	>() {
+		return new FlowBuilder<Input, Output, [], null>([]);
 	}
 
 	public node<NodeDef extends NodeAction<any, any>>(
@@ -25,20 +23,9 @@ export class FlowBuilder<
 			prev: PrevNode extends ConcreteNode<any, any>
 				? Awaited<ReturnType<PrevNode['action']>>
 				: Input;
-			input: z.output<Input>;
+			input: Input;
 		}) => Parameters<NodeDef>['0']
 	) {
-		// param 0 is the action input
-		// return <NewNode extends ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>>(
-		// 	getUserInput: (data: {
-		// 		nodes: NodeDefinitions;
-		// 		prev: PrevNode extends ConcreteNode<any, any>
-		// 			? Awaited<ReturnType<PrevNode['action']>>
-		// 			: Input;
-		// 		input: z.output<Input>;
-		// 	}) => Parameters<NodeDef>['0']
-		// ): FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode> => {
-
 		type NewNode = ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
 		const input = this.createDynamicPlaceholders('input');
 		const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
@@ -76,8 +63,8 @@ export class FlowBuilder<
 			prev: PrevNode extends ConcreteNode<any, any>
 				? Awaited<ReturnType<PrevNode['action']>>
 				: Input;
-			input: z.output<Input>;
-		}) => z.output<Output>
+			input: Input;
+		}) => Output
 	) {
 		return this.node(output<Output>, getUserInput);
 	}

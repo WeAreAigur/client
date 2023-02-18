@@ -3,32 +3,19 @@ import { z } from 'zod';
 import { FlowBuilder } from './builder';
 
 export interface PipelineConf<
-	Input extends z.AnyZodObject,
-	Output extends z.AnyZodObject | ZodReadableStream
+	Input extends Record<string, unknown>,
+	Output extends Record<string, unknown> | ReadableStream
 > {
 	id: string;
-	input: Input;
-	output: Output;
 	flow: (
 		builder: FlowBuilder<Input, Output, [], null>
-	) => FlowBuilder<Input, Output, any, ConcreteNode<z.input<Output>, z.output<Output>>>;
+	) => FlowBuilder<Input, Output, any, ConcreteNode<Output, Output>>;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;
 	updateProgress?: boolean;
+	validateInput?: (input: Input) => { valid: boolean; message?: string };
 }
-
-// export type NodeDefinition<
-// 	Input extends z.AnyZodObject | ZodReadableStream,
-// 	Output extends z.AnyZodObject | ZodReadableStream
-// > = {
-// 	id: string;
-// 	schema: {
-// 		input: Input;
-// 		output: Output;
-// 	};
-// 	action: (input: z.output<Input>, apiKeys: Record<string, string>) => Promise<z.output<Output>>;
-// };
 
 export type NodeAction<
 	Input extends Record<string, unknown> | ReadableStream,

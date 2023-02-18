@@ -1,24 +1,19 @@
-import { z } from 'zod';
 import { aigur } from '#/services/aigur';
 
-import { supabaseUpload } from '@aigur/supabase';
 import {
 	googleTextToSpeech,
 	gpt3Prediction,
 	replaceString,
 	stringToArrayBuffer,
 } from '@aigur/client';
+import { supabaseUpload } from '@aigur/supabase';
 
-export const summarizeAndReadPipeline = aigur.pipeline.create({
+export const summarizeAndReadPipeline = aigur.pipeline.create<
+	{ text: string },
+	{ url: string; summary: string }
+>({
 	id: 'summarizeAndRead',
 	updateProgress: true,
-	input: z.object({
-		text: z.string(),
-	}),
-	output: z.object({
-		url: z.string().url(),
-		summary: z.string(),
-	}),
 	flow: (flow) =>
 		flow
 			.node(replaceString, ({ input }) => ({

@@ -1,8 +1,5 @@
-import { ZodReadableStream } from '#/types';
-import { z } from 'zod';
-
-export async function output<PipelineOutput extends z.AnyZodObject | ZodReadableStream>(
-	input: z.input<PipelineOutput>
-): Promise<z.output<PipelineOutput>> {
+export async function output<PipelineOutput extends Record<string, unknown> | ReadableStream>(
+	input: PipelineOutput
+): Promise<PipelineOutput> {
 	return input;
 }

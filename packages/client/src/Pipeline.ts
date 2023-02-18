@@ -1,24 +1,15 @@
-import { z } from 'zod';
-
 import { FlowBuilder } from './builder';
 import { delay } from './delay';
 import { getInputByContext } from './getInputByContext';
 import { makeid } from './makeid';
-import {
-	APIKeys,
-	ConcreteNode,
-	EventType,
-	PipelineConf,
-	ProgressEventType,
-	ZodReadableStream,
-} from './types';
+import { APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType } from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
 
 export class Pipeline<
-	Input extends z.AnyZodObject,
-	Output extends z.AnyZodObject | ZodReadableStream
+	Input extends Record<string, unknown>,
+	Output extends Record<string, unknown> | ReadableStream
 > {
 	public readonly onProgressListeners: Map<
 		string,
@@ -29,17 +20,17 @@ export class Pipeline<
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
-		public readonly flow: FlowBuilder<z.AnyZodObject, z.AnyZodObject | ZodReadableStream, any, any>,
+		public readonly flow: FlowBuilder<Input, Output, any, any>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToEvents();
 	}
 
-	public invoke(input: z.input<Input>) {
-		return this.processPipeline<Input, Output>(this.conf, input);
+	public invoke(input: Input) {
+		return this.processPipeline(input);
 	}
 
-	public invokeRemote(endpoint: string, input: z.input<Input>): Promise<z.output<Output>> {
+	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
 		return (
 			fetch(endpoint, {
 				method: 'POST',
@@ -58,7 +49,7 @@ export class Pipeline<
 
 	public async invokeStream(
 		endpoint: string,
-		input: z.input<Input>,
+		input: Input,
 		cb: (chunk: string) => void
 	): Promise<void> {
 		const response = await fetch(endpoint, {
@@ -88,11 +79,11 @@ export class Pipeline<
 	}
 
 	public vercel = {
-		invoke: (input: z.input<Input>): Promise<z.output<Output>> => {
+		invoke: (input: Input): Promise<Output> => {
 			// TODO: move base url to "create" optional param
 			return this.invokeRemote(`/api/pipelines/${this.conf.id}?_vercel_no_cache=1`, input);
 		},
-		invokeStream: (input: z.input<Input>, cb: (chunk: string) => void) => {
+		invokeStream: (input: Input, cb: (chunk: string) => void) => {
 			// TODO: move base url to "create" optional param
 			return this.invokeStream(`/api/pipelines/${this.conf.id}?_vercel_no_cache=1`, input, cb);
 		},
@@ -158,15 +149,22 @@ export class Pipeline<
 		}
 	}
 
-	private async processPipeline<
-		Input extends z.AnyZodObject,
-		Output extends z.AnyZodObject | ZodReadableStream
-	>(pipeline: PipelineConf<Input, Output>, input: z.input<Input>): Promise<z.output<Output>> {
+	private async processPipeline(input: Input): Promise<Output> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
 			await this.notifyEvent('pipeline:start');
-			const parsedInput = pipeline.input.parse(input);
-			const values: any = { input: parsedInput };
+			if (this.conf.validateInput) {
+				console.log(`***validating input`);
+				const result = this.conf.validateInput(input);
+				console.log(`***result`, result);
+				if (!result.valid) {
+					throw new Error(result.message);
+				}
+			} else {
+				console.log(`***no input validation`);
+			}
+			// const parsedInput = pipeline.input.parse(input);
+			const values: any = { input };
 			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();
 

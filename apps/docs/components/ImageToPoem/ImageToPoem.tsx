@@ -1,4 +1,5 @@
 import { pipelines } from '#/pipelines/pipelines';
+import { logsnag } from '#/services/logsnag';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -19,6 +20,11 @@ export function ImageToPoem(props: ImageToPoemProps) {
 	}, [image]);
 
 	function invokePipeline(image: string) {
+		logsnag.publish({
+			channel: 'client',
+			notify: true,
+			event: 'ImageToPoem',
+		});
 		setInProgress(true);
 		setPoem('');
 		pipelines.imageToPoemStream.vercel.invokeStream({ image }, (text) => {

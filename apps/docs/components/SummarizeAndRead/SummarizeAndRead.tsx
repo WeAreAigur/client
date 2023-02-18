@@ -1,8 +1,9 @@
-import { useState } from 'react';
 import { pipelines } from '#/pipelines/pipelines';
+import { logsnag } from '#/services/logsnag';
+import { useState } from 'react';
 
-import { SummarizeAndReadPipelineView } from './SummarizeAndReadPipelineView';
 import { PlayAudio } from './PlayAudio';
+import { SummarizeAndReadPipelineView } from './SummarizeAndReadPipelineView';
 
 interface SummarizeAndReadProps {}
 
@@ -26,6 +27,11 @@ export function SummarizeAndRead(props: SummarizeAndReadProps) {
 	const [summary, setSummary] = useState<string | null>(null);
 
 	const summarize = async () => {
+		logsnag.publish({
+			channel: 'client',
+			notify: true,
+			event: 'SummarizeAndRead',
+		});
 		setInProgress(true);
 		setAudioUrl(null);
 		setSummary(null);

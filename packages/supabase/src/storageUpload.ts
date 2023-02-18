@@ -15,11 +15,11 @@ const outputSchema = z.object({
 	url: z.string().url(),
 });
 
-export async function supabaseUpload(input: z.input<typeof inputSchema>) {
+export async function supabaseUpload(
+	input: z.input<typeof inputSchema>
+): Promise<z.output<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
-	const supabase = createClient(payload.supabaseUrl, payload.supabaseServiceKey, {
-		global: { fetch: fetch.bind(globalThis) },
-	});
+	const supabase = createClient(payload.supabaseUrl, payload.supabaseServiceKey);
 	const uploadedFile = await uploadFileToStorage(
 		payload.file,
 		`${payload.name ?? makeid(16)}.${payload.extension}`,

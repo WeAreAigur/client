@@ -13,6 +13,6 @@
 		"resolveJsonModule": true,
 		"jsx": "preserve"
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "playground.js"],
 	"exclude": ["node_modules"]
 }

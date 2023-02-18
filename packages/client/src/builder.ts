@@ -49,6 +49,7 @@ export class FlowBuilder<
 				prev: prev.output,
 				input,
 			}),
+			// configure output to return a placeholder for any property accessed (e.g. $context.0.url$)
 			output: this.createDynamicPlaceholders(this.nodes.length),
 		} as NewNode;
 
@@ -69,25 +70,17 @@ export class FlowBuilder<
 		return dynamicOutput;
 	}
 
-	private setPlaceholderValues<T extends ConcreteNode<any, any>>(
-		outputKeys: string[],
-		index: number | 'input'
-	): T['output'] {
-		const placeholderedOutput: T['output'] = {};
-		for (let key of outputKeys) {
-			placeholderedOutput[key] = `$context.${index}.${key}$`;
-		}
-		return placeholderedOutput;
+	output(
+		getUserInput: (data: {
+			nodes: NodeDefinitions;
+			prev: PrevNode extends ConcreteNode<any, any>
+				? Awaited<ReturnType<PrevNode['action']>>
+				: Input;
+			input: z.output<Input>;
+		}) => z.output<Output>
+	) {
+		return this.node(output<Output>, getUserInput);
 	}
-
-	// node2<
-	// 	I extends Record<string, any> | ReadableStream,
-	// 	O extends Record<string, any> | ReadableStream
-	// >(node: NodeAction<I, O>) {
-	// 	return this.nodeFactory(node);
-	// }
-
-	output = this.node.bind(this, output<Output>);
 
 	getNodes() {
 		return this.nodes;

@@ -17,7 +17,7 @@ const withNextra = nextra({
 
 export default withNextra({
 	reactStrictMode: true,
-	transpilePackages: ['@aigur/client', '@aigur/supabase'],
+	transpilePackages: ['@aigur/client', '@aigur/supabase', '@aigur/validate'],
 	images: {
 		domains: ['rxbcnsluyhrlazakjohf.supabase.co', 'oaidalleapiprodscus.blob.core.windows.net'],
 	},

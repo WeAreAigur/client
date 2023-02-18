@@ -1,16 +1,11 @@
 import { aigur } from '#/services/aigur';
-import { z } from 'zod';
 
 import { googleImageLabeling, gpt3PredictionStream, replaceString } from '@aigur/client';
 
-export const imageToPoemStreamPipeline = aigur.pipeline.create({
+export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }, ReadableStream>({
 	id: 'imageToPoemStream',
 	stream: true,
 	updateProgress: true,
-	input: z.object({
-		image: z.string(), // base64
-	}),
-	output: z.instanceof(globalThis.ReadableStream ?? Object),
 	flow: (flow) =>
 		flow
 			.node(googleImageLabeling, ({ input }) => ({

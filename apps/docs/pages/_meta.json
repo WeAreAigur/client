@@ -8,6 +8,7 @@
 	"nodes": "Nodes",
 	"external-nodes": "External Nodes",
 	"customnodes": "Custom Nodes",
+	"pipelinevalidation": "Pipeline Validation",
 	"hooks": "Hooks",
 	"complexflows": "Complex Flows"
 }

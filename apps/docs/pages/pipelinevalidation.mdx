@@ -1,0 +1,90 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+You can validate your Pipeline's input using the `validateInput` method.
+
+```ts input.ts mark=6:16
+import { aigur } from '#/services/aigur';
+import { gpt3Prediction, replaceString } from '@aigur/client';
+
+export const jokeGptPipeline = aigur.pipeline.create<{ subject: string }, { joke: string }>({
+  id: 'jokegpt',
+  validateInput: (input) => {
+    if (input.subject.length > 100) {
+      return {
+        valid: false,
+        message: 'Subject is too long',
+      }
+    }
+    return {
+      valid: true
+    }
+  },
+  flow: (flow) =>
+    flow
+      .node(replaceString, ({ input }) => ({
+        text: input.subject,
+        modifier: 'tell me a joke about $(text)$',
+      }))
+      .node(gpt3Prediction, ({ prev }) => ({
+        prompt: prev.text,
+      }))
+      .output(({ prev }) => ({
+        joke: prev.text,
+      })),
+});
+
+```
+
+## Using Zod
+
+Aigur also provides a `zod` helper to validate your input using [Zod](https://zod.dev).
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+  <Tab>
+    ```fish copy
+    pnpm add @aigur/validate
+    ```
+  </Tab>
+  <Tab>
+    ```fish copy
+    npm i @aigur/validate
+    ```
+  </Tab>
+  <Tab>
+    ```fish copy
+    yarn add @aigur/validate
+    ```
+  </Tab>
+</Tabs>
+
+`@aigur/validate` provides a function called `validateInput` that takes a Zod schema and returns a validation function that can be used in your pipeline.
+
+```ts input.ts mark=2,5,7:9,11[54:80],13
+import { aigur } from '#/services/aigur';
+import { z } from 'zod';
+
+import { gpt3Prediction, replaceString } from '@aigur/client';
+import { validateInput } from '@aigur/validate';
+
+const inputSchema = z.object({
+  subject: z.string(),
+});
+
+export const jokeGptPipeline = aigur.pipeline.create<z.input<typeof inputSchema>, { joke: string }>({
+  id: 'jokegpt',
+  validateInput: validateInput(inputSchema),
+  flow: (flow) =>
+    flow
+      .node(replaceString, ({ input }) => ({
+        text: input.subject,
+        modifier: 'tell me a joke about $(text)$',
+      }))
+      .node(gpt3Prediction, ({ prev }) => ({
+        prompt: prev.text,
+      }))
+      .output(({ prev }) => ({
+        joke: prev.text,
+      })),
+});
+
+```

@@ -6,27 +6,22 @@ Once you create your pipeline you can invoke it by calling the `invoke` method.
 The input is your defined Pipeline input and the output is the defined Pipeline output.
 
 <CH.Code lineNumbers={true}>
-```ts index.ts focus=3:8,23:25 mark=4[3:9],7[3:6],23[9:12],24[3:9]
-export const jokeGptPipeline = aigur.pipeline.create({
-	id: 'jokegpt',
-	input: z.object({
-		subject: z.string(),
-	}),
-	output: z.object({
-		joke: z.string(),
-	}),
-	flow: (flow) =>
-		flow
-			.node(replaceString, ({ input }) => ({
-				text: input.subject,
-				modifier: 'tell me a joke about $(text)$',
-			}))
-			.node(gpt3Prediction, ({ prev, input, nodes }) => ({
-				prompt: prev.text,
-			}))
-			.output(({ prev }) => ({
-				joke: prev.text,
-			})),
+```ts index.ts focus=2,18:20 mark=2[13:19],2[33:36],18[9:12],19[3:9]
+export const jokeGptPipeline = aigur.pipeline
+  .create<{ subject: string}, { joke: string}>({
+    id: 'jokegpt',
+    flow: (flow) =>
+      flow
+        .node(replaceString, ({ input }) => ({
+          text: input.subject,
+          modifier: 'tell me a joke about $(text)$',
+        }))
+        .node(gpt3Prediction, ({ prev, input, nodes }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => ({
+          joke: prev.text,
+        })),
 });
 
 const { joke } = await jokeGptPipeline.invoke({

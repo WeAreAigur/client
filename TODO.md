@@ -1,5 +1,5 @@
+- resize image for image to poem pipeline
 - hooks, node can register (on start pipeline, on start node etc)
-- "lazy" for all examples
 - fix enum in pipelines (cant set string)
 - nodes
   - image to image

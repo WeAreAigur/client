@@ -14,6 +14,8 @@ export interface PipelineConf<
 	stream?: boolean;
 	retryDelayInMs?: number;
 	updateProgress?: boolean;
+	eventListener?: (cb: (event: PipelineEvent) => void) => void;
+	eventPublisher?: (event: PipelineEvent) => Promise<Response>;
 	validateInput?: (input: Input) => { valid: boolean; message?: string };
 }
 
@@ -31,6 +33,7 @@ export type ConcreteNode<
 	output: Output;
 };
 
+export type PipelineEvent = { type: EventType; data?: Record<any, any>; pipelineId: string };
 export type EventType = PipelineEventType | ProgressEventType;
 export type PipelineEventType = 'pipeline:start' | 'pipeline:finish';
 export type ProgressEventType = 'node:start' | 'node:finish' | 'node:stream';

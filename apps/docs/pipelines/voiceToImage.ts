@@ -1,5 +1,6 @@
 import { aigur } from '#/services/aigur';
 
+import { createAblyNotifier } from '@aigur/ably';
 import {
 	enhanceWithKeywords,
 	gpt3Prediction,
@@ -10,12 +11,20 @@ import {
 } from '@aigur/client';
 import { supabaseUpload } from '@aigur/supabase';
 
+const ably = createAblyNotifier(
+	process.env.ABLY_KEY!,
+	process.env.NEXT_PUBLIC_ABLY_SUBSCRIBE_KEY!,
+	'aigur-client'
+);
+
 export const voiceToImagePipeline = aigur.pipeline.create<
 	{ audio: string },
 	{ url: string; transcription: string; enhancedPrompt: string }
 >({
 	id: 'voiceToImage',
 	updateProgress: true,
+	eventListener: ably.eventListener,
+	eventPublisher: ably.eventPublisher,
 	flow: (flow) =>
 		flow
 			.node(stringToArrayBuffer, ({ input }) => ({

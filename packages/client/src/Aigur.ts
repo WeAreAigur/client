@@ -1,6 +1,6 @@
-import { APIKeys, PipelineConf } from './types';
-import { Pipeline } from './Pipeline';
 import { FlowBuilder } from './builder';
+import { Pipeline } from './Pipeline';
+import { APIKeys, PipelineConf } from './types';
 
 interface AigurConfiguration {
 	apiKeys: APIKeys;
@@ -14,6 +14,7 @@ export type Aigur = ReturnType<typeof createClient>;
 export const createClient = (opts: AigurConfiguration) => {
 	const { apiKeys } = opts;
 	return {
+		apiKeys,
 		pipeline: {
 			create: <
 				Input extends Record<string, unknown>,

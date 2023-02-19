@@ -2,7 +2,14 @@ import { FlowBuilder } from './builder';
 import { delay } from './delay';
 import { getInputByContext } from './getInputByContext';
 import { makeid } from './makeid';
-import { APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType } from './types';
+import {
+	APIKeys,
+	ConcreteNode,
+	EventType,
+	PipelineConf,
+	PipelineEvent,
+	ProgressEventType,
+} from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -17,6 +24,8 @@ export class Pipeline<
 	> = new Map();
 	public readonly onStartListeners: Map<string, () => void> = new Map();
 	public readonly onFinishListeners: Map<string, () => void> = new Map();
+	private eventPublisher: (event: PipelineEvent) => Promise<Response>;
+	private eventListener: (cb: (event: PipelineEvent) => void) => void;
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
@@ -89,6 +98,14 @@ export class Pipeline<
 		},
 	};
 
+	public setEventPublisher(publisher: (event: PipelineEvent) => Promise<Response>) {
+		this.eventPublisher = publisher;
+	}
+
+	public setEventListener(listener: (cb: (event: PipelineEvent) => void) => void) {
+		this.eventListener = listener;
+	}
+
 	public onProgress(
 		cb: (args: { node: ConcreteNode<any, any>; type: ProgressEventType; index: number }) => void
 	) {
@@ -113,40 +130,6 @@ export class Pipeline<
 		return () => {
 			this.onFinishListeners.delete(id);
 		};
-	}
-
-	private listenToEvents() {
-		if (
-			!this.conf.updateProgress ||
-			typeof window === 'undefined' ||
-			!this.apiKeys?.ablySubscribe
-		) {
-			return;
-		}
-		// TODO: move channel name to config
-		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
-		const eventSource = new EventSource(dataEndpoint);
-		eventSource.onmessage = (event) => {
-			const e: { pipelineId: string; type: EventType; data: Record<any, any> } = JSON.parse(
-				event.data
-			);
-			if (e.pipelineId !== this.conf.id) {
-				return;
-			}
-			if (e.type === 'pipeline:start') {
-				this.triggerListeners(this.onStartListeners);
-			} else if (e.type === 'pipeline:finish') {
-				this.triggerListeners(this.onFinishListeners);
-			} else if (e.type === 'node:start' || e.type === 'node:finish') {
-				this.triggerListeners(this.onProgressListeners, { ...e.data, type: e.type });
-			}
-		};
-	}
-
-	private triggerListeners(listeners: Map<string, (...args: any[]) => void>, ...args: any[]) {
-		for (let listener of listeners.values()) {
-			listener(...args);
-		}
 	}
 
 	private async processPipeline(input: Input): Promise<Output> {
@@ -201,22 +184,35 @@ export class Pipeline<
 		return action(inputByContext, this.apiKeys);
 	}
 
-	private notifyEvent(type: EventType, data?: Record<any, any>) {
-		if (!this.conf.updateProgress || !this.apiKeys.ablyPublish) {
+	private listenToEvents() {
+		if (!this.conf.updateProgress || typeof window === 'undefined' || !this.eventListener) {
 			return;
 		}
 
-		return fetch('https://rest.ably.io/channels/aigur-client/messages?enveloped=false ', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Basic ${btoa(this.apiKeys.ablyPublish)}`,
-			},
-			body: JSON.stringify({
-				type,
-				data,
-				pipelineId: this.conf.id,
-			}),
+		this.eventListener((event) => {
+			if (event.pipelineId !== this.conf.id) {
+				return;
+			}
+			if (event.type === 'pipeline:start') {
+				this.triggerListeners(this.onStartListeners);
+			} else if (event.type === 'pipeline:finish') {
+				this.triggerListeners(this.onFinishListeners);
+			} else if (event.type === 'node:start' || event.type === 'node:finish') {
+				this.triggerListeners(this.onProgressListeners, { ...event.data, type: event.type });
+			}
 		});
+	}
+
+	private triggerListeners(listeners: Map<string, (...args: any[]) => void>, ...args: any[]) {
+		for (let listener of listeners.values()) {
+			listener(...args);
+		}
+	}
+
+	private notifyEvent(type: EventType, data?: Record<any, any>) {
+		if (!this.conf.updateProgress || !this.eventPublisher) {
+			return;
+		}
+		return this.eventPublisher({ type, data, pipelineId: this.conf.id });
 	}
 }

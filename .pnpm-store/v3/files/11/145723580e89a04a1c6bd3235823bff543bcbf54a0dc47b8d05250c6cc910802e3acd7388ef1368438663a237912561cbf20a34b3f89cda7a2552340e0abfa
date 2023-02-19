@@ -1,0 +1,24 @@
+import { L as LoaderOptions } from './types-cb47bdaf.js';
+import { RemarkLinkRewriteOptions } from './mdx-plugins/remark-link-rewrite.js';
+import 'next';
+import 'mdast';
+import '@mdx-js/mdx';
+import 'rehype-pretty-code';
+import 'gray-matter';
+import 'webpack';
+import 'react';
+import 'unified';
+
+declare const buildDynamicMDX: (content: string, { remarkLinkRewriteOptions, ...loaderOptions }?: Pick<LoaderOptions, "defaultShowCopyCode" | "latex" | "codeHighlight"> & {
+    remarkLinkRewriteOptions?: RemarkLinkRewriteOptions | undefined;
+}) => Promise<{
+    __nextra_dynamic_mdx: string;
+    __nextra_dynamic_opts: string;
+}>;
+declare const buildDynamicMeta: () => Promise<{
+    __nextra_pageMap: any;
+} | {
+    __nextra_pageMap?: undefined;
+}>;
+
+export { buildDynamicMDX, buildDynamicMeta };

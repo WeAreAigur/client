@@ -1,0 +1,46 @@
+{
+  "name": "logsnag",
+  "version": "0.1.6",
+  "description": "LogSnag Client",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:deno": "denoify",
+    "build:vite": "tsc && vite build",
+    "dev:vite": "vite",
+    "publish-lib": "npm run build && npm publish",
+    "publish-beta": "npm run build && npm publish --tag beta",
+    "publish-dryrun": "npm run build && npm publish --dry-run",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "lint": "eslint --ext .js,.ts ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LogSnag/logsnag.js.git"
+  },
+  "keywords": [
+    "logsnag",
+    "events",
+    "logging"
+  ],
+  "author": "Shayan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LogSnag/logsnag.js/issues"
+  },
+  "homepage": "https://github.com/LogSnag/logsnag.js#readme",
+  "dependencies": {
+    "isomorphic-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.9.0",
+    "@typescript-eslint/parser": "^5.9.0",
+    "denoify": "^1.4.1",
+    "eslint": "^8.6.0",
+    "prettier": "^2.5.1",
+    "typescript": "^4.2.3",
+    "vite": "^3.1.8"
+  }
+}

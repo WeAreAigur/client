@@ -1,0 +1,197 @@
+// src/plugin.ts
+import fs from "graceful-fs";
+import { promisify } from "util";
+import {
+  isSerializable,
+  normalizePageRoute,
+  parseFileName,
+  sortPages,
+  truthy
+} from "./utils.mjs";
+import path from "path";
+import grayMatter from "gray-matter";
+import pLimit from "p-limit";
+import {
+  CWD,
+  DYNAMIC_META_FILENAME,
+  MARKDOWN_EXTENSION_REGEX,
+  META_FILENAME
+} from "./constants.mjs";
+import { findPagesDirectory } from "./file-system.mjs";
+var readdir = promisify(fs.readdir);
+var readFile = promisify(fs.readFile);
+var collectMdx = async (filePath, route = "") => {
+  const { name, locale } = parseFileName(filePath);
+  const content = await readFile(filePath, "utf8");
+  const { data } = grayMatter(content);
+  return {
+    kind: "MdxPage",
+    name,
+    route,
+    ...locale && { locale },
+    ...Object.keys(data).length && { frontMatter: data }
+  };
+};
+var limit = pLimit(20);
+async function collectFiles(dir, locales, route = "/", fileMap = /* @__PURE__ */ Object.create(null)) {
+  var _a;
+  const files = await readdir(dir, { withFileTypes: true });
+  const promises = files.map(async (f) => {
+    const filePath = path.join(dir, f.name);
+    const isDirectory = f.isDirectory();
+    const { name, locale, ext } = isDirectory ? { name: path.basename(filePath), locale: "", ext: "" } : parseFileName(filePath);
+    const fileRoute = normalizePageRoute(route, name);
+    if (isDirectory) {
+      if (fileRoute === "/api")
+        return;
+      const { items: items2 } = await collectFiles(
+        filePath,
+        locales,
+        fileRoute,
+        fileMap
+      );
+      if (!items2.length)
+        return;
+      return {
+        kind: "Folder",
+        name: f.name,
+        route: fileRoute,
+        children: items2
+      };
+    }
+    return limit(async () => {
+      if (MARKDOWN_EXTENSION_REGEX.test(ext)) {
+        if (name.startsWith("["))
+          return;
+        const fp = filePath;
+        fileMap[fp] = await collectMdx(fp, fileRoute);
+        return fileMap[fp];
+      }
+      const fileName = name + ext;
+      if (fileName === META_FILENAME) {
+        const fp = filePath;
+        const content = await readFile(fp, "utf8");
+        fileMap[fp] = {
+          kind: "Meta",
+          ...locale && { locale },
+          data: JSON.parse(content)
+        };
+        return fileMap[fp];
+      }
+      if (fileName === DYNAMIC_META_FILENAME) {
+        const metaMod = await import(filePath);
+        const meta = metaMod.default;
+        const fp = filePath.replace(/\.js$/, ".json");
+        if (typeof meta === "function") {
+          fileMap[fp] = {
+            kind: "Meta",
+            ...locale && { locale },
+            __nextra_src: filePath,
+            data: {}
+          };
+        } else if (meta && typeof meta === "object" && isSerializable(meta)) {
+          fileMap[fp] = {
+            kind: "Meta",
+            ...locale && { locale },
+            data: meta
+          };
+        } else {
+          console.error(
+            `[nextra] "${fileName}" is not a valid meta file. The default export is required to be a serializable object or a function. Please check the following file:`,
+            path.relative(CWD, filePath)
+          );
+        }
+        return fileMap[fp];
+      }
+      if (fileName === "meta.json") {
+        console.warn(
+          '[nextra] "meta.json" was renamed to "_meta.json". Rename the following file:',
+          path.relative(CWD, filePath)
+        );
+      } else if (/_meta\.(jsx|ts|tsx)$/.test(fileName)) {
+        console.error(
+          `[nextra] "${fileName}" is not currently supported, please rename the following file to "${DYNAMIC_META_FILENAME}":`,
+          path.relative(CWD, filePath)
+        );
+      }
+    });
+  });
+  const items = (await Promise.all(promises)).filter(truthy);
+  const mdxPages = [];
+  const metaLocaleIndexes = /* @__PURE__ */ new Map();
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item.kind === "MdxPage") {
+      mdxPages.push(item);
+    }
+    if (item.kind === "Meta") {
+      metaLocaleIndexes.set(item.locale || "", i);
+    }
+  }
+  for (const locale of locales) {
+    const metaIndex = metaLocaleIndexes.get(locale);
+    const defaultMeta = sortPages(mdxPages, locale);
+    const metaFilename = locale ? META_FILENAME.replace(".", `.${locale}.`) : META_FILENAME;
+    const metaPath = path.join(dir, metaFilename);
+    if (metaIndex !== void 0) {
+      const meta = { ...items[metaIndex] };
+      for (const [key, value] of defaultMeta) {
+        (_a = meta.data)[key] || (_a[key] = value);
+        const metaItem = meta.data[key];
+        if (typeof metaItem === "object") {
+          metaItem.title || (metaItem.title = value);
+        }
+      }
+      fileMap[metaPath] = meta;
+      items[metaIndex] = meta;
+    }
+  }
+  return { items, fileMap };
+}
+var PageMapCache = class {
+  constructor() {
+    this.cache = {
+      items: [],
+      fileMap: /* @__PURE__ */ Object.create(null)
+    };
+  }
+  set(data) {
+    this.cache.items = data.items;
+    this.cache.fileMap = data.fileMap;
+  }
+  clear() {
+    this.cache = null;
+  }
+  get() {
+    return this.cache;
+  }
+};
+var pageMapCache = new PageMapCache();
+var NextraPlugin = class {
+  constructor(config) {
+    this.config = config;
+  }
+  apply(compiler) {
+    compiler.hooks.beforeCompile.tapAsync(
+      "NextraPlugin",
+      async (_, callback) => {
+        const { locales } = this.config;
+        const PAGES_DIR = findPagesDirectory();
+        try {
+          const result = await collectFiles(PAGES_DIR, locales);
+          pageMapCache.set(result);
+          callback();
+        } catch (err) {
+          callback(err);
+        }
+      }
+    );
+  }
+};
+export {
+  NextraPlugin,
+  PageMapCache,
+  collectFiles,
+  collectMdx,
+  pageMapCache
+};

@@ -1,6 +1,8 @@
 import { ConcreteNode, NodeAction } from './types';
 import { output } from './nodes/output/output';
 
+// import type {FlowBuilder as FlowBuilder2} from '@aigur/types';
+
 export class FlowBuilder<
 	Input extends Record<string, unknown>,
 	Output extends Record<string, unknown> | ReadableStream,

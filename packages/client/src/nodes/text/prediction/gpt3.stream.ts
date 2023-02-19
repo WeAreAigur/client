@@ -1,9 +1,9 @@
-import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 import { z } from 'zod';
+import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 
 import { inputSchema as gpt3BaseInputSchema } from './gpt3';
 
-import type { APIKeys } from '../../../types';
+import type { APIKeys } from '@aigur/types';
 
 const inputSchema = gpt3BaseInputSchema.merge(
 	z.object({

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { APIKeys } from '../../../types';
+import type { APIKeys } from '@aigur/types';
 
 const inputSchema = z.object({
 	image: z.string(), // base64

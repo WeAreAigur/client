@@ -1,6 +1,4 @@
-// import { FlowBuilder } from './builder';
-
-type FlowBuilder<
+export declare type FlowBuilder<
 	Input extends Record<string, unknown>,
 	Output extends Record<string, unknown> | ReadableStream,
 	NodeDefinitions extends ConcreteNode<any, any>[],

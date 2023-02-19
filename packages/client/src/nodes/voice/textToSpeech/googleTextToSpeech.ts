@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { APIKeys } from '../../../types';
+import { APIKeys } from '@aigur/types';
 
 const inputSchema = z.object({
 	text: z.string(),

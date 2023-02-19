@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { APIKeys } from '../../../types';
+import type { APIKeys } from '@aigur/types';
 
 export const stabilityModel = z.enum([
 	'stable-diffusion-v1-5',

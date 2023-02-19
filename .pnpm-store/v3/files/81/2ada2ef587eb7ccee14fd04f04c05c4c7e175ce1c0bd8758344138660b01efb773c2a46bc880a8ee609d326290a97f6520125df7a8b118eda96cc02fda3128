@@ -1,0 +1,37 @@
+{
+  "name": "@code-hike/lighter",
+  "version": "0.2.6",
+  "license": "MIT",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/",
+    "grammars/",
+    "themes/"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.19.0",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^14.0.0",
+    "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/pluginutils": "^5.0.2",
+    "@types/react": "^18.0.26",
+    "rollup": "^2.79.0",
+    "rollup-plugin-dts": "^5.1.1",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4",
+    "vscode-oniguruma": "^1.0.0",
+    "vscode-textmate": "^7.0.0"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w"
+  },
+  "repository": "https://github.com/code-hike/lighter",
+  "homepage": "https://lighter.codehike.org",
+  "funding": "https://github.com/code-hike/lighter?sponsor=1"
+}

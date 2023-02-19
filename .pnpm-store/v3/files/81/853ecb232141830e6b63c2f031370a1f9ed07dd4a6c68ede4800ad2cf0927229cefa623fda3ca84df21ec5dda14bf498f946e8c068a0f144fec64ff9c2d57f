@@ -1,0 +1,49 @@
+{
+	"name": "is-blob",
+	"version": "2.1.0",
+	"description": "Check if a value is a `Blob`",
+	"license": "MIT",
+	"repository": "sindresorhus/is-blob",
+	"funding": "https://github.com/sponsors/sindresorhus",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},
+	"engines": {
+		"node": ">=6"
+	},
+	"scripts": {
+		"test": "xo && ava && tsd"
+	},
+	"files": [
+		"index.js",
+		"index.d.ts"
+	],
+	"keywords": [
+		"blob",
+		"object",
+		"file",
+		"raw",
+		"data",
+		"immutable",
+		"browser",
+		"check",
+		"detect",
+		"is",
+		"type"
+	],
+	"devDependencies": {
+		"@types/jsdom": "^12.2.4",
+		"ava": "^0.25.0",
+		"jsdom": "^11.3.0",
+		"tsd": "^0.11.0",
+		"xo": "^0.23.0"
+	},
+	"xo": {
+		"envs": [
+			"node",
+			"browser"
+		]
+	}
+}

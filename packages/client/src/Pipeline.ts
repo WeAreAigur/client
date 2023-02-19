@@ -115,40 +115,6 @@ export class Pipeline<
 		};
 	}
 
-	private listenToEvents() {
-		if (
-			!this.conf.updateProgress ||
-			typeof window === 'undefined' ||
-			!this.apiKeys?.ablySubscribe
-		) {
-			return;
-		}
-		// TODO: move channel name to config
-		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=aigur-client&v=1.2&key=${this.apiKeys.ablySubscribe}&enveloped=false`;
-		const eventSource = new EventSource(dataEndpoint);
-		eventSource.onmessage = (event) => {
-			const e: { pipelineId: string; type: EventType; data: Record<any, any> } = JSON.parse(
-				event.data
-			);
-			if (e.pipelineId !== this.conf.id) {
-				return;
-			}
-			if (e.type === 'pipeline:start') {
-				this.triggerListeners(this.onStartListeners);
-			} else if (e.type === 'pipeline:finish') {
-				this.triggerListeners(this.onFinishListeners);
-			} else if (e.type === 'node:start' || e.type === 'node:finish') {
-				this.triggerListeners(this.onProgressListeners, { ...e.data, type: e.type });
-			}
-		};
-	}
-
-	private triggerListeners(listeners: Map<string, (...args: any[]) => void>, ...args: any[]) {
-		for (let listener of listeners.values()) {
-			listener(...args);
-		}
-	}
-
 	private async processPipeline(input: Input): Promise<Output> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
@@ -201,22 +167,35 @@ export class Pipeline<
 		return action(inputByContext, this.apiKeys);
 	}
 
-	private notifyEvent(type: EventType, data?: Record<any, any>) {
-		if (!this.conf.updateProgress || !this.apiKeys.ablyPublish) {
+	private listenToEvents() {
+		if (!this.conf.updateProgress || typeof window === 'undefined' || !this.conf.eventListener) {
 			return;
 		}
 
-		return fetch('https://rest.ably.io/channels/aigur-client/messages?enveloped=false ', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Basic ${btoa(this.apiKeys.ablyPublish)}`,
-			},
-			body: JSON.stringify({
-				type,
-				data,
-				pipelineId: this.conf.id,
-			}),
+		this.conf.eventListener((event) => {
+			if (event.pipelineId !== this.conf.id) {
+				return;
+			}
+			if (event.type === 'pipeline:start') {
+				this.triggerListeners(this.onStartListeners);
+			} else if (event.type === 'pipeline:finish') {
+				this.triggerListeners(this.onFinishListeners);
+			} else if (event.type === 'node:start' || event.type === 'node:finish') {
+				this.triggerListeners(this.onProgressListeners, { ...event.data, type: event.type });
+			}
 		});
+	}
+
+	private triggerListeners(listeners: Map<string, (...args: any[]) => void>, ...args: any[]) {
+		for (let listener of listeners.values()) {
+			listener(...args);
+		}
+	}
+
+	private notifyEvent(type: EventType, data?: Record<any, any>) {
+		if (!this.conf.updateProgress || !this.conf.eventPublisher) {
+			return;
+		}
+		return this.conf.eventPublisher({ type, data, pipelineId: this.conf.id });
 	}
 }

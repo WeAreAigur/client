@@ -1,0 +1,24 @@
+{
+	"name": "@aigur/ably",
+	"version": "0.32.0",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"pbl": "npm publish --access public",
+		"build": "tsup src/index.ts --format cjs --dts --minify",
+		"dev": "tsup src/index.ts --format cjs --dts --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"tsconfig": "workspace:*",
+		"typescript": "^4.5.3",
+		"tsup": "^6.6.3"
+	}
+}

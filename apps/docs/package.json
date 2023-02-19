@@ -12,6 +12,7 @@
 		"@aigur/client": "workspace:*",
 		"@aigur/supabase": "workspace:*",
 		"@aigur/validate": "workspace:*",
+		"@aigur/ably": "workspace:*",
 		"@code-hike/mdx": "^0.8.0",
 		"@next/font": "13.1.6",
 		"@tailwindcss/aspect-ratio": "^0.4.2",

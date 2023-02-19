@@ -1,7 +1,9 @@
-export type EventType = PipelineEventType | ProgressEventType;
+// export type EventType = PipelineEventType | ProgressEventType;
+export type EventType = any;
 export type PipelineEventType = 'pipeline:start' | 'pipeline:finish';
 export type ProgressEventType = 'node:start' | 'node:finish' | 'node:stream';
-export type PipelineEvent = { type: EventType; data?: Record<any, any>; pipelineId: string };
+export type PipelineEvent = any;
+// export type PipelineEvent = { type: EventType; data?: Record<any, any>; pipelineId: string };
 
 /**
  * @typedef {Object} AblyNotifier
@@ -26,9 +28,9 @@ export function createAblyNotifier(
 		eventListener,
 	};
 
-	function eventPublisher(type: EventType, data?: Record<any, any>) {
+	function eventPublisher(event: PipelineEvent) {
 		if (!ablyPublishKey) {
-			return;
+			return Promise.resolve();
 		}
 
 		return fetch(`https://rest.ably.io/channels/${channel}/messages?enveloped=false`, {
@@ -37,11 +39,7 @@ export function createAblyNotifier(
 				'Content-Type': 'application/json',
 				Authorization: `Basic ${btoa(ablyPublishKey)}`,
 			},
-			body: JSON.stringify({
-				type,
-				data,
-				pipelineId: this.conf.id,
-			}),
+			body: JSON.stringify(event),
 		});
 	}
 

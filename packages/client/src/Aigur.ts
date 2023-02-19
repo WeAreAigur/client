@@ -1,10 +1,6 @@
 import { FlowBuilder } from './builder';
 import { Pipeline } from './Pipeline';
-import { APIKeys, PipelineConf } from './types';
-
-interface AigurConfiguration {
-	apiKeys: APIKeys;
-}
+import { AigurConfiguration, PipelineConf } from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -26,6 +22,8 @@ export const createClient = (opts: AigurConfiguration) => {
 					...conf,
 					retries: conf.retries ?? DEFAULT_RETRIES,
 					retryDelayInMs: conf.retryDelayInMs ?? RETRY_DELAY_IN_MS,
+					eventListener: opts.eventListener,
+					eventPublisher: opts.eventPublisher,
 				};
 				const flow = conf.flow(new FlowBuilder<Input, Output, [], null>([]));
 				return new Pipeline(pipelineConf, flow, apiKeys);

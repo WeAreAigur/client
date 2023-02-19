@@ -2,14 +2,7 @@ import { FlowBuilder } from './builder';
 import { delay } from './delay';
 import { getInputByContext } from './getInputByContext';
 import { makeid } from './makeid';
-import {
-	APIKeys,
-	ConcreteNode,
-	EventType,
-	PipelineConf,
-	PipelineEvent,
-	ProgressEventType,
-} from './types';
+import { APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType } from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -24,8 +17,6 @@ export class Pipeline<
 	> = new Map();
 	public readonly onStartListeners: Map<string, () => void> = new Map();
 	public readonly onFinishListeners: Map<string, () => void> = new Map();
-	private eventPublisher: (event: PipelineEvent) => Promise<Response>;
-	private eventListener: (cb: (event: PipelineEvent) => void) => void;
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
@@ -97,14 +88,6 @@ export class Pipeline<
 			return this.invokeStream(`/api/pipelines/${this.conf.id}?_vercel_no_cache=1`, input, cb);
 		},
 	};
-
-	public setEventPublisher(publisher: (event: PipelineEvent) => Promise<Response>) {
-		this.eventPublisher = publisher;
-	}
-
-	public setEventListener(listener: (cb: (event: PipelineEvent) => void) => void) {
-		this.eventListener = listener;
-	}
 
 	public onProgress(
 		cb: (args: { node: ConcreteNode<any, any>; type: ProgressEventType; index: number }) => void
@@ -185,11 +168,11 @@ export class Pipeline<
 	}
 
 	private listenToEvents() {
-		if (!this.conf.updateProgress || typeof window === 'undefined' || !this.eventListener) {
+		if (!this.conf.updateProgress || typeof window === 'undefined' || !this.conf.eventListener) {
 			return;
 		}
 
-		this.eventListener((event) => {
+		this.conf.eventListener((event) => {
 			if (event.pipelineId !== this.conf.id) {
 				return;
 			}
@@ -210,9 +193,9 @@ export class Pipeline<
 	}
 
 	private notifyEvent(type: EventType, data?: Record<any, any>) {
-		if (!this.conf.updateProgress || !this.eventPublisher) {
+		if (!this.conf.updateProgress || !this.conf.eventPublisher) {
 			return;
 		}
-		return this.eventPublisher({ type, data, pipelineId: this.conf.id });
+		return this.conf.eventPublisher({ type, data, pipelineId: this.conf.id });
 	}
 }

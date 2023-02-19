@@ -2,6 +2,12 @@ import { z } from 'zod';
 
 import { FlowBuilder } from './builder';
 
+export interface AigurConfiguration {
+	apiKeys: APIKeys;
+	eventListener?: (cb: (event: PipelineEvent) => void) => void;
+	eventPublisher?: (event: PipelineEvent) => Promise<any>;
+}
+
 export interface PipelineConf<
 	Input extends Record<string, unknown>,
 	Output extends Record<string, unknown> | ReadableStream
@@ -15,7 +21,7 @@ export interface PipelineConf<
 	retryDelayInMs?: number;
 	updateProgress?: boolean;
 	eventListener?: (cb: (event: PipelineEvent) => void) => void;
-	eventPublisher?: (event: PipelineEvent) => Promise<Response>;
+	eventPublisher?: (event: PipelineEvent) => Promise<any>;
 	validateInput?: (input: Input) => { valid: boolean; message?: string };
 }
 

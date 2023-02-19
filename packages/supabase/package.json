@@ -7,8 +7,7 @@
 	"scripts": {
 		"pbl": "npm publish --access public",
 		"build": "tsup src/index.ts --format cjs --dts --minify",
-		"dev": "tsup src/index.ts --format cjs --dts --watch",
-		"test": ":"
+		"dev": "tsup src/index.ts --format cjs --dts --watch"
 	},
 	"keywords": [],
 	"author": "",

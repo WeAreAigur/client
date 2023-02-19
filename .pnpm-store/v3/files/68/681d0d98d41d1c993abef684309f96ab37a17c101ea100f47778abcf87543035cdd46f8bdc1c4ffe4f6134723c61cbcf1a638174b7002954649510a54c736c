@@ -1,0 +1,56 @@
+{
+  "name": "remark-mdx-disable-explicit-jsx",
+  "version": "0.1.0",
+  "description": "Remark plugin to reenable styling of html tags with 'components' prop",
+  "keywords": [
+    "mdx",
+    "markdown",
+    "mdxast"
+  ],
+  "author": "Alexey Ivanov <mail@alexeyivanov.info>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iAdramelk/remark-mdx-disable-explicit-jsx.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "index.d.ts",
+    "index.js"
+  ],
+  "scripts": {
+    "test": "c8 uvu test",
+    "format": "eslint . --fix && prettier . -w"
+  },
+  "nano-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --w"
+    ],
+    "*": "prettier --w"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "./node_modules/.bin/nano-staged"
+  },
+  "dependencies": {
+    "@types/hast": "^2.3.4",
+    "unified": "^10.1.1",
+    "unist-util-visit": "^4.1.0"
+  },
+  "devDependencies": {
+    "@mdx-js/mdx": "^2.0.0-rc.2",
+    "c8": "^7.11.0",
+    "eslint": "^8.7.0",
+    "nano-staged": "^0.5.0",
+    "prettier": "^2.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "simple-git-hooks": "^2.7.0",
+    "uvu": "^0.5.3",
+    "vfile": "^5.3.0",
+    "xdm": "^3.3.3"
+  }
+}

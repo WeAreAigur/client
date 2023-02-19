@@ -1,0 +1,19 @@
+import * as zod from 'zod';
+export declare class ValidationError extends Error {
+    details: Array<Zod.ZodIssue>;
+    type: 'ZodValidationError';
+    constructor(message: string, options: {
+        details: Array<Zod.ZodIssue>;
+    });
+}
+export declare function fromZodError(zodError: zod.ZodError, options?: {
+    maxIssuesInMessage?: number;
+    issueSeparator?: string;
+    unionSeparator?: string;
+    prefixSeparator?: string;
+    prefix?: string;
+}): ValidationError;
+export declare const toValidationError: (options?: Parameters<typeof fromZodError>[1]) => (err: unknown) => ValidationError | Error;
+export declare function isValidationError(err: unknown): err is ValidationError;
+export declare function isValidationErrorLike(err: unknown): err is ValidationError;
+//# sourceMappingURL=ValidationError.d.ts.map

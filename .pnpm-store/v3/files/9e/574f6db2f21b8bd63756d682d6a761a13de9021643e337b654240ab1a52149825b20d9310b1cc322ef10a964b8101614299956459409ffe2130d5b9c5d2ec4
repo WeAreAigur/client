@@ -1,0 +1,12 @@
+import { a as PageMapItem } from './types-cb47bdaf.js';
+import 'next';
+import 'mdast';
+import '@mdx-js/mdx';
+import 'rehype-pretty-code';
+import 'gray-matter';
+import 'webpack';
+import 'react';
+
+declare function filterRouteLocale(pageMap: PageMapItem[], locale: string, defaultLocale: string): PageMapItem[];
+
+export { filterRouteLocale as default };

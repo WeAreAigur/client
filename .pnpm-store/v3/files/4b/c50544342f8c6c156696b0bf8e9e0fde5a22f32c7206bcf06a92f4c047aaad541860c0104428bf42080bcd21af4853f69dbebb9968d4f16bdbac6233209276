@@ -1,0 +1,32 @@
+import { L as LoaderOptions, R as ReadingTime, H as Heading } from './types-cb47bdaf.js';
+import { ProcessorOptions } from '@mdx-js/mdx';
+import 'next';
+import 'mdast';
+import 'rehype-pretty-code';
+import 'gray-matter';
+import 'webpack';
+import 'react';
+
+type MdxOptions = LoaderOptions['mdxOptions'] & Pick<ProcessorOptions, 'jsx' | 'outputFormat'>;
+declare function compileMdx(source: string, loaderOptions?: Pick<LoaderOptions, 'staticImage' | 'flexsearch' | 'defaultShowCopyCode' | 'readingTime' | 'latex' | 'codeHighlight'> & {
+    mdxOptions?: MdxOptions;
+    route?: string;
+    locale?: string;
+}, { filePath, useCachedCompiler, isPageImport }?: {
+    filePath?: string | undefined;
+    useCachedCompiler?: boolean | undefined;
+    isPageImport?: boolean | undefined;
+}): Promise<{
+    structurizedData: any;
+    searchIndexKey: string | null;
+    frontMatter: {
+        [key: string]: any;
+    };
+    readingTime?: ReadingTime | undefined;
+    headings: Heading[];
+    hasJsxInH1?: boolean | undefined;
+    title: string;
+    result: string;
+}>;
+
+export { compileMdx };

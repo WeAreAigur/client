@@ -1,4 +1,5 @@
 import { jokeGptPipeline } from '#/pipelines/jokegpt';
+import { logsnag } from '#/services/logsnag';
 import { useState } from 'react';
 
 interface JokeFormProps {}
@@ -9,6 +10,11 @@ export function JokeForm(props: JokeFormProps) {
 	const [joke, setJoke] = useState<string>('');
 
 	const submit = async (e: any) => {
+		logsnag.publish({
+			channel: 'client',
+			notify: true,
+			event: 'Joke',
+		});
 		e.preventDefault();
 		setInProgress(true);
 		const { joke } = await jokeGptPipeline.vercel.invoke({ subject });

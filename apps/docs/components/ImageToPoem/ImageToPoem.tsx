@@ -3,10 +3,13 @@ import { logsnag } from '#/services/logsnag';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
+import { Tabs } from '../Tabs';
 import { ImageToPoemPipelineView } from './ImageToPoemPipelineView';
 import { ImageUpload } from './ImageUpload';
 
-interface ImageToPoemProps {}
+interface ImageToPoemProps {
+	children: React.ReactNode;
+}
 
 export function ImageToPoem(props: ImageToPoemProps) {
 	const [image, setImage] = useState<string | null>(null);
@@ -71,7 +74,24 @@ export function ImageToPoem(props: ImageToPoemProps) {
 				)}
 			</div>
 			<div className="flex-1 md:w-1/2">
-				<ImageToPoemPipelineView isActive={inProgress} pipeline={pipelines.imageToPoemStream} />
+				<Tabs
+					className="h-[520px]"
+					tabs={[
+						{
+							label: 'Pipeline',
+							content: (
+								<ImageToPoemPipelineView
+									isActive={inProgress}
+									pipeline={pipelines.imageToPoemStream}
+								/>
+							),
+						},
+						{
+							label: 'Code',
+							content: props.children,
+						},
+					]}
+				/>
 			</div>
 		</div>
 	);

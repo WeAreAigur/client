@@ -21,13 +21,104 @@ Clone this [repo](https://github.com/WeAreAigur/client-template) for a quickstar
 
 This pipeline takes an audio recording of a prompt, transcribes it using Whisper, enhances it with keywords using GPT3 and generates an image using Stable Diffusion.
 
-<VoiceToImage />
+<VoiceToImage>
+```ts index.ts
+import { aigur } from '#/services/aigur';
+import {
+  enhanceWithKeywords,
+  gpt3Prediction,
+  replaceString,
+  stabilityTextToImage,
+  stringToArrayBuffer,
+  whisperApi,
+} from '@aigur/client';
+import { supabaseUpload } from '@aigur/supabase';
+
+export const voiceToImagePipeline = aigur.pipeline.create<
+  { audio: string },
+  { url: string; transcription: string; enhancedPrompt: string }
+>({
+  id: 'voiceToImage',
+  updateProgress: true,
+  flow: (flow) =>
+    flow
+      .node(stringToArrayBuffer, ({ input }) => ({
+        string: input.audio,
+      }))
+      .node(supabaseUpload, ({ prev }) => ({
+        bucket: 'audio',
+        extension: 'mp3',
+        file: prev.arrayBuffer,
+        supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
+        supabaseUrl: process.env.SUPABASE_URL!,
+      }))
+      .node(whisperApi, ({ prev }) => ({
+        audioUrl: prev.url,
+      }))
+      .node(enhanceWithKeywords, ({ prev }) => ({
+        text: prev.text,
+      }))
+      .node(gpt3Prediction, ({ prev }) => ({
+        prompt: prev.text,
+      }))
+      .node(replaceString, ({ prev }) => ({
+        text: prev.text,
+        modifier: `high resolution photography, magazine, $(text)$, cinematic composition, 8k, highly detailed, cinematography, mega scans, 35mm lens, god rays, pools of light`,
+      }))
+      .node(stabilityTextToImage, ({ prev }) => ({
+        text_prompts: [
+          {
+            text: prev.text,
+          },
+        ],
+        steps: 60,
+      }))
+      .node(supabaseUpload, ({ prev }) => ({
+        bucket: 'results',
+        extension: 'png',
+        file: prev.result,
+        supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
+        supabaseUrl: process.env.SUPABASE_URL!,
+      }))
+      .output(({ prev, nodes }) => ({
+        transcription: nodes[2].output.text,
+        enhancedPrompt: nodes[5].output.text,
+        url: prev.url,
+      })),
+});
+```
+</VoiceToImage>
 
 ### Image to Poem
 
 This pipeline takes an image, labels it with Google's Vision API and creates a poem according the labels it finds.
 
-<ImageToPoem />
+<ImageToPoem>
+```ts index.ts
+import { aigur } from '#/services/aigur';
+import { googleImageLabeling, gpt3PredictionStream, replaceString } from '@aigur/client';
+
+export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }, ReadableStream>({
+  id: 'imageToPoemStream',
+  stream: true,
+  updateProgress: true,
+  flow: (flow) =>
+    flow
+      .node(googleImageLabeling, ({ input }) => ({
+        image: input.image,
+      }))
+      .node(replaceString, ({ prev }) => ({
+        text: prev.labels,
+        modifier:
+          `Write a very short poem about an image with the following entities:\n$(text)$\n`,
+      }))
+      .node(gpt3PredictionStream, ({ prev }) => ({
+        prompt: prev.text,
+      }))
+      .output(({ prev }) => prev.stream),
+});
+```
+</ImageToPoem>
 
 
 
@@ -35,7 +126,52 @@ This pipeline takes an image, labels it with Google's Vision API and creates a p
 
 This pipeline takes a long text, summarizes it with GPT3 and converts the result to audio.
 
-<SummarizeAndRead />
+<SummarizeAndRead>
+```ts index.ts
+import { aigur } from '#/services/aigur';
+import {
+	googleTextToSpeech,
+	gpt3Prediction,
+	replaceString,
+	stringToArrayBuffer,
+} from '@aigur/client';
+import { supabaseUpload } from '@aigur/supabase';
+
+export const summarizeAndReadPipeline = aigur.pipeline.create<
+	{ text: string },
+	{ url: string; summary: string }
+>({
+	id: 'summarizeAndRead',
+	updateProgress: true,
+	flow: (flow) =>
+		flow
+			.node(replaceString, ({ input }) => ({
+				text: input.text,
+				modifier: '$(text)$\n\nTl;dr',
+			}))
+			.node(gpt3Prediction, ({ prev }) => ({
+				prompt: prev.text,
+			}))
+			.node(googleTextToSpeech, ({ prev }) => ({
+				text: prev.text,
+			}))
+			.node(stringToArrayBuffer, ({ prev }) => ({
+				string: prev.audio,
+			}))
+			.node(supabaseUpload, ({ prev }) => ({
+				bucket: 'audio',
+				extension: 'mp3',
+				file: prev.arrayBuffer,
+				supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
+				supabaseUrl: process.env.SUPABASE_URL!,
+			}))
+			.output(({ prev, nodes }) => ({
+				url: prev.url,
+				summary: nodes[1].output.text,
+			})),
+});
+```
+</SummarizeAndRead>
 
 
 --- 

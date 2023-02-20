@@ -9,7 +9,6 @@ interface SummarizeAndReadPipelineViewProps {
 export function SummarizeAndReadPipelineView(props: SummarizeAndReadPipelineViewProps) {
 	return (
 		<PipelineEditor
-			className="h-[520px]"
 			pipeline={props.pipeline}
 			nodes={[
 				{

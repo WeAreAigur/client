@@ -1,8 +1,8 @@
-import { FlowBuilder } from './builder';
-import { delay } from './delay';
-import { getInputByContext } from './getInputByContext';
-import { makeid } from './makeid';
 import { APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType } from './types';
+import { makeid } from './makeid';
+import { getInputByContext } from './getInputByContext';
+import { delay } from './delay';
+import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -17,6 +17,7 @@ export class Pipeline<
 	> = new Map();
 	public readonly onStartListeners: Map<string, () => void> = new Map();
 	public readonly onFinishListeners: Map<string, () => void> = new Map();
+	private readonly pipelineInstanceId = makeid(16);
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output>,
@@ -26,8 +27,8 @@ export class Pipeline<
 		this.listenToEvents();
 	}
 
-	public invoke(input: Input) {
-		return this.processPipeline(input);
+	public invoke(input: Input, pipelineInstanceId: string = this.pipelineInstanceId) {
+		return this.processPipeline(input, pipelineInstanceId);
 	}
 
 	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
@@ -37,7 +38,10 @@ export class Pipeline<
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(input),
+				body: JSON.stringify({
+					input,
+					pipelineInstanceId: this.pipelineInstanceId,
+				}),
 			})
 				// TODO: check response.ok
 				// if (!response.ok) {
@@ -57,7 +61,10 @@ export class Pipeline<
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(input),
+			body: JSON.stringify({
+				input,
+				pipelineInstanceId: this.pipelineInstanceId,
+			}),
 		});
 		if (!response.ok) {
 			throw new Error(response.statusText);
@@ -81,11 +88,11 @@ export class Pipeline<
 	public vercel = {
 		invoke: (input: Input): Promise<Output> => {
 			// TODO: move base url to "create" optional param
-			return this.invokeRemote(`/api/pipelines/${this.conf.id}?_vercel_no_cache=1`, input);
+			return this.invokeRemote(`/api/pipelines/${this.conf.id}`, input);
 		},
 		invokeStream: (input: Input, cb: (chunk: string) => void) => {
 			// TODO: move base url to "create" optional param
-			return this.invokeStream(`/api/pipelines/${this.conf.id}?_vercel_no_cache=1`, input, cb);
+			return this.invokeStream(`/api/pipelines/${this.conf.id}`, input, cb);
 		},
 	};
 
@@ -115,10 +122,10 @@ export class Pipeline<
 		};
 	}
 
-	private async processPipeline(input: Input): Promise<Output> {
+	private async processPipeline(input: Input, pipelineInstanceId: string): Promise<Output> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
-			await this.notifyEvent('pipeline:start');
+			await this.notifyEvent('pipeline:start', pipelineInstanceId);
 			if (this.conf.validateInput) {
 				const result = this.conf.validateInput(input);
 				if (!result.valid) {
@@ -132,7 +139,10 @@ export class Pipeline<
 			let startProgressPromise;
 
 			for (let i = 0; i < nodes.length; i++) {
-				startProgressPromise = this.notifyEvent('node:start', { node: nodes[i].name, index: i });
+				startProgressPromise = this.notifyEvent('node:start', pipelineInstanceId, {
+					node: nodes[i].name,
+					index: i,
+				});
 				let attemptCount = 0;
 				let isSuccess = false;
 				do {
@@ -150,10 +160,13 @@ export class Pipeline<
 				} while (!isSuccess && attemptCount <= retriesCount);
 				// we wait here as to not delay the execution itself
 				await startProgressPromise;
-				await this.notifyEvent('node:finish', { node: nodes[i].name, index: i });
+				await this.notifyEvent('node:finish', pipelineInstanceId, {
+					node: nodes[i].name,
+					index: i,
+				});
 			}
 
-			await this.notifyEvent('pipeline:finish');
+			await this.notifyEvent('pipeline:finish', pipelineInstanceId);
 			return output;
 		} catch (e) {
 			console.error(e);
@@ -172,7 +185,7 @@ export class Pipeline<
 			return;
 		}
 
-		this.conf.eventListener((event) => {
+		this.conf.eventListener(this.pipelineInstanceId, (event) => {
 			if (event.pipelineId !== this.conf.id) {
 				return;
 			}
@@ -192,10 +205,10 @@ export class Pipeline<
 		}
 	}
 
-	private notifyEvent(type: EventType, data?: Record<any, any>) {
+	private notifyEvent(type: EventType, pipelineInstanceId: string, data?: Record<any, any>) {
 		if (!this.conf.updateProgress || !this.conf.eventPublisher) {
 			return;
 		}
-		return this.conf.eventPublisher({ type, data, pipelineId: this.conf.id });
+		return this.conf.eventPublisher(pipelineInstanceId, { type, data, pipelineId: this.conf.id });
 	}
 }

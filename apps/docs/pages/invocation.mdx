@@ -44,7 +44,7 @@ Here are examples of the server side endpoint that will do the actual invocation
     <CH.Code>
     ```ts
     export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-      const input = req.body;
+      const { input } = req.body;
       const output = await pipeline.invoke(input); // <-- import your pipeline
       return res.json(output);
     }
@@ -55,7 +55,7 @@ Here are examples of the server side endpoint that will do the actual invocation
     <CH.Code>
     ```ts
     app.post('/api/jokePipeline', async (req, res) => {
-      const input = req.body;
+      const { input } = req.body;
       const output = await pipeline.invoke(input); // <-- import your pipeline
       res.json(output);
     });

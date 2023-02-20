@@ -23,30 +23,31 @@ export function createAblyNotifier(
 	ablySubscribeKey: string,
 	channel: string
 ) {
-	const id = makeid(16);
-	const channelName = `${channel}-${id}`;
 	return {
 		eventPublisher,
 		eventListener,
 	};
 
-	function eventPublisher(event: PipelineEvent) {
+	function eventPublisher(pipelineInstanceId: string, event: PipelineEvent) {
 		if (!ablyPublishKey) {
 			return Promise.resolve();
 		}
 
-		return fetch(`https://rest.ably.io/channels/${channelName}/messages?enveloped=false`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Basic ${btoa(ablyPublishKey)}`,
-			},
-			body: JSON.stringify(event),
-		});
+		return fetch(
+			`https://rest.ably.io/channels/${channel}-${pipelineInstanceId}/messages?enveloped=false`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Basic ${btoa(ablyPublishKey)}`,
+				},
+				body: JSON.stringify(event),
+			}
+		);
 	}
 
-	function eventListener(cb: (event: PipelineEvent) => void) {
-		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=${channelName}&v=1.2&key=${ablySubscribeKey}&enveloped=false`;
+	function eventListener(pipelineInstanceId: string, cb: (event: PipelineEvent) => void) {
+		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=${channel}-${pipelineInstanceId}&v=1.2&key=${ablySubscribeKey}&enveloped=false`;
 		const eventSource = new EventSource(dataEndpoint);
 		eventSource.onmessage = (event) => cb(JSON.parse(event.data));
 	}

@@ -69,7 +69,7 @@ export function Chat(props: SummarizeAndReadProps) {
 				<form onSubmit={submit} className="flex flex-col flex-1 space-y-4">
 					<div
 						ref={chatContainerRef}
-						className="flex flex-col space-y-1 overflow-auto border rounded-lg border-accent h-52"
+						className="flex flex-col p-2 space-y-1 overflow-auto border rounded-lg border-accent h-96"
 					>
 						{transcript.map((transcriptLine, index) => (
 							<TranscriptLineView key={index} transcriptLine={transcriptLine} />
@@ -97,7 +97,7 @@ export function Chat(props: SummarizeAndReadProps) {
 			</div>
 			<div className="flex-1 md:w-1/2">
 				<Tabs
-					className="h-[490px]"
+					className="h-[500px]"
 					tabs={[
 						{
 							label: 'Pipeline',

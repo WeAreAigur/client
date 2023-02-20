@@ -52,7 +52,6 @@ async function OpenAIStream(response: Response) {
 						if (counter < 2 && (text.match(/\n/) || []).length) {
 							return;
 						}
-						console.log(`enqueing chunk`, text);
 						const queue = encoder.encode(text);
 						controller.enqueue(queue);
 						counter++;

@@ -1,9 +1,9 @@
-import { pipelines } from '#/pipelines/pipelines';
-import { logsnag } from '#/services/logsnag';
 import { useEffect, useRef, useState } from 'react';
+import { logsnag } from '#/services/logsnag';
+import { pipelines } from '#/pipelines/pipelines';
 
-import { Tabs } from '../Tabs';
 import { ChatPipelineView } from './ChatPipelineView';
+import { Tabs } from '../Tabs';
 
 interface SummarizeAndReadProps {
 	children: React.ReactNode;
@@ -41,7 +41,6 @@ export function Chat(props: SummarizeAndReadProps) {
 		setInProgress(true);
 		setChatBotResponse({ text: '', speaker: 'Bot' });
 		pipelines.chat.vercel.invokeStream({ text }, (res) => {
-			console.log(`got result`, res);
 			setInProgress(false);
 			setChatBotResponse((botResponse) => ({
 				text: (botResponse ? botResponse.text : '') + res,
@@ -54,8 +53,6 @@ export function Chat(props: SummarizeAndReadProps) {
 	useEffect(() => {
 		scrollToBottom();
 	}, [transcript]);
-
-	console.log(`rendering`);
 
 	function scrollToBottom() {
 		if (chatContainerRef.current) {

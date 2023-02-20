@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.0.0
+
+### Major Changes
+
+- 95e8e087: send pipeline events to specific pipelineInstanceId
+
 ## 0.35.0
 
 ### Minor Changes

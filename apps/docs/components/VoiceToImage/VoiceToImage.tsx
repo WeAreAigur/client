@@ -4,11 +4,14 @@ import { logsnag } from '#/services/logsnag';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
+import { Tabs } from '../Tabs';
 import { premadeAudio } from './premadeAudio';
 import { VoiceRecorder } from './VoiceRecorder';
 import { VoiceToImagePipelineView } from './VoiceToImagePipelineView';
 
-interface VoiceToImageProps {}
+interface VoiceToImageProps {
+	children: React.ReactNode;
+}
 
 export function VoiceToImage(props: VoiceToImageProps) {
 	const { toggleRecording, isRecording, result } = useRecord();
@@ -95,7 +98,21 @@ export function VoiceToImage(props: VoiceToImageProps) {
 				</div>
 			</div>
 			<div className="flex-1 md:w-1/2">
-				<VoiceToImagePipelineView isActive={inProgress} pipeline={pipelines.voiceToImage} />
+				<Tabs
+					className="h-[850px]"
+					tabs={[
+						{
+							label: 'Pipeline',
+							content: (
+								<VoiceToImagePipelineView isActive={inProgress} pipeline={pipelines.voiceToImage} />
+							),
+						},
+						{
+							label: 'Code',
+							content: props.children,
+						},
+					]}
+				/>
 			</div>
 		</div>
 	);

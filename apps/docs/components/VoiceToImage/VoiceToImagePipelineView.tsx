@@ -9,7 +9,6 @@ interface VoiceToImagePipelineViewProps {
 export function VoiceToImagePipelineView(props: VoiceToImagePipelineViewProps) {
 	return (
 		<PipelineEditor
-			className="h-[750px]"
 			pipeline={props.pipeline}
 			nodes={[
 				{

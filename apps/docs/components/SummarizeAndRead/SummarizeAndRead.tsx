@@ -2,10 +2,13 @@ import { pipelines } from '#/pipelines/pipelines';
 import { logsnag } from '#/services/logsnag';
 import { useState } from 'react';
 
+import { Tabs } from '../Tabs';
 import { PlayAudio } from './PlayAudio';
 import { SummarizeAndReadPipelineView } from './SummarizeAndReadPipelineView';
 
-interface SummarizeAndReadProps {}
+interface SummarizeAndReadProps {
+	children: React.ReactNode;
+}
 
 const examples = {
 	Boston:
@@ -43,7 +46,7 @@ export function SummarizeAndRead(props: SummarizeAndReadProps) {
 
 	return (
 		<div className="flex flex-col pt-8 space-y-8 md:space-y-0 md:space-x-8 md:flex-row">
-			<div className="flex flex-col flex-1 space-y-4 md:w-1/2 md:h-[32rem]">
+			<div className="flex flex-col flex-1 space-y-4 md:w-1/2 md:h-[32rem] my-14">
 				<textarea
 					placeholder="Enter some text here"
 					className="flex-1 w-full textarea textarea-bordered"
@@ -76,7 +79,24 @@ export function SummarizeAndRead(props: SummarizeAndReadProps) {
 				</div>
 			</div>
 			<div className="flex-1 md:w-1/2">
-				<SummarizeAndReadPipelineView isActive={inProgress} pipeline={pipelines.summarizeAndRead} />
+				<Tabs
+					className="h-[620px]"
+					tabs={[
+						{
+							label: 'Pipeline',
+							content: (
+								<SummarizeAndReadPipelineView
+									isActive={inProgress}
+									pipeline={pipelines.summarizeAndRead}
+								/>
+							),
+						},
+						{
+							label: 'Code',
+							content: props.children,
+						},
+					]}
+				/>
 			</div>
 		</div>
 	);

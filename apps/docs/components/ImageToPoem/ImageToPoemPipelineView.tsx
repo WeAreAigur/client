@@ -9,7 +9,6 @@ interface ImageToPoemPipelineViewProps {
 export function ImageToPoemPipelineView(props: ImageToPoemPipelineViewProps) {
 	return (
 		<PipelineEditor
-			className="h-[370px]"
 			pipeline={props.pipeline}
 			nodes={[
 				{

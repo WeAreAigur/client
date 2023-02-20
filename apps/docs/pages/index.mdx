@@ -3,6 +3,7 @@ import { VoiceToImage } from '#/components/VoiceToImage/VoiceToImage'
 import { VoiceToImagePipelineView } from '#/components/VoiceToImage/VoiceToImagePipelineView'
 import { ImageToPoem } from '#/components/ImageToPoem/ImageToPoem'
 import { SummarizeAndRead } from '#/components/SummarizeAndRead/SummarizeAndRead'
+import { Chat } from '#/components/Chat/Chat'
 
 ## What is Aigur Client?
 
@@ -16,6 +17,7 @@ A **free** and **opensource** (MIT) library to compose and invoke fully typed (ð
 ## Examples
 
 Clone this [repo](https://github.com/WeAreAigur/client-template) for a quickstart NextJs template or check out the examples below.
+
 
 ### Create an Image with your Voice
 
@@ -117,6 +119,36 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }
 });
 ```
 </ImageToPoem>
+
+### Chatbot
+
+A simple chatbot in a few lines of code.
+
+<Chat>
+```ts index.ts
+import { aigur } from '#/services/aigur';
+import { gpt3PredictionStream, replaceString } from '@aigur/client';
+import { chatPrompt } from './chatPrompt';
+
+export const chatPipeline = aigur.pipeline
+  .create<{ text: string }, ReadableStream>({
+    id: 'chat',
+    stream: true,
+    flow: (flow) =>
+      flow
+        .node(replaceString, ({ input }) => ({
+          text: input.text,
+          modifier: `${chatPrompt}\n Human: $(text)$\n Assistant:`,
+        }))
+        .node(gpt3PredictionStream, ({ prev }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => prev.stream),
+  });
+
+```
+</Chat>
+
 
 
 

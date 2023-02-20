@@ -23,6 +23,8 @@ export function createAblyNotifier(
 	ablySubscribeKey: string,
 	channel: string
 ) {
+	const id = makeid(16);
+	const channelName = `${channel}-${id}`;
 	return {
 		eventPublisher,
 		eventListener,
@@ -33,7 +35,7 @@ export function createAblyNotifier(
 			return Promise.resolve();
 		}
 
-		return fetch(`https://rest.ably.io/channels/${channel}/messages?enveloped=false`, {
+		return fetch(`https://rest.ably.io/channels/${channelName}/messages?enveloped=false`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -44,8 +46,18 @@ export function createAblyNotifier(
 	}
 
 	function eventListener(cb: (event: PipelineEvent) => void) {
-		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=${channel}&v=1.2&key=${ablySubscribeKey}&enveloped=false`;
+		const dataEndpoint = `https://realtime.ably.io/event-stream?channels=${channelName}&v=1.2&key=${ablySubscribeKey}&enveloped=false`;
 		const eventSource = new EventSource(dataEndpoint);
 		eventSource.onmessage = (event) => cb(JSON.parse(event.data));
 	}
+}
+
+export function makeid(length: number = 16) {
+	let result = '';
+	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	const charactersLength = characters.length;
+	for (let i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
 }

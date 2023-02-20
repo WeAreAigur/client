@@ -7,6 +7,7 @@ import { chatPrompt } from './chatPrompt';
 export const chatPipeline = aigur.pipeline.create<{ text: string }, ReadableStream>({
 	id: 'chat',
 	stream: true,
+	updateProgress: true,
 	flow: (flow) =>
 		flow
 			.node(replaceString, ({ input }) => ({

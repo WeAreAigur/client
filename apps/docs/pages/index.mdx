@@ -39,7 +39,6 @@ export const voiceToImagePipeline = aigur.pipeline.create<
   { url: string; transcription: string; enhancedPrompt: string }
 >({
   id: 'voiceToImage',
-  updateProgress: true,
   flow: (flow) =>
     flow
       .node(stringToArrayBuffer, ({ input }) => ({
@@ -101,7 +100,6 @@ import { googleImageLabeling, gpt3PredictionStream, replaceString } from '@aigur
 export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }, ReadableStream>({
   id: 'imageToPoemStream',
   stream: true,
-  updateProgress: true,
   flow: (flow) =>
     flow
       .node(googleImageLabeling, ({ input }) => ({
@@ -142,7 +140,6 @@ export const summarizeAndReadPipeline = aigur.pipeline.create<
 	{ url: string; summary: string }
 >({
 	id: 'summarizeAndRead',
-	updateProgress: true,
 	flow: (flow) =>
 		flow
 			.node(replaceString, ({ input }) => ({

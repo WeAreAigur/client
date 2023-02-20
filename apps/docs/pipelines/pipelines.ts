@@ -1,12 +1,9 @@
-import { z } from 'zod';
-
-import { voiceToImagePipeline } from './voiceToImage';
-import { summarizeAndReadPipeline } from './summarizeAndRead';
-import { jokeGptPipelineStream } from './jokegpt.stream';
-import { jokeGptPipeline } from './jokegpt';
+import { chatPipeline } from './chat';
 import { imageToPoemStreamPipeline } from './imageToPoem.stream';
-
-const x = z;
+import { jokeGptPipeline } from './jokegpt';
+import { jokeGptPipelineStream } from './jokegpt.stream';
+import { summarizeAndReadPipeline } from './summarizeAndRead';
+import { voiceToImagePipeline } from './voiceToImage';
 
 export const pipelines = {
 	jokegpt: jokeGptPipeline,
@@ -14,4 +11,5 @@ export const pipelines = {
 	imageToPoemStream: imageToPoemStreamPipeline,
 	voiceToImage: voiceToImagePipeline,
 	summarizeAndRead: summarizeAndReadPipeline,
+	chat: chatPipeline,
 } as const;

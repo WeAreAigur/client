@@ -1,5 +1,4 @@
-- resize image for image to poem pipeline
-- hooks, node can register (on start pipeline, on start node etc)
+- readme for client package
 - fix enum in pipelines (cant set string)
 - nodes
   - image to image

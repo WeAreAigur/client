@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { logsnag } from '#/services/logsnag';
 import { pipelines } from '#/pipelines/pipelines';
+import { logsnag } from '#/services/logsnag';
+import { useEffect, useRef, useState } from 'react';
 
-import { ChatPipelineView } from './ChatPipelineView';
 import { Tabs } from '../Tabs';
+import { ChatPipelineView } from './ChatPipelineView';
 
 interface SummarizeAndReadProps {
 	children: React.ReactNode;
@@ -82,7 +82,6 @@ export function Chat(props: SummarizeAndReadProps) {
 							<input
 								ref={inputRef}
 								type="input"
-								autoFocus
 								placeholder="Enter some text here"
 								className="w-full input input-bordered"
 								value={text}

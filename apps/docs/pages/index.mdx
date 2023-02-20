@@ -19,34 +19,6 @@ A **free** and **opensource** (MIT) library to compose and invoke fully typed (ð
 Clone this [repo](https://github.com/WeAreAigur/client-template) for a quickstart NextJs template or check out the examples below.
 
 
-### Chatbot
-
-<Chat>
-```ts index.ts
-import { aigur } from '#/services/aigur';
-import { gpt3PredictionStream, replaceString } from '@aigur/client';
-import { chatPrompt } from './chatPrompt';
-
-export const chatPipeline = aigur.pipeline
-  .create<{ text: string }, ReadableStream>({
-    id: 'chat',
-    stream: true,
-    flow: (flow) =>
-      flow
-        .node(replaceString, ({ input }) => ({
-          text: input.text,
-          modifier: `${chatPrompt}\n Human: $(text)$\n Assistant:`,
-        }))
-        .node(gpt3PredictionStream, ({ prev }) => ({
-          prompt: prev.text,
-        }))
-        .output(({ prev }) => prev.stream),
-  });
-
-```
-</Chat>
-
-
 ### Create an Image with your Voice
 
 This pipeline takes an audio recording of a prompt, transcribes it using Whisper, enhances it with keywords using GPT3 and generates an image using Stable Diffusion.
@@ -147,6 +119,36 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }
 });
 ```
 </ImageToPoem>
+
+### Chatbot
+
+A simple chatbot in a few lines of code.
+
+<Chat>
+```ts index.ts
+import { aigur } from '#/services/aigur';
+import { gpt3PredictionStream, replaceString } from '@aigur/client';
+import { chatPrompt } from './chatPrompt';
+
+export const chatPipeline = aigur.pipeline
+  .create<{ text: string }, ReadableStream>({
+    id: 'chat',
+    stream: true,
+    flow: (flow) =>
+      flow
+        .node(replaceString, ({ input }) => ({
+          text: input.text,
+          modifier: `${chatPrompt}\n Human: $(text)$\n Assistant:`,
+        }))
+        .node(gpt3PredictionStream, ({ prev }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => prev.stream),
+  });
+
+```
+</Chat>
+
 
 
 

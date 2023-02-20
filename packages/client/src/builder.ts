@@ -1,5 +1,5 @@
-import { ConcreteNode, NodeAction } from './types';
 import { output } from './nodes/output/output';
+import { ConcreteNode, NodeAction } from './types';
 
 export class FlowBuilder<
 	Input extends Record<string, unknown>,
@@ -16,26 +16,30 @@ export class FlowBuilder<
 		return new FlowBuilder<Input, Output, [], null>([]);
 	}
 
+	public values = {
+		get prev(): PrevNode extends ConcreteNode<any, any>
+			? Awaited<ReturnType<PrevNode['action']>>
+			: Input {
+			return this.nodes.length > 0
+				? this.nodes[this.nodes.length - 1].output
+				: this.createDynamicPlaceholders('input');
+		},
+		get nodes() {
+			return this.nodes;
+		},
+		get input() {
+			return this.createDynamicPlaceholders('input');
+		},
+	};
+
 	public node<NodeDef extends NodeAction<any, any>>(
 		nodeDefinition: NodeDef,
-		getUserInput: (data: {
-			nodes: NodeDefinitions;
-			prev: PrevNode extends ConcreteNode<any, any>
-				? Awaited<ReturnType<PrevNode['action']>>
-				: Input;
-			input: Input;
-		}) => Parameters<NodeDef>['0']
+		nodeInput: Parameters<NodeDef>['0']
 	) {
 		type NewNode = ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
-		const input = this.createDynamicPlaceholders('input');
-		const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 		const node = {
 			action: nodeDefinition,
-			input: getUserInput({
-				nodes: this.nodes,
-				prev: prev.output,
-				input,
-			}),
+			input: nodeInput,
 			// configure output to return a placeholder for any property accessed (e.g. $context.0.url$)
 			output: this.createDynamicPlaceholders(this.nodes.length),
 		} as NewNode;
@@ -57,16 +61,8 @@ export class FlowBuilder<
 		return dynamicOutput;
 	}
 
-	output(
-		getUserInput: (data: {
-			nodes: NodeDefinitions;
-			prev: PrevNode extends ConcreteNode<any, any>
-				? Awaited<ReturnType<PrevNode['action']>>
-				: Input;
-			input: Input;
-		}) => Output
-	) {
-		return this.node(output<Output>, getUserInput);
+	output(data: Output) {
+		return this.node(output<Output>, data);
 	}
 
 	getNodes() {

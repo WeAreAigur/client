@@ -4,8 +4,8 @@ import { FlowBuilder } from './builder';
 
 export interface AigurConfiguration {
 	apiKeys: APIKeys;
-	eventListener?: (cb: (event: PipelineEvent) => void) => void;
-	eventPublisher?: (event: PipelineEvent) => Promise<any>;
+	eventListener?: (pipelineInstanceId: string, cb: (event: PipelineEvent) => void) => void;
+	eventPublisher?: (pipelineInstanceId: string, event: PipelineEvent) => Promise<any>;
 }
 
 export interface PipelineConf<
@@ -20,8 +20,8 @@ export interface PipelineConf<
 	stream?: boolean;
 	retryDelayInMs?: number;
 	updateProgress?: boolean;
-	eventListener?: (cb: (event: PipelineEvent) => void) => void;
-	eventPublisher?: (event: PipelineEvent) => Promise<any>;
+	eventListener?: (pipelineInstanceId: string, cb: (event: PipelineEvent) => void) => void;
+	eventPublisher?: (pipelineInstanceId: string, event: PipelineEvent) => Promise<any>;
 	validateInput?: (input: Input) => { valid: boolean; message?: string };
 }
 
@@ -39,7 +39,11 @@ export type ConcreteNode<
 	output: Output;
 };
 
-export type PipelineEvent = { type: EventType; data?: Record<any, any>; pipelineId: string };
+export type PipelineEvent = {
+	type: EventType;
+	data?: Record<any, any>;
+	pipelineId: string;
+};
 export type EventType = PipelineEventType | ProgressEventType;
 export type PipelineEventType = 'pipeline:start' | 'pipeline:finish';
 export type ProgressEventType = 'node:start' | 'node:finish' | 'node:stream';

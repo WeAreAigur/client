@@ -37,6 +37,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 	useEffect(() => {
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
 			console.log(`${Date.now()} - Pipeline finishing`, event.pipelineId, event);
+			setStatus('done');
 			setTimeout(() => setStatus('idle'), PIPELINE_RESET_TIME);
 		});
 		const unsubOnStart = props.data.pipeline.onStart((event) => {

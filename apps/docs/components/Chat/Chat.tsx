@@ -102,7 +102,7 @@ export function Chat(props: SummarizeAndReadProps) {
 							label: 'Pipeline',
 							content: (
 								<div className="flex flex-col flex-1 space-y-2">
-									<ChatPipelineView isActive={inProgress} pipeline={pipelines.chat} />,
+									<ChatPipelineView isActive={inProgress} pipeline={pipelines.chat} />
 									<div className="text-xs text-gray-400">
 										* Slight issue with visualizing streaming nodes.
 									</div>

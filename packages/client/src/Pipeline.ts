@@ -221,10 +221,8 @@ export class Pipeline<
 		if (!this.conf.updateProgress || !this.conf.eventPublisher) {
 			return;
 		}
-		const timestamp = Date.now();
 		return this.conf.eventPublisher(opts.pipelineInstanceId, {
 			pipelineId: this.conf.id,
-			timestamp,
 			eventIndex: this.eventIndex++,
 			...opts,
 		});

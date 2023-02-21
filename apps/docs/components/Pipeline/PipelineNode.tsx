@@ -22,6 +22,11 @@ function upperFirst(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+console.log('beep');
+setTimeout(() => {
+	console.log('boop');
+}, 5000);
+
 export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
 	const lastProgressEventIdx = useRef<number>(-1);
@@ -29,7 +34,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 	useEffect(() => {
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
 			console.log(`${Date.now()} - Pipeline finishing`, event.pipelineId, event);
-			setTimeout(() => setStatus('idle'), 2500);
+			setTimeout(() => setStatus('idle'), 10000);
 		});
 		const unsubOnStart = props.data.pipeline.onStart((event) => {
 			console.log(`${Date.now()} - Pipeline starting`, event.pipelineId, event);

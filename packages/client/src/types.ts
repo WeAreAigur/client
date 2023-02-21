@@ -43,7 +43,6 @@ export type PipelineEvent = {
 	type: EventType;
 	data?: Record<any, any>;
 	pipelineId: string;
-	timestamp: number;
 	eventIndex: number;
 };
 

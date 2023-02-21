@@ -28,11 +28,11 @@ export function PipelineNode(props: PipelineNodeProps) {
 
 	useEffect(() => {
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
-			console.log(`Pipeline finishing`, event.pipelineId, event.eventIndex);
+			console.log(`${Date.now()} - Pipeline finishing`, event.pipelineId, event);
 			setTimeout(() => setStatus('idle'), 2500);
 		});
 		const unsubOnStart = props.data.pipeline.onStart((event) => {
-			console.log(`Pipeline starting`, event.pipelineId, event.eventIndex);
+			console.log(`${Date.now()} - Pipeline starting`, event.pipelineId, event);
 		});
 		const unsubOnProgress = props.data.pipeline.onProgress((event) => {
 			if (event.eventIndex < lastProgressEventIdx.current) {
@@ -40,12 +40,12 @@ export function PipelineNode(props: PipelineNodeProps) {
 			}
 			if (event.data?.index === props.data.index) {
 				lastProgressEventIdx.current = event.eventIndex;
-				console.log(`***event`, event.data?.index, event);
+				console.log(`${Date.now()} - event`, event.data?.index, event);
 				if (event.type === 'node:start') {
-					console.log(`setting status to inProgress`, event.data?.index);
+					console.log(`${Date.now()} - setting status to inProgress`, event.data?.index);
 					setStatus((status) => (status === 'idle' ? 'inProgress' : status));
 				} else if (event.type === 'node:finish') {
-					console.log(`setting status to done`, event.data?.index);
+					console.log(`${Date.now()} - setting status to done`, event.data?.index);
 					setStatus('done');
 				}
 			}

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import { useEffect, useRef, useState } from 'react';
 
 import type { Pipeline } from '@aigur/client';
 
@@ -22,36 +22,42 @@ function upperFirst(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+const PIPELINE_RESET_TIME = 1_500;
 export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
+	const lastProgressEventIdx = useRef<number>(-1);
 
 	useEffect(() => {
-		props.data.pipeline.onStart(() => {
-			setStatus('idle');
+		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
+			// dont accept anymore events
+			lastProgressEventIdx.current = event.eventIndex;
+			setStatus('done');
+			setTimeout(() => {
+				setStatus('idle');
+				lastProgressEventIdx.current = 0;
+			}, PIPELINE_RESET_TIME);
 		});
-		props.data.pipeline.onProgress(({ node, type, index }) => {
-			if (index === props.data.index) {
-				if (type === 'node:start') {
-					setStatus('inProgress');
-				} else if (type === 'node:finish') {
+		const unsubOnProgress = props.data.pipeline.onProgress((event) => {
+			if (event.data?.index === props.data.index) {
+				if (event.eventIndex < lastProgressEventIdx.current) {
+					return;
+				}
+				lastProgressEventIdx.current = event.eventIndex;
+				if (event.type === 'node:start') {
+					setStatus((status) => (status === 'idle' ? 'inProgress' : status));
+				} else if (event.type === 'node:finish') {
 					setStatus('done');
 				}
 			}
 		});
-	}, [props.data.pipeline, props.data.index]);
+		return () => {
+			unsubOnFinish();
+			unsubOnProgress();
+		};
+	}, [props.data.pipeline, props.data.index, status]);
 
 	const borderColor = props.data.type === 'provider' ? 'border-blue-600' : 'border-pink-600';
 	const ringColor = props.data.type === 'provider' ? 'ring-blue-900' : 'ring-pink-900';
-
-	const Status = () => {
-		if (status === 'inProgress') {
-			return <div className="badge badge-warning">In Progress</div>;
-		}
-		if (status === 'done') {
-			return <div className="badge badge-success">Done</div>;
-		}
-		return null;
-	};
 
 	return (
 		<div
@@ -65,7 +71,18 @@ export function PipelineNode(props: PipelineNodeProps) {
 				<div className="text-2xl font-bold text-stone-100">{props.data.label}</div>
 			</div>
 			<div className="absolute right-2 bottom-2">
-				<Status />
+				{/* Lovely double triple ternary 💪🏻 */}
+				<div
+					className={`transition-all duration-300 badge ${
+						status === 'idle'
+							? 'badge-outline'
+							: status === 'inProgress'
+							? 'badge-warning'
+							: 'badge-success'
+					}`}
+				>
+					{status === 'idle' ? 'Idle' : status === 'inProgress' ? 'In Progress' : 'Done'}
+				</div>
 			</div>
 			{props.data.handles?.map((handle, i) => (
 				<Handle

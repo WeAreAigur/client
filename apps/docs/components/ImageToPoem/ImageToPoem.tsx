@@ -69,7 +69,7 @@ export function ImageToPoem(props: ImageToPoemProps) {
 					</div>
 				</div>
 				{poem ? (
-					<pre className="text-sm">{poem}</pre>
+					<div className="text-sm">{poem}</div>
 				) : (
 					<div>{inProgress ? 'Generating poem...' : 'No poem yet :('}</div>
 				)}
@@ -81,10 +81,15 @@ export function ImageToPoem(props: ImageToPoemProps) {
 						{
 							label: 'Pipeline',
 							content: (
-								<ImageToPoemPipelineView
-									isActive={inProgress}
-									pipeline={pipelines.imageToPoemStream}
-								/>
+								<div className="flex flex-col flex-1 space-y-2">
+									<ImageToPoemPipelineView
+										isActive={inProgress}
+										pipeline={pipelines.imageToPoemStream}
+									/>
+									<div className="text-xs text-gray-400">
+										* Slight issue with visualizing streaming nodes.
+									</div>
+								</div>
 							),
 						},
 						{

@@ -8,6 +8,7 @@ import ReactFlow, {
 	useEdgesState,
 	useNodesState,
 } from 'reactflow';
+import { useEffect, useState } from 'react';
 
 import { PipelineNode } from './PipelineNode';
 import { convertNodes } from './convertNodes';
@@ -26,12 +27,23 @@ const nodeTypes = {
 	pipelineNode: PipelineNode,
 };
 
+const PIPELINE_RESET_TIME = 1500;
+
 export function PipelineEditor(props: PipelineEditorProps) {
 	const [nodes] = useNodesState(
 		convertNodes(props.nodes, props.edges, props.isHorizontal, props.pipeline)
 	);
 	const [edges] = useEdgesState(props.edges);
+	const [isActive, setIsActive] = useState(props.isActive);
 	const zoomLevel = props.zoom ?? 0.4;
+
+	useEffect(() => {
+		if (props.isActive) {
+			setIsActive(props.isActive);
+		} else {
+			setTimeout(() => setIsActive(props.isActive), PIPELINE_RESET_TIME);
+		}
+	}, [props.isActive]);
 
 	return (
 		<div className={`flex-1 ${props.className ?? ''}`}>
@@ -51,11 +63,11 @@ export function PipelineEditor(props: PipelineEditorProps) {
 					>
 						<Background variant={BackgroundVariant.Dots} />
 						<Panel position={'top-left'}>
-							{props.isActive ? (
-								<span className="badge badge-success">Active</span>
-							) : (
-								<span className="badge">Idle</span>
-							)}
+							<span
+								className={`badge ${isActive ? 'badge-success' : ''} transition-all duration-300`}
+							>
+								Active
+							</span>
 						</Panel>
 					</ReactFlow>
 				</div>

@@ -28,20 +28,12 @@ export function PipelineNode(props: PipelineNodeProps) {
 	const lastProgressEventIdx = useRef<number>(-1);
 
 	useEffect(() => {
-		console.log('beep');
-		setTimeout(() => {
-			console.log('boop');
-		}, 5000);
-	}, []);
-
-	useEffect(() => {
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
 			console.log(`${Date.now()} - Pipeline finishing`, event.pipelineId, event);
+			// dont accept anymore events
+			lastProgressEventIdx.current = event.eventIndex;
 			setStatus('done');
 			setTimeout(() => setStatus('idle'), PIPELINE_RESET_TIME);
-		});
-		const unsubOnStart = props.data.pipeline.onStart((event) => {
-			console.log(`${Date.now()} - Pipeline starting`, event.pipelineId, event);
 		});
 		const unsubOnProgress = props.data.pipeline.onProgress((event) => {
 			if (event.eventIndex < lastProgressEventIdx.current) {
@@ -61,7 +53,6 @@ export function PipelineNode(props: PipelineNodeProps) {
 		});
 		return () => {
 			unsubOnFinish();
-			unsubOnStart();
 			unsubOnProgress();
 		};
 	}, [props.data.pipeline, props.data.index, status]);

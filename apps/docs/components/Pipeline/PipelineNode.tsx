@@ -22,14 +22,16 @@ function upperFirst(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-console.log('beep');
-setTimeout(() => {
-	console.log('boop');
-}, 5000);
-
 export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
 	const lastProgressEventIdx = useRef<number>(-1);
+
+	useEffect(() => {
+		console.log('beep');
+		setTimeout(() => {
+			console.log('boop');
+		}, 5000);
+	}, []);
 
 	useEffect(() => {
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {

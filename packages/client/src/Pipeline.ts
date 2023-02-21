@@ -128,7 +128,10 @@ export class Pipeline<
 	private async processPipeline(input: Input, pipelineInstanceId: string): Promise<Output> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
-			this.notifyEvent({ type: 'pipeline:start', pipelineInstanceId });
+			const pipelineStartPromise = this.notifyEvent({ type: 'pipeline:start', pipelineInstanceId });
+			if (!this.conf.stream) {
+				await pipelineStartPromise;
+			}
 			if (this.conf.validateInput) {
 				const result = this.conf.validateInput(input);
 				if (!result.valid) {
@@ -141,7 +144,7 @@ export class Pipeline<
 			const nodes: any[] = this.flow.getNodes();
 
 			for (let i = 0; i < nodes.length; i++) {
-				this.notifyEvent({
+				const nodeStartPromise = this.notifyEvent({
 					type: 'node:start',
 					pipelineInstanceId,
 					data: {
@@ -149,6 +152,9 @@ export class Pipeline<
 						index: i,
 					},
 				});
+				if (!this.conf.stream) {
+					await nodeStartPromise;
+				}
 				let attemptCount = 0;
 				let isSuccess = false;
 				do {
@@ -164,7 +170,7 @@ export class Pipeline<
 						await delay((this.conf.retryDelayInMs ?? RETRY_DELAY_IN_MS) * attemptCount);
 					}
 				} while (!isSuccess && attemptCount <= retriesCount);
-				this.notifyEvent({
+				const nodeEndPromise = this.notifyEvent({
 					type: 'node:finish',
 					pipelineInstanceId,
 					data: {
@@ -172,8 +178,17 @@ export class Pipeline<
 						index: i,
 					},
 				});
+				if (!this.conf.stream) {
+					await nodeEndPromise;
+				}
 			}
-			this.notifyEvent({ type: 'pipeline:finish', pipelineInstanceId });
+			const pipelineFinishPromise = this.notifyEvent({
+				type: 'pipeline:finish',
+				pipelineInstanceId,
+			});
+			if (!this.conf.stream) {
+				await pipelineFinishPromise;
+			}
 			return output;
 		} catch (e) {
 			console.error(e);

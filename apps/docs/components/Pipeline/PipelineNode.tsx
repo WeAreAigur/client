@@ -22,12 +22,20 @@ function upperFirst(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+let resetTimeout;
 const PIPELINE_RESET_TIME = 1_500;
+const PIPELINE_RESET_ON_START_TIME = 10_000;
 export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
 	const lastProgressEventIdx = useRef<number>(-1);
 
 	useEffect(() => {
+		const unsubOnStart = props.data.pipeline.onStart(() => {
+			if (resetTimeout) {
+				clearTimeout(resetTimeout);
+			}
+			resetTimeout = setTimeout(() => setStatus('idle'), PIPELINE_RESET_ON_START_TIME);
+		});
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
 			// dont accept anymore events
 			lastProgressEventIdx.current = event.eventIndex;
@@ -53,6 +61,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 		return () => {
 			unsubOnFinish();
 			unsubOnProgress();
+			unsubOnStart();
 		};
 	}, [props.data.pipeline, props.data.index, status]);
 

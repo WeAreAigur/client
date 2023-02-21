@@ -173,7 +173,7 @@ export class Pipeline<
 					},
 				});
 			}
-			await this.notifyEvent({ type: 'pipeline:finish', pipelineInstanceId });
+			this.notifyEvent({ type: 'pipeline:finish', pipelineInstanceId });
 			return output;
 		} catch (e) {
 			console.error(e);

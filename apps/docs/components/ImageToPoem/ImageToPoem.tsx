@@ -1,11 +1,11 @@
-import { pipelines } from '#/pipelines/pipelines';
-import { logsnag } from '#/services/logsnag';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { logsnag } from '#/services/logsnag';
+import { pipelines } from '#/pipelines/pipelines';
 
-import { Tabs } from '../Tabs';
-import { ImageToPoemPipelineView } from './ImageToPoemPipelineView';
 import { ImageUpload } from './ImageUpload';
+import { ImageToPoemPipelineView } from './ImageToPoemPipelineView';
+import { Tabs } from '../Tabs';
 
 interface ImageToPoemProps {
 	children: React.ReactNode;
@@ -81,10 +81,15 @@ export function ImageToPoem(props: ImageToPoemProps) {
 						{
 							label: 'Pipeline',
 							content: (
-								<ImageToPoemPipelineView
-									isActive={inProgress}
-									pipeline={pipelines.imageToPoemStream}
-								/>
+								<div className="flex flex-col flex-1 space-y-2">
+									<ImageToPoemPipelineView
+										isActive={inProgress}
+										pipeline={pipelines.imageToPoemStream}
+									/>
+									<div className="text-xs text-gray-400">
+										* Slight issue with visualizing streaming nodes.
+									</div>
+								</div>
 							),
 						},
 						{

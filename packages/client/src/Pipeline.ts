@@ -1,8 +1,8 @@
-import { APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType } from './types';
-import { makeid } from './makeid';
-import { getInputByContext } from './getInputByContext';
-import { delay } from './delay';
 import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { getInputByContext } from './getInputByContext';
+import { makeid } from './makeid';
+import { APIKeys, ConcreteNode, EventType, PipelineConf, ProgressEventType } from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -125,7 +125,7 @@ export class Pipeline<
 	private async processPipeline(input: Input, pipelineInstanceId: string): Promise<Output> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
-			await this.notifyEvent('pipeline:start', pipelineInstanceId);
+			this.notifyEvent('pipeline:start', pipelineInstanceId);
 			if (this.conf.validateInput) {
 				const result = this.conf.validateInput(input);
 				if (!result.valid) {
@@ -139,7 +139,7 @@ export class Pipeline<
 			let startProgressPromise;
 
 			for (let i = 0; i < nodes.length; i++) {
-				startProgressPromise = this.notifyEvent('node:start', pipelineInstanceId, {
+				this.notifyEvent('node:start', pipelineInstanceId, {
 					node: nodes[i].name,
 					index: i,
 				});
@@ -159,14 +159,12 @@ export class Pipeline<
 					}
 				} while (!isSuccess && attemptCount <= retriesCount);
 				// we wait here as to not delay the execution itself
-				await startProgressPromise;
-				await this.notifyEvent('node:finish', pipelineInstanceId, {
+				this.notifyEvent('node:finish', pipelineInstanceId, {
 					node: nodes[i].name,
 					index: i,
 				});
 			}
-
-			await this.notifyEvent('pipeline:finish', pipelineInstanceId);
+			this.notifyEvent('pipeline:finish', pipelineInstanceId);
 			return output;
 		} catch (e) {
 			console.error(e);

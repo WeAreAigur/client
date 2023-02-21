@@ -56,11 +56,12 @@ export function ImageToPoem(props: ImageToPoemProps) {
 							<button
 								key={key}
 								className="btn btn-sm btn-primary"
-								onClick={() =>
+								onClick={() => {
+									setImage(null);
 									import('./premadeImages').then((mod) => {
 										setImage(mod[key]);
-									})
-								}
+									});
+								}}
 							>
 								{key}
 							</button>

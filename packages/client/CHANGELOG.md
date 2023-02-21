@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.0.2
+
+### Patch Changes
+
+- 6974e556: Wait for events for non-stream pipelines (temp)
+
 ## 1.0.1
 
 ### Patch Changes

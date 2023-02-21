@@ -22,7 +22,7 @@ function upperFirst(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-const PIPELINE_RESET_TIME = 1500;
+const PIPELINE_RESET_TIME = 5000;
 export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
 	const lastProgressEventIdx = useRef<number>(-1);
@@ -66,7 +66,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 		};
 	}, [props.data.pipeline, props.data.index, status]);
 
-	console.log(`***rendering node ${props.data.label}, ${props.data.index}, ${status}`);
+	console.log(`${Date.now()} - rendering node ${props.data.label}, ${props.data.index}, ${status}`);
 
 	const borderColor = props.data.type === 'provider' ? 'border-blue-600' : 'border-pink-600';
 	const ringColor = props.data.type === 'provider' ? 'ring-blue-900' : 'ring-pink-900';

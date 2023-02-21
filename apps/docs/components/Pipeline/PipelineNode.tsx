@@ -22,12 +22,18 @@ function upperFirst(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-const PIPELINE_RESET_TIME = 1500;
+const PIPELINE_RESET_TIME = 1_500;
 export function PipelineNode(props: PipelineNodeProps) {
 	const [status, setStatus] = useState<'idle' | 'inProgress' | 'done'>('idle');
 	const lastProgressEventIdx = useRef<number>(-1);
 
 	useEffect(() => {
+		const unsubOnStart = props.data.pipeline.onStart((event) => {
+			console.log(`${Date.now()} - Pipeline starting`, event.pipelineId, event);
+			// if (event.eventIndex > lastProgressEventIdx.current) {
+			// 	setStatus('idle');
+			// }
+		});
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
 			console.log(`${Date.now()} - Pipeline finishing`, event.pipelineId, event);
 			// dont accept anymore events
@@ -37,6 +43,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 			setTimeout(() => {
 				console.log(`${Date.now()} - setting to idle`, props.data.index);
 				setStatus('idle');
+				lastProgressEventIdx.current = 0;
 			}, PIPELINE_RESET_TIME);
 		});
 		const unsubOnProgress = props.data.pipeline.onProgress((event) => {
@@ -63,6 +70,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 		return () => {
 			unsubOnFinish();
 			unsubOnProgress();
+			unsubOnStart();
 		};
 	}, [props.data.pipeline, props.data.index, status]);
 

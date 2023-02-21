@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { logsnag } from '#/services/logsnag';
 import { pipelines } from '#/pipelines/pipelines';
+import { logsnag } from '#/services/logsnag';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
-import { ImageUpload } from './ImageUpload';
-import { ImageToPoemPipelineView } from './ImageToPoemPipelineView';
 import { Tabs } from '../Tabs';
+import { ImageToPoemPipelineView } from './ImageToPoemPipelineView';
+import { ImageUpload } from './ImageUpload';
 
 interface ImageToPoemProps {
 	children: React.ReactNode;
@@ -69,7 +69,7 @@ export function ImageToPoem(props: ImageToPoemProps) {
 					</div>
 				</div>
 				{poem ? (
-					<pre className="text-sm">{poem}</pre>
+					<div className="text-sm">{poem}</div>
 				) : (
 					<div>{inProgress ? 'Generating poem...' : 'No poem yet :('}</div>
 				)}

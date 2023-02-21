@@ -1,5 +1,5 @@
-import { Handle, Position } from 'reactflow';
 import { useEffect, useRef, useState } from 'react';
+import { Handle, Position } from 'reactflow';
 
 import type { Pipeline } from '@aigur/client';
 
@@ -27,8 +27,12 @@ export function PipelineNode(props: PipelineNodeProps) {
 	const lastProgressEventIdx = useRef<number>(-1);
 
 	useEffect(() => {
-		const unsubOnFinish = props.data.pipeline.onFinish(() => {
-			setTimeout(() => setStatus('idle'), 2000);
+		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
+			console.log(`Pipeline finishing`, event.pipelineId, event.eventIndex);
+			setTimeout(() => setStatus('idle'), 2500);
+		});
+		const unsubOnStart = props.data.pipeline.onStart((event) => {
+			console.log(`Pipeline starting`, event.pipelineId, event.eventIndex);
 		});
 		const unsubOnProgress = props.data.pipeline.onProgress((event) => {
 			if (event.eventIndex < lastProgressEventIdx.current) {
@@ -48,6 +52,7 @@ export function PipelineNode(props: PipelineNodeProps) {
 		});
 		return () => {
 			unsubOnFinish();
+			unsubOnStart();
 			unsubOnProgress();
 		};
 	}, [props.data.pipeline, props.data.index, status]);

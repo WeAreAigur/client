@@ -1,3 +1,7 @@
+import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { getInputByContext } from './getInputByContext';
+import { makeid } from './makeid';
 import {
 	APIKeys,
 	EventType,
@@ -5,10 +9,6 @@ import {
 	PipelineProgressEvent,
 	PipelineStatusEvent,
 } from './types';
-import { makeid } from './makeid';
-import { getInputByContext } from './getInputByContext';
-import { delay } from './delay';
-import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -132,6 +132,7 @@ export class Pipeline<
 			if (this.conf.validateInput) {
 				const result = this.conf.validateInput(input);
 				if (!result.valid) {
+					// TODO: notifyEvent on error
 					throw new Error(result.message);
 				}
 			}
@@ -196,12 +197,12 @@ export class Pipeline<
 				return;
 			}
 			// TODO: move to lookup object
-			if (event.type === 'pipeline:start') {
+			if (event.type === 'node:start' || event.type === 'node:finish') {
+				this.triggerListeners(this.onProgressListeners, event);
+			} else if (event.type === 'pipeline:start') {
 				this.triggerListeners(this.onStartListeners, event);
 			} else if (event.type === 'pipeline:finish') {
 				this.triggerListeners(this.onFinishListeners, event);
-			} else if (event.type === 'node:start' || event.type === 'node:finish') {
-				this.triggerListeners(this.onProgressListeners, event);
 			}
 		});
 	}

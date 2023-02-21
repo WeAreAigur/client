@@ -27,7 +27,7 @@ const nodeTypes = {
 	pipelineNode: PipelineNode,
 };
 
-const PIPELINE_RESET_TIME = 1000;
+const PIPELINE_RESET_TIME = 1500;
 
 export function PipelineEditor(props: PipelineEditorProps) {
 	const [nodes] = useNodesState(

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import { useEffect, useRef, useState } from 'react';
 
 import type { Pipeline } from '@aigur/client';
 
@@ -28,20 +28,11 @@ export function PipelineNode(props: PipelineNodeProps) {
 	const lastProgressEventIdx = useRef<number>(-1);
 
 	useEffect(() => {
-		const unsubOnStart = props.data.pipeline.onStart((event) => {
-			console.log(`${Date.now()} - Pipeline starting`, event.pipelineId, event);
-			// if (event.eventIndex > lastProgressEventIdx.current) {
-			// 	setStatus('idle');
-			// }
-		});
 		const unsubOnFinish = props.data.pipeline.onFinish((event) => {
-			console.log(`${Date.now()} - Pipeline finishing`, event.pipelineId, event);
 			// dont accept anymore events
 			lastProgressEventIdx.current = event.eventIndex;
-			console.log(`${Date.now()} - setting to done`, props.data.index);
 			setStatus('done');
 			setTimeout(() => {
-				console.log(`${Date.now()} - setting to idle`, props.data.index);
 				setStatus('idle');
 				lastProgressEventIdx.current = 0;
 			}, PIPELINE_RESET_TIME);
@@ -49,20 +40,12 @@ export function PipelineNode(props: PipelineNodeProps) {
 		const unsubOnProgress = props.data.pipeline.onProgress((event) => {
 			if (event.data?.index === props.data.index) {
 				if (event.eventIndex < lastProgressEventIdx.current) {
-					console.log(`${Date.now()} - dropping event`, {
-						current: lastProgressEventIdx.current,
-						eventIndex: event.eventIndex,
-						index: event.data?.index,
-					});
 					return;
 				}
 				lastProgressEventIdx.current = event.eventIndex;
-				console.log(`${Date.now()} - event`, event.data?.index, event);
 				if (event.type === 'node:start') {
-					console.log(`${Date.now()} - setting status to inProgress`, event.data?.index);
 					setStatus((status) => (status === 'idle' ? 'inProgress' : status));
 				} else if (event.type === 'node:finish') {
-					console.log(`${Date.now()} - setting status to done`, event.data?.index);
 					setStatus('done');
 				}
 			}
@@ -70,11 +53,8 @@ export function PipelineNode(props: PipelineNodeProps) {
 		return () => {
 			unsubOnFinish();
 			unsubOnProgress();
-			unsubOnStart();
 		};
 	}, [props.data.pipeline, props.data.index, status]);
-
-	console.log(`${Date.now()} - rendering node ${props.data.label}, ${props.data.index}, ${status}`);
 
 	const borderColor = props.data.type === 'provider' ? 'border-blue-600' : 'border-pink-600';
 	const ringColor = props.data.type === 'provider' ? 'ring-blue-900' : 'ring-pink-900';

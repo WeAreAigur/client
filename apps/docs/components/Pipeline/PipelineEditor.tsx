@@ -9,8 +9,8 @@ import ReactFlow, {
 	useNodesState,
 } from 'reactflow';
 
-import { PipelineNode } from './PipelineNode';
 import { convertNodes } from './convertNodes';
+import { PipelineNode } from './PipelineNode';
 
 export interface PipelineEditorProps {
 	nodes: { label: string; definition: { type: string; label?: string } }[];
@@ -51,11 +51,13 @@ export function PipelineEditor(props: PipelineEditorProps) {
 					>
 						<Background variant={BackgroundVariant.Dots} />
 						<Panel position={'top-left'}>
-							{props.isActive ? (
-								<span className="badge badge-success">Active</span>
-							) : (
-								<span className="badge">Idle</span>
-							)}
+							<span
+								className={`badge ${
+									props.isActive ? 'badge-success' : ''
+								} transition-all duration-300`}
+							>
+								Active
+							</span>
 						</Panel>
 					</ReactFlow>
 				</div>

@@ -43,6 +43,15 @@ export type PipelineEvent = {
 	type: EventType;
 	data?: Record<any, any>;
 	pipelineId: string;
+	timestamp: number;
+	eventIndex: number;
+};
+
+export type PipelineProgressEvent = PipelineEvent & {
+	type: ProgressEventType;
+};
+export type PipelineStatusEvent = PipelineEvent & {
+	type: PipelineEventType;
 };
 export type EventType = PipelineEventType | ProgressEventType;
 export type PipelineEventType = 'pipeline:start' | 'pipeline:finish';

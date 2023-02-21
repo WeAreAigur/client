@@ -32,17 +32,21 @@ export function PipelineNode(props: PipelineNodeProps) {
 			console.log(`${Date.now()} - Pipeline finishing`, event.pipelineId, event);
 			// dont accept anymore events
 			lastProgressEventIdx.current = event.eventIndex;
-			console.log(`setting to done`, event.data?.index);
+			console.log(`${Date.now()} - setting to done`, props.data.index);
 			setStatus('done');
 			setTimeout(() => {
-				console.log(`setting to idle`, event.data?.index);
+				console.log(`${Date.now()} - setting to idle`, props.data.index);
 				setStatus('idle');
 			}, PIPELINE_RESET_TIME);
 		});
 		const unsubOnProgress = props.data.pipeline.onProgress((event) => {
 			if (event.data?.index === props.data.index) {
 				if (event.eventIndex < lastProgressEventIdx.current) {
-					console.log(`dropping event`, { current: lastProgressEventIdx.current, event });
+					console.log(`${Date.now()} - dropping event`, {
+						current: lastProgressEventIdx.current,
+						eventIndex: event.eventIndex,
+						index: event.data?.index,
+					});
 					return;
 				}
 				lastProgressEventIdx.current = event.eventIndex;

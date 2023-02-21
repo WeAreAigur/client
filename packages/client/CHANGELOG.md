@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.0.1
+
+### Patch Changes
+
+- 01842232: fix events blocking streaming
+
 ## 1.0.0
 
 ### Major Changes

@@ -16,10 +16,17 @@ export const chatPipeline = aigur.pipeline.create<
 		flow
 			.node(replaceString, ({ input, memory }) => ({
 				text: input.text,
-				modifier: `${chatPrompt}\n ${memory.previousChat}\n Human: $(text)$\n Assistant:`,
+				modifier: `${memory.previousChat}\n Human: $(text)$\n Assistant:`,
+			}))
+			.node(replaceString, ({ prev }) => ({
+				text: prev.text,
+				modifier: `${chatPrompt}\n $(text)$`,
 			}))
 			.node(gpt3PredictionStream, ({ prev }) => ({
 				prompt: prev.text,
 			}))
 			.output(({ prev }) => prev.stream),
+	updateMemory: ({ values, output }) => ({
+		previousChat: `${values[0].output.text} ${output}`,
+	}),
 });

@@ -45,14 +45,40 @@ export class Pipeline<
 			memory,
 		});
 		await this.processPipeline(context);
-		await this.saveMemory(context);
-		return context.output;
+		let pipelineOutput: any = context.output;
+		if (this.conf.stream && context.output instanceof ReadableStream) {
+			const [output, memoryStream] = context.output.tee();
+			pipelineOutput = output as Output;
+			readStreamUntilEnd(memoryStream).then((output: any) => {
+				this.saveMemory({ ...context, output });
+			});
+		} else {
+			await this.saveMemory(context);
+		}
+		return pipelineOutput;
+
+		function readStreamUntilEnd(stream: ReadableStream) {
+			return new Promise(async (resolve) => {
+				const reader = stream.getReader();
+				const decoder = new TextDecoder();
+				let done = false;
+				let output = '';
+				while (!done) {
+					const { value, done: doneReading } = await reader.read();
+					done = doneReading;
+					const chunkValue = decoder.decode(value);
+					output += chunkValue;
+				}
+				resolve(output);
+			});
+		}
 	}
 	private async saveMemory(context: PipelineContext<Input, Output, MemoryData>) {
 		if (!this.conf.updateMemory || !this.conf.memoryManager) {
 			return;
 		}
 		const memoryToSave = this.conf.updateMemory(context);
+		console.log(`***memoryToSave`, memoryToSave);
 		return this.conf.memoryManager.saveMemory(this.getMemoryId(context.userId), memoryToSave);
 	}
 

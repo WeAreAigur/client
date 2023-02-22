@@ -12,7 +12,7 @@ export interface AigurConfiguration {
 export type PipelineContext<Input, Output, MemoryData> = {
 	pipelineInstanceId: string;
 	input: Input;
-	output: Output;
+	output: Output extends ReadableStream ? string : Output;
 	values: Record<string, NodeContext<any, any>>;
 	memory: MemoryData | null;
 	userId: string;

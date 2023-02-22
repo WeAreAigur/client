@@ -34,7 +34,7 @@ export function getConcreteNodeInput(
 
 		for (let ref of contextReferences) {
 			const contextValue = values[ref.nodeId].output;
-			if (contextValue === undefined) {
+			if (contextValue === undefined || contextValue === null) {
 				continue;
 			}
 			const propertyValue = contextValue[ref.property];

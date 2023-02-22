@@ -1,21 +1,37 @@
 import { z } from 'zod';
 
 import { FlowBuilder } from './builder';
+import { Pipeline } from './Pipeline';
 
 export interface AigurConfiguration {
 	apiKeys: APIKeys;
 	eventListener?: (pipelineInstanceId: string, cb: (event: PipelineEvent) => void) => void;
 	eventPublisher?: (pipelineInstanceId: string, event: PipelineEvent) => Promise<any>;
+	memorySave?: (
+		pipeline: Pipeline<any, any, any>,
+		memory: Record<string, unknown>
+	) => Promise<void>;
+	memoryLoad?: (pipeline: Pipeline<any, any, any>) => Promise<Record<string, unknown>>;
 }
+
+export type PipelineContext<Input, Output, Memory> = {
+	pipelineInstanceId: string;
+	input: Input;
+	output: Output;
+	values: Record<string, NodeContext<any, any>>;
+	memory: Memory;
+};
 
 export interface PipelineConf<
 	Input extends Record<string, unknown>,
-	Output extends Record<string, unknown> | ReadableStream
+	Output extends Record<string, unknown> | ReadableStream,
+	Memory extends Record<string, unknown>
 > {
 	id: string;
 	flow: (
 		builder: FlowBuilder<Input, Output, [], null>
 	) => FlowBuilder<Input, Output, any, ConcreteNode<Output, Output>>;
+	retainMemory?: (pipelineContext: PipelineContext<Input, Output, Memory>) => Memory;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;

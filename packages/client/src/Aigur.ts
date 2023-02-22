@@ -1,6 +1,6 @@
-import { FlowBuilder } from './builder';
-import { Pipeline } from './Pipeline';
 import { AigurConfiguration, PipelineConf } from './types';
+import { Pipeline } from './Pipeline';
+import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -14,11 +14,12 @@ export const createClient = (opts: AigurConfiguration) => {
 		pipeline: {
 			create: <
 				Input extends Record<string, unknown>,
-				Output extends Record<string, unknown> | ReadableStream
+				Output extends Record<string, unknown> | ReadableStream,
+				Memory extends Record<string, unknown> = {}
 			>(
-				conf: PipelineConf<Input, Output>
+				conf: PipelineConf<Input, Output, Memory>
 			) => {
-				const pipelineConf: PipelineConf<Input, Output> = {
+				const pipelineConf: PipelineConf<Input, Output, Memory> = {
 					...conf,
 					retries: conf.retries ?? DEFAULT_RETRIES,
 					retryDelayInMs: conf.retryDelayInMs ?? RETRY_DELAY_IN_MS,
@@ -26,7 +27,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					eventPublisher: opts.eventPublisher,
 				};
 				const flow = conf.flow(new FlowBuilder<Input, Output, [], null>([]));
-				return new Pipeline(pipelineConf, flow, apiKeys);
+				return new Pipeline<Input, Output, Memory>(pipelineConf, flow, apiKeys);
 			},
 		},
 	};

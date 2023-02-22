@@ -8,7 +8,8 @@
 		"pbl": "npm publish --access public",
 		"build": "tsup src/index.ts --format cjs --dts --minify",
 		"dev": "tsup src/index.ts --format cjs --dts --watch",
-		"test": "vitest"
+		"test": "vitest run",
+		"test:dev": "vitest dev"
 	},
 	"keywords": [],
 	"author": "",

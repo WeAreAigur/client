@@ -1,3 +1,8 @@
+import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { getConcreteNodeInput } from './getInputByContext';
+import { makeid } from './makeid';
+import { createContext, PipelineContext } from './PipelineContext';
 import {
 	APIKeys,
 	EventType,
@@ -5,11 +10,6 @@ import {
 	PipelineProgressEvent,
 	PipelineStatusEvent,
 } from './types';
-import { createContext, PipelineContext } from './PipelineContext';
-import { makeid } from './makeid';
-import { getConcreteNodeInput } from './getInputByContext';
-import { delay } from './delay';
-import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -240,7 +240,8 @@ export class Pipeline<
 		return this.conf.eventPublisher(opts.context.pipelineInstanceId, {
 			pipelineId: this.conf.id,
 			eventIndex: this.eventIndex++,
-			...opts,
+			type: opts.type,
+			data: opts.data,
 		});
 	}
 }

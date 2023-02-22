@@ -8,7 +8,7 @@ export function convertNodes(
 	nodes: any[],
 	edges: Edge<any>[],
 	isHorizontal: boolean = false,
-	pipeline: Pipeline<any, any>
+	pipeline: Pipeline<any, any, any>
 ): RFNode<any>[] {
 	const nodeMap = new Map<string, any>();
 	for (let i = 0; i < nodes.length; i++) {
@@ -36,7 +36,7 @@ export function convertNodes(
 		isFirst: boolean,
 		isLast: boolean,
 		isHorizontal: boolean,
-		pipeline: Pipeline<any, any>
+		pipeline: Pipeline<any, any, any>
 	): RFNode<any> {
 		return {
 			id: index.toString(),

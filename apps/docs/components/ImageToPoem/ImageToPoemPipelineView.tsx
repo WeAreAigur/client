@@ -3,7 +3,7 @@ import { PipelineEditor } from '../Pipeline/PipelineEditor';
 import type { Pipeline } from '@aigur/client';
 interface ImageToPoemPipelineViewProps {
 	isActive: boolean;
-	pipeline: Pipeline<any, any>;
+	pipeline: Pipeline<any, any, any>;
 }
 
 export function ImageToPoemPipelineView(props: ImageToPoemPipelineViewProps) {

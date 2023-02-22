@@ -3,7 +3,7 @@ import { PipelineEditor } from '../Pipeline/PipelineEditor';
 import type { Pipeline } from '@aigur/client';
 interface ChatPipelineViewProps {
 	isActive: boolean;
-	pipeline: Pipeline<any, any>;
+	pipeline: Pipeline<any, any, any>;
 }
 
 export function ChatPipelineView(props: ChatPipelineViewProps) {

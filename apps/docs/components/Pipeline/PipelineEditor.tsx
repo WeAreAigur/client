@@ -1,12 +1,6 @@
 import type { Pipeline } from '@aigur/client';
 import ReactFlow, {
-	Background,
-	BackgroundVariant,
-	Edge,
-	Panel,
-	ReactFlowProvider,
-	useEdgesState,
-	useNodesState,
+    Background, BackgroundVariant, Edge, Panel, ReactFlowProvider, useEdgesState, useNodesState
 } from 'reactflow';
 import { useEffect, useState } from 'react';
 
@@ -20,7 +14,7 @@ export interface PipelineEditorProps {
 	zoom?: number;
 	isHorizontal?: boolean;
 	className?: string;
-	pipeline: Pipeline<any, any>;
+	pipeline: Pipeline<any, any, any>;
 }
 
 const nodeTypes = {

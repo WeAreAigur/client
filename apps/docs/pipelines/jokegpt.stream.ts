@@ -2,10 +2,7 @@ import { aigur } from '#/services/aigur';
 
 import { gpt3PredictionStream, replaceString } from '@aigur/client';
 
-export const jokeGptPipelineStream = aigur.pipeline.create<
-	{ subject: string },
-	ReadableStream<string>
->({
+export const jokeGptPipelineStream = aigur.pipeline.create<{ subject: string }, ReadableStream>({
 	id: 'jokegptStream',
 	stream: true,
 	flow: (flow) =>

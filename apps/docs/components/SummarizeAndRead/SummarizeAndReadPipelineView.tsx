@@ -3,7 +3,7 @@ import { PipelineEditor } from '../Pipeline/PipelineEditor';
 import type { Pipeline } from '@aigur/client';
 interface SummarizeAndReadPipelineViewProps {
 	isActive: boolean;
-	pipeline: Pipeline<any, any>;
+	pipeline: Pipeline<any, any, any>;
 }
 
 export function SummarizeAndReadPipelineView(props: SummarizeAndReadPipelineViewProps) {

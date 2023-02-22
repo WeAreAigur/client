@@ -1,5 +1,10 @@
 import {
-    APIKeys, EventType, PipelineConf, PipelineContext, PipelineProgressEvent, PipelineStatusEvent
+	APIKeys,
+	EventType,
+	PipelineConf,
+	PipelineContext,
+	PipelineProgressEvent,
+	PipelineStatusEvent,
 } from './types';
 import { makeid } from './makeid';
 import { delay } from './delay';
@@ -53,7 +58,6 @@ export class Pipeline<
 	private getMemoryId(userId?: string) {
 		return `${this.conf.id}${userId ? `-${userId}` : ''}`;
 	}
-
 
 	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
 		return (

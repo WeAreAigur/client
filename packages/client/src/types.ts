@@ -38,6 +38,13 @@ export type ConcreteNode<
 	input: Input;
 	output: Output;
 };
+export type NodeContext<
+	Input extends Record<string, unknown> | ReadableStream,
+	Output extends Record<string, unknown> | ReadableStream
+> = {
+	input: Input;
+	output: Output;
+};
 
 export type PipelineEvent = {
 	type: EventType;

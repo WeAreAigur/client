@@ -51,5 +51,5 @@ test('multiple nodes', async () => {
 
 	const result = await pipeline.invoke({ text: 'world' });
 
-	expect(result).toStrictEqual({ message: 'Hello Hello Hello Hello world!!!' });
+	expect(result).toStrictEqual({ message: 'Hello Hello Hello Hello world!!!!' });
 });

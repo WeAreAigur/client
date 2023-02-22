@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export function getInputByContext(
+export function getConcreteNodeInput(
 	inputPlaceholders: Record<string, any> | z.ZodEffects<any>,
 	values: Record<string, any>
 ) {

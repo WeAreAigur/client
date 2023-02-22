@@ -1,8 +1,3 @@
-import { FlowBuilder } from './builder';
-import { delay } from './delay';
-import { getInputByContext as getConcreteNodeInput } from './getInputByContext';
-import { makeid } from './makeid';
-import { createContext, PipelineContext } from './PipelineContext';
 import {
 	APIKeys,
 	EventType,
@@ -10,6 +5,11 @@ import {
 	PipelineProgressEvent,
 	PipelineStatusEvent,
 } from './types';
+import { createContext, PipelineContext } from './PipelineContext';
+import { makeid } from './makeid';
+import { getConcreteNodeInput } from './getInputByContext';
+import { delay } from './delay';
+import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;

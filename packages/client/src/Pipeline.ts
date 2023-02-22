@@ -1,7 +1,8 @@
 import { FlowBuilder } from './builder';
 import { delay } from './delay';
-import { getInputByContext } from './getInputByContext';
+import { getConcreteNodeInput } from './getInputByContext';
 import { makeid } from './makeid';
+import { createContext, PipelineContext } from './PipelineContext';
 import {
 	APIKeys,
 	EventType,
@@ -32,8 +33,13 @@ export class Pipeline<
 		this.listenToEvents();
 	}
 
-	public invoke(input: Input, pipelineInstanceId: string = this.pipelineInstanceId) {
-		return this.processPipeline(input, pipelineInstanceId);
+	public async invoke(input: Input, pipelineInstanceId: string = this.pipelineInstanceId) {
+		const context = createContext({
+			input,
+			pipelineInstanceId,
+		});
+		await this.processPipeline(context);
+		return context.output;
 	}
 
 	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
@@ -125,31 +131,29 @@ export class Pipeline<
 		};
 	}
 
-	private async processPipeline(input: Input, pipelineInstanceId: string): Promise<Output> {
+	private async processPipeline(context: PipelineContext<Input>): Promise<PipelineContext<Input>> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
-			const pipelineStartPromise = this.notifyEvent({ type: 'pipeline:start', pipelineInstanceId });
+			const pipelineStartPromise = this.notifyEvent({ type: 'pipeline:start', context });
 			if (!this.conf.stream) {
 				await pipelineStartPromise;
 			}
 			if (this.conf.validateInput) {
-				const result = this.conf.validateInput(input);
+				const result = this.conf.validateInput(context.input);
 				if (!result.valid) {
 					// TODO: notifyEvent on error
 					throw new Error(result.message);
 				}
 			}
-			const values: any = { input };
-			let output: any = {};
 			const nodes: any[] = this.flow.getNodes();
 
-			for (let i = 0; i < nodes.length; i++) {
+			for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
 				const nodeStartPromise = this.notifyEvent({
 					type: 'node:start',
-					pipelineInstanceId,
+					context,
 					data: {
-						node: nodes[i].name,
-						index: i,
+						node: nodes[nodeIndex].name,
+						index: nodeIndex,
 					},
 				});
 				if (!this.conf.stream) {
@@ -160,8 +164,9 @@ export class Pipeline<
 				do {
 					attemptCount++;
 					try {
-						output = await this.executeAction(nodes, i, values);
-						values[i] = output;
+						const { action, input: inputPlaceholders } = nodes[nodeIndex];
+						const nodeInput = getConcreteNodeInput(inputPlaceholders, context.values);
+						context.values[nodeIndex] = await action(nodeInput, this.apiKeys);
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {
@@ -172,10 +177,10 @@ export class Pipeline<
 				} while (!isSuccess && attemptCount <= retriesCount);
 				const nodeEndPromise = this.notifyEvent({
 					type: 'node:finish',
-					pipelineInstanceId,
+					context,
 					data: {
-						node: nodes[i].name,
-						index: i,
+						node: nodes[nodeIndex].name,
+						index: nodeIndex,
 					},
 				});
 				if (!this.conf.stream) {
@@ -184,22 +189,18 @@ export class Pipeline<
 			}
 			const pipelineFinishPromise = this.notifyEvent({
 				type: 'pipeline:finish',
-				pipelineInstanceId,
+				context,
 			});
 			if (!this.conf.stream) {
 				await pipelineFinishPromise;
 			}
-			return output;
+
+			context.output = context.values[nodes.length - 1];
+			return context;
 		} catch (e) {
 			console.error(e);
 			throw e;
 		}
-	}
-
-	private async executeAction(nodes, index, values) {
-		const { action, input } = nodes[index];
-		const inputByContext = getInputByContext(input, values);
-		return action(inputByContext, this.apiKeys);
 	}
 
 	private listenToEvents() {
@@ -230,16 +231,17 @@ export class Pipeline<
 
 	private notifyEvent(opts: {
 		type: EventType;
-		pipelineInstanceId: string;
+		context: PipelineContext<Input>;
 		data?: Record<any, any>;
 	}) {
 		if (!this.conf.updateProgress || !this.conf.eventPublisher) {
 			return;
 		}
-		return this.conf.eventPublisher(opts.pipelineInstanceId, {
+		return this.conf.eventPublisher(opts.context.pipelineInstanceId, {
 			pipelineId: this.conf.id,
 			eventIndex: this.eventIndex++,
-			...opts,
+			type: opts.type,
+			data: opts.data,
 		});
 	}
 }

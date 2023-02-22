@@ -9,12 +9,13 @@ export interface AigurConfiguration {
 	memory?: Memory<any>;
 }
 
-export type PipelineContext<Input, Output, Memory> = {
+export type PipelineContext<Input, Output, MemoryData> = {
 	pipelineInstanceId: string;
 	input: Input;
 	output: Output;
 	values: Record<string, NodeContext<any, any>>;
-	memory: Memory;
+	memory?: MemoryData;
+	userId: string;
 };
 
 export interface PipelineConf<

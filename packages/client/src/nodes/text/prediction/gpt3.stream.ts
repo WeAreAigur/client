@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { z } from 'zod';
 
 import { inputSchema as gpt3BaseInputSchema } from './gpt3';
 
@@ -12,7 +12,9 @@ const inputSchema = gpt3BaseInputSchema.merge(
 );
 
 const outputSchema = z.object({
-	stream: z.instanceof(globalThis.ReadableStream<string> ?? Object),
+	stream: z.instanceof(
+		typeof globalThis.ReadableStream !== 'undefined' ? globalThis.ReadableStream<string> : Object
+	),
 });
 
 export async function gpt3PredictionStream(

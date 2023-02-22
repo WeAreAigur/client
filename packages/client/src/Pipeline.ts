@@ -1,3 +1,8 @@
+import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { getConcreteNodeInput } from './getInputByContext';
+import { makeid } from './makeid';
+import { createContext } from './PipelineContext';
 import {
 	APIKeys,
 	EventType,
@@ -6,9 +11,6 @@ import {
 	PipelineProgressEvent,
 	PipelineStatusEvent,
 } from './types';
-import { makeid } from './makeid';
-import { delay } from './delay';
-import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -36,27 +38,38 @@ export class Pipeline<
 	public async invoke(
 		input: Input,
 		opts?: {
-			pipelineInstanceId: string;
+			pipelineInstanceId?: string;
 			userId?: string;
 		}
 	) {
-		const context = createContext<Input, Output, Memory>({
+		const memory = await this.loadMemory(opts?.userId);
+		const context = createContext<Input, Output, MemoryData>({
 			input,
-			pipelineInstanceId,
+			pipelineInstanceId: opts?.pipelineInstanceId ?? this.pipelineInstanceId,
+			userId: opts?.userId ?? '',
+			memory,
 		});
 		await this.processPipeline(context);
 		await this.saveMemory(context);
 		return context.output;
 	}
-	private async saveMemory(context: PipelineContext<Input, Output, Memory>) {
-		if (!this.conf.updateMemory) {
+	private async saveMemory(context: PipelineContext<Input, Output, MemoryData>) {
+		if (!this.conf.updateMemory || !this.conf.memory) {
 			return;
 		}
 		const memoryToSave = this.conf.updateMemory(context);
-		await this.saveMemory(this.getMemoryId(opts?.userId), memoryToSave);
+		return this.conf.memory.saveMemory(this.getMemoryId(context.userId), memoryToSave);
 	}
+
 	private getMemoryId(userId?: string) {
 		return `${this.conf.id}${userId ? `-${userId}` : ''}`;
+	}
+
+	private loadMemory(userId?: string): Promise<MemoryData | undefined> {
+		if (!this.conf.memory) {
+			return Promise.resolve(undefined);
+		}
+		return this.conf.memory.loadMemory(this.getMemoryId(userId));
 	}
 
 	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
@@ -149,8 +162,8 @@ export class Pipeline<
 	}
 
 	private async processPipeline(
-		context: PipelineContext<Input, Output, Memory>
-	): Promise<PipelineContext<Input, Output, Memory>> {
+		context: PipelineContext<Input, Output, MemoryData>
+	): Promise<PipelineContext<Input, Output, MemoryData>> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
 			const pipelineStartPromise = this.notifyEvent({ type: 'pipeline:start', context });
@@ -184,7 +197,7 @@ export class Pipeline<
 					attemptCount++;
 					try {
 						const { action, input: inputPlaceholders } = nodes[nodeIndex];
-						const contextNode = context.values[nodeIndex];
+						const contextNode = (context.values[nodeIndex] = { input: null, output: null });
 						contextNode.input = getConcreteNodeInput(inputPlaceholders, context.values);
 						contextNode.output = await action(contextNode.input, this.apiKeys);
 						isSuccess = true;
@@ -251,7 +264,7 @@ export class Pipeline<
 
 	private notifyEvent(opts: {
 		type: EventType;
-		context: PipelineContext<Input>;
+		context: PipelineContext<Input, Output, MemoryData>;
 		data?: Record<any, any>;
 	}) {
 		if (!this.conf.updateProgress || !this.conf.eventPublisher) {

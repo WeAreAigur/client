@@ -1,16 +1,22 @@
 import { NodeContext, PipelineContext } from './types';
 
-export function createContext<Input, Output, Memory>(opts: {
+export function createContext<Input, Output, MemoryData>(opts: {
 	pipelineInstanceId: string;
 	input: Input;
-}): PipelineContext<Input, Output, Memory> {
-	const values = { input: opts.input } as Record<string, NodeContext<any, any>>;
-	const memory = {} as Memory;
+	userId: string;
+	memory?: MemoryData;
+}): PipelineContext<Input, Output, MemoryData> {
+	// setup pipeline input inside values
+	const values = { input: { input: opts.input, output: opts.input } } as Record<
+		string,
+		NodeContext<any, any>
+	>;
 	return {
 		pipelineInstanceId: opts.pipelineInstanceId,
 		input: opts.input,
 		output: {} as Output,
 		values,
-		memory,
+		memory: opts.memory,
+		userId: opts.userId,
 	};
 }

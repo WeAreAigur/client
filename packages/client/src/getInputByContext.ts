@@ -1,31 +1,30 @@
-import { z } from 'zod';
+import { NodeContext } from './types';
 
 export function getConcreteNodeInput(
-	inputPlaceholders: Record<string, any> | z.ZodEffects<any>,
-	values: Record<string, any>
+	inputPlaceholders: Record<string, any>,
+	values: Record<string, NodeContext<any, any>>
 ) {
 	if (typeof inputPlaceholders === 'string') {
-		return handleSingleValue(inputPlaceholders);
+		return handleInputAsSingleValue(inputPlaceholders);
 	}
 
-	const input: Record<string, any> = { ...inputPlaceholders };
+	// spreading as to not mutate original input placeholders with real data
+	return handleInputAsObject({ ...inputPlaceholders });
 
-	return getInputContextInner(input);
-
-	function getInputContextInner(input: Record<string, any>) {
+	function handleInputAsObject(input: Record<string, any>) {
 		const newInput = {};
 		for (const key in input) {
-			newInput[key] = handleSingleValue(input[key]);
+			newInput[key] = handleInputAsSingleValue(input[key]);
 		}
 		return newInput;
 	}
 
-	function handleSingleValue(value) {
+	function handleInputAsSingleValue(value) {
 		if (Array.isArray(value)) {
-			return value.map((item) => getInputContextInner(item));
+			return value.map((item) => handleInputAsObject(item));
 		}
 		if (typeof value === 'object' && value !== null) {
-			return getInputContextInner(value);
+			return handleInputAsObject(value);
 		}
 
 		let newValue: any = value;
@@ -34,7 +33,7 @@ export function getConcreteNodeInput(
 		const contextReferences = getContextReferences(value);
 
 		for (let ref of contextReferences) {
-			const contextValue = values[ref.nodeId];
+			const contextValue = values[ref.nodeId].output;
 			const propertyValue = contextValue[ref.property];
 			if (propertyValue instanceof ArrayBuffer) {
 				newValue = propertyValue;

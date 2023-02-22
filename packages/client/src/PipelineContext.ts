@@ -4,7 +4,7 @@ export function createContext<Input, Output, MemoryData>(opts: {
 	pipelineInstanceId: string;
 	input: Input;
 	userId: string;
-	memory?: MemoryData;
+	memory: MemoryData | null;
 }): PipelineContext<Input, Output, MemoryData> {
 	// setup pipeline input and memory inside values
 	const values = {

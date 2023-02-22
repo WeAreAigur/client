@@ -6,7 +6,7 @@ test('use memory', async () => {
 	const cache = {};
 	const aigur = createClient({
 		apiKeys: {},
-		memory: {
+		memoryManager: {
 			loadMemory: async (id) => cache[id],
 			saveMemory: async (id, value) => {
 				cache[id] = value;

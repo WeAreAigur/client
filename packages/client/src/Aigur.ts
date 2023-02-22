@@ -21,7 +21,7 @@ export const createClient = (opts: AigurConfiguration) => {
 			) => {
 				const pipelineConf: PipelineConf<Input, Output, MemoryData> = {
 					...conf,
-					memory: opts.memory,
+					memoryManager: opts.memoryManager,
 					retries: conf.retries ?? DEFAULT_RETRIES,
 					retryDelayInMs: conf.retryDelayInMs ?? RETRY_DELAY_IN_MS,
 					eventListener: opts.eventListener,

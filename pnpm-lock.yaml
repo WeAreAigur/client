@@ -27,6 +27,7 @@ importers:
       '@types/node': 18.11.19
       '@types/react': 18.0.27
       '@types/react-dom': 18.0.10
+      '@upstash/redis': ^1.20.0
       '@vercel/analytics': ^0.1.10
       autoprefixer: ^10.4.13
       compressorjs: ^1.1.1
@@ -58,6 +59,7 @@ importers:
       '@types/node': 18.11.19
       '@types/react': 18.0.27
       '@types/react-dom': 18.0.10
+      '@upstash/redis': 1.20.0
       '@vercel/analytics': 0.1.10_react@18.2.0
       compressorjs: 1.1.1
       daisyui: 2.50.0_gbtt6ss3tbiz4yjtvdr6fbrj44
@@ -1835,6 +1837,14 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.50.0
       eslint-visitor-keys: 3.3.0
+    dev: false
+
+  /@upstash/redis/1.20.0:
+    resolution: {integrity: sha512-jhOfwBF/dZpx0Gd139YB2KTXqkBrB1fksK0jzSqep5QZyN1cfcZUy5QfcSen5EEdYyUSmWefBzNqGWSJustsJg==}
+    dependencies:
+      isomorphic-fetch: 3.0.0
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /@vercel/analytics/0.1.10_react@18.2.0:

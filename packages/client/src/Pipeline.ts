@@ -42,29 +42,29 @@ export class Pipeline<
 			input,
 			pipelineInstanceId: opts?.pipelineInstanceId ?? this.pipelineInstanceId,
 			userId: opts?.userId ?? '',
-			memory: memory,
+			memory,
 		});
 		await this.processPipeline(context);
 		await this.saveMemory(context);
 		return context.output;
 	}
 	private async saveMemory(context: PipelineContext<Input, Output, MemoryData>) {
-		if (!this.conf.updateMemory || !this.conf.memory) {
+		if (!this.conf.updateMemory || !this.conf.memoryManager) {
 			return;
 		}
 		const memoryToSave = this.conf.updateMemory(context);
-		return this.conf.memory.saveMemory(this.getMemoryId(context.userId), memoryToSave);
+		return this.conf.memoryManager.saveMemory(this.getMemoryId(context.userId), memoryToSave);
 	}
 
 	private getMemoryId(userId?: string) {
 		return `${this.conf.id}${userId ? `-${userId}` : ''}`;
 	}
 
-	private loadMemory(userId?: string): Promise<MemoryData | undefined> {
-		if (!this.conf.memory) {
-			return Promise.resolve(undefined);
+	private loadMemory(userId?: string): Promise<MemoryData | null> {
+		if (!this.conf.memoryManager) {
+			return Promise.resolve(null);
 		}
-		return this.conf.memory.loadMemory(this.getMemoryId(userId));
+		return this.conf.memoryManager.loadMemory(this.getMemoryId(userId));
 	}
 
 	public invokeRemote(endpoint: string, input: Input): Promise<Output> {

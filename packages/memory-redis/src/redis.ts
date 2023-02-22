@@ -1,6 +1,6 @@
 interface Redis {
-	get: (key: string) => Promise<string>;
-	set: (key: string, value: string) => Promise<void>;
+	get: (key: string) => Promise<string | null>;
+	set: (key: string, value: string) => Promise<string | null>;
 }
 
 export function createRedisMemory(redis: Redis) {
@@ -19,6 +19,9 @@ export function createRedisMemory(redis: Redis) {
 
 	async function loadMemory(id: string) {
 		const item = await redis.get(id);
+		if (item === null) {
+			return item;
+		}
 		try {
 			return JSON.parse(item);
 		} catch (e) {

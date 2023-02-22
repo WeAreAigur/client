@@ -6,7 +6,7 @@ export interface AigurConfiguration {
 	apiKeys: APIKeys;
 	eventListener?: (pipelineInstanceId: string, cb: (event: PipelineEvent) => void) => void;
 	eventPublisher?: (pipelineInstanceId: string, event: PipelineEvent) => Promise<any>;
-	memory?: Memory<any>;
+	memoryManager?: MemoryManager<any>;
 }
 
 export type PipelineContext<Input, Output, MemoryData> = {
@@ -14,7 +14,7 @@ export type PipelineContext<Input, Output, MemoryData> = {
 	input: Input;
 	output: Output;
 	values: Record<string, NodeContext<any, any>>;
-	memory?: MemoryData;
+	memory: MemoryData | null;
 	userId: string;
 };
 
@@ -28,7 +28,7 @@ export interface PipelineConf<
 		builder: FlowBuilder<Input, Output, MemoryData, [], null>
 	) => FlowBuilder<Input, Output, MemoryData, any, ConcreteNode<Output, Output>>;
 	updateMemory?: (pipelineContext: PipelineContext<Input, Output, MemoryData>) => MemoryData;
-	memory?: Memory<MemoryData>;
+	memoryManager?: MemoryManager<MemoryData>;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;
@@ -89,7 +89,7 @@ export type APIKeys = Record<string, string> & {
 	whisperapi?: string;
 };
 
-export interface Memory<T> {
-	saveMemory: (id: string, value: any) => Promise<void>;
-	loadMemory: (id: string) => Promise<T>;
+export interface MemoryManager<T> {
+	saveMemory: (id: string, value: any) => Promise<T | null>;
+	loadMemory: (id: string) => Promise<T | null>;
 }

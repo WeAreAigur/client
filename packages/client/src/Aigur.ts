@@ -27,7 +27,7 @@ export const createClient = (opts: AigurConfiguration) => {
 					eventListener: opts.eventListener,
 					eventPublisher: opts.eventPublisher,
 				};
-				const flow = conf.flow(new FlowBuilder<Input, Output, [], null>([]));
+				const flow = conf.flow(new FlowBuilder<Input, Output, MemoryData, [], null>([]));
 				return new Pipeline<Input, Output, MemoryData>(pipelineConf, flow, apiKeys);
 			},
 		},

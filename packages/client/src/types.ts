@@ -25,8 +25,8 @@ export interface PipelineConf<
 > {
 	id: string;
 	flow: (
-		builder: FlowBuilder<Input, Output, [], null>
-	) => FlowBuilder<Input, Output, any, ConcreteNode<Output, Output>>;
+		builder: FlowBuilder<Input, Output, MemoryData, [], null>
+	) => FlowBuilder<Input, Output, MemoryData, any, ConcreteNode<Output, Output>>;
 	updateMemory?: (pipelineContext: PipelineContext<Input, Output, MemoryData>) => MemoryData;
 	memory?: Memory<MemoryData>;
 	retries?: number;

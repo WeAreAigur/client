@@ -1,16 +1,11 @@
-import { FlowBuilder } from './builder';
-import { delay } from './delay';
-import { getConcreteNodeInput } from './getInputByContext';
-import { makeid } from './makeid';
-import { createContext } from './PipelineContext';
 import {
-	APIKeys,
-	EventType,
-	PipelineConf,
-	PipelineContext,
-	PipelineProgressEvent,
-	PipelineStatusEvent,
+    APIKeys, EventType, PipelineConf, PipelineContext, PipelineProgressEvent, PipelineStatusEvent
 } from './types';
+import { createContext } from './PipelineContext';
+import { makeid } from './makeid';
+import { getConcreteNodeInput } from './getConcreteNodeInput';
+import { delay } from './delay';
+import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -29,7 +24,7 @@ export class Pipeline<
 
 	constructor(
 		public readonly conf: PipelineConf<Input, Output, MemoryData>,
-		public readonly flow: FlowBuilder<Input, Output, any, any>,
+		public readonly flow: FlowBuilder<Input, Output, MemoryData, any, any>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToEvents();
@@ -47,7 +42,7 @@ export class Pipeline<
 			input,
 			pipelineInstanceId: opts?.pipelineInstanceId ?? this.pipelineInstanceId,
 			userId: opts?.userId ?? '',
-			memory,
+			memory: memory,
 		});
 		await this.processPipeline(context);
 		await this.saveMemory(context);

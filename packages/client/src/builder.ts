@@ -4,17 +4,11 @@ import { output } from './nodes/output/output';
 export class FlowBuilder<
 	Input extends Record<string, unknown>,
 	Output extends Record<string, unknown> | ReadableStream,
+	MemoryData extends Record<string, unknown>,
 	NodeDefinitions extends ConcreteNode<any, any>[],
 	PrevNode extends ConcreteNode<any, any> | null
 > {
 	constructor(private nodes: NodeDefinitions) {}
-
-	static create<
-		Input extends Record<string, unknown>,
-		Output extends Record<string, unknown> | ReadableStream
-	>() {
-		return new FlowBuilder<Input, Output, [], null>([]);
-	}
 
 	public node<NodeDef extends NodeAction<any, any>>(
 		nodeDefinition: NodeDef,
@@ -24,9 +18,11 @@ export class FlowBuilder<
 				? Awaited<ReturnType<PrevNode['action']>>
 				: Input;
 			input: Input;
+			memory: MemoryData;
 		}) => Parameters<NodeDef>['0']
 	) {
 		type NewNode = ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
+		const memory = this.createDynamicPlaceholders('memory');
 		const input = this.createDynamicPlaceholders('input');
 		const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 		const node = {
@@ -35,20 +31,27 @@ export class FlowBuilder<
 				nodes: this.nodes,
 				prev: prev.output,
 				input,
+				memory,
 			}),
 			// configure output to return a placeholder for any property accessed (e.g. $context.0.url$)
 			output: this.createDynamicPlaceholders(this.nodes.length),
 		} as NewNode;
 
 		this.nodes.push(node);
-		return this as unknown as FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode>;
+		return this as unknown as FlowBuilder<
+			Input,
+			Output,
+			MemoryData,
+			[...NodeDefinitions, NewNode],
+			NewNode
+		>;
 	}
 
-	private createDynamicPlaceholders(nodeIndex: number | 'input') {
+	private createDynamicPlaceholders(source: number | 'input' | 'memory') {
 		const output = {};
 		const safeNotInstanciatedWarningProxy = {
 			get: function (object, prop) {
-				return `$context.${nodeIndex}.${prop}$`;
+				return `$context.${source}.${prop}$`;
 			},
 		};
 

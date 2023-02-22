@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 
 import { createClient, replaceString } from '../src/index';
 
-test.only('simple pipeline', async () => {
+test('simple pipeline', async () => {
 	const aigur = createClient({ apiKeys: {} });
 	const pipeline = aigur.pipeline.create<{ text: string }, { message: string }>({
 		id: 'testPipeline',

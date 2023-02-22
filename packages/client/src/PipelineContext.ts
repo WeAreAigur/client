@@ -6,11 +6,11 @@ export function createContext<Input, Output, MemoryData>(opts: {
 	userId: string;
 	memory?: MemoryData;
 }): PipelineContext<Input, Output, MemoryData> {
-	// setup pipeline input inside values
-	const values = { input: { input: opts.input, output: opts.input } } as Record<
-		string,
-		NodeContext<any, any>
-	>;
+	// setup pipeline input and memory inside values
+	const values = {
+		input: { input: opts.input, output: opts.input },
+		memory: { input: opts.memory, output: opts.memory },
+	} as Record<string, NodeContext<any, any>>;
 	return {
 		pipelineInstanceId: opts.pipelineInstanceId,
 		input: opts.input,

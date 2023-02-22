@@ -34,6 +34,9 @@ export function getConcreteNodeInput(
 
 		for (let ref of contextReferences) {
 			const contextValue = values[ref.nodeId].output;
+			if (contextValue === undefined) {
+				continue;
+			}
 			const propertyValue = contextValue[ref.property];
 			if (propertyValue instanceof ArrayBuffer) {
 				newValue = propertyValue;
@@ -53,7 +56,7 @@ export function getConcreteNodeInput(
 
 	function getContextReferences(value: string) {
 		if (typeof value !== 'string') return [];
-		const contextRegex = /\$context\.(\d+|input)\.(\w+)\$/g;
+		const contextRegex = /\$context\.(\d+|input|memory)\.(\w+)\$/g;
 		const matches = value.matchAll(contextRegex);
 		const references: any[] = [];
 

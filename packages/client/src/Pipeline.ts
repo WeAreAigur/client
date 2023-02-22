@@ -1,14 +1,7 @@
 import {
-	APIKeys,
-	EventType,
-	PipelineConf,
-	PipelineContext,
-	PipelineProgressEvent,
-	PipelineStatusEvent,
+    APIKeys, EventType, PipelineConf, PipelineContext, PipelineProgressEvent, PipelineStatusEvent
 } from './types';
-import { createContext } from './PipelineContext';
 import { makeid } from './makeid';
-import { getConcreteNodeInput } from './getInputByContext';
 import { delay } from './delay';
 import { FlowBuilder } from './builder';
 
@@ -18,7 +11,7 @@ const RETRY_DELAY_IN_MS = 350;
 export class Pipeline<
 	Input extends Record<string, unknown>,
 	Output extends Record<string, unknown> | ReadableStream,
-	Memory extends Record<string, unknown>
+	MemoryData extends Record<string, unknown>
 > {
 	public readonly onProgressListeners: Map<string, (event: PipelineProgressEvent) => void> =
 		new Map();
@@ -28,14 +21,20 @@ export class Pipeline<
 	private eventIndex = 0;
 
 	constructor(
-		public readonly conf: PipelineConf<Input, Output, Memory>,
+		public readonly conf: PipelineConf<Input, Output, MemoryData>,
 		public readonly flow: FlowBuilder<Input, Output, any, any>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToEvents();
 	}
 
-	public async invoke(input: Input, pipelineInstanceId: string = this.pipelineInstanceId) {
+	public async invoke(
+		input: Input,
+		opts?: {
+			pipelineInstanceId: string;
+			userId?: string;
+		}
+	) {
 		const context = createContext<Input, Output, Memory>({
 			input,
 			pipelineInstanceId,
@@ -45,11 +44,16 @@ export class Pipeline<
 		return context.output;
 	}
 	private async saveMemory(context: PipelineContext<Input, Output, Memory>) {
-		if (!this.conf.retainMemory) {
+		if (!this.conf.updateMemory) {
 			return;
 		}
-		const memory = this.conf.retainMemory(context);
+		const memoryToSave = this.conf.updateMemory(context);
+		await this.saveMemory(this.getMemoryId(opts?.userId), memoryToSave);
 	}
+	private getMemoryId(userId?: string) {
+		return `${this.conf.id}${userId ? `-${userId}` : ''}`;
+	}
+
 
 	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
 		return (

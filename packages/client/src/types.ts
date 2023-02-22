@@ -1,17 +1,12 @@
 import { z } from 'zod';
 
 import { FlowBuilder } from './builder';
-import { Pipeline } from './Pipeline';
 
 export interface AigurConfiguration {
 	apiKeys: APIKeys;
 	eventListener?: (pipelineInstanceId: string, cb: (event: PipelineEvent) => void) => void;
 	eventPublisher?: (pipelineInstanceId: string, event: PipelineEvent) => Promise<any>;
-	memorySave?: (
-		pipeline: Pipeline<any, any, any>,
-		memory: Record<string, unknown>
-	) => Promise<void>;
-	memoryLoad?: (pipeline: Pipeline<any, any, any>) => Promise<Record<string, unknown>>;
+	memory?: Memory<any>;
 }
 
 export type PipelineContext<Input, Output, Memory> = {
@@ -25,13 +20,14 @@ export type PipelineContext<Input, Output, Memory> = {
 export interface PipelineConf<
 	Input extends Record<string, unknown>,
 	Output extends Record<string, unknown> | ReadableStream,
-	Memory extends Record<string, unknown>
+	MemoryData extends Record<string, unknown>
 > {
 	id: string;
 	flow: (
 		builder: FlowBuilder<Input, Output, [], null>
 	) => FlowBuilder<Input, Output, any, ConcreteNode<Output, Output>>;
-	retainMemory?: (pipelineContext: PipelineContext<Input, Output, Memory>) => Memory;
+	updateMemory?: (pipelineContext: PipelineContext<Input, Output, MemoryData>) => MemoryData;
+	memory?: Memory<MemoryData>;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;
@@ -91,3 +87,8 @@ export type APIKeys = Record<string, string> & {
 	googleapis?: string;
 	whisperapi?: string;
 };
+
+export interface Memory<T> {
+	saveMemory: (id: string, value: any) => Promise<void>;
+	loadMemory: (id: string) => Promise<T>;
+}

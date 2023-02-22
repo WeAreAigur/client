@@ -15,19 +15,20 @@ export const createClient = (opts: AigurConfiguration) => {
 			create: <
 				Input extends Record<string, unknown>,
 				Output extends Record<string, unknown> | ReadableStream,
-				Memory extends Record<string, unknown> = {}
+				MemoryData extends Record<string, unknown> = {}
 			>(
-				conf: PipelineConf<Input, Output, Memory>
+				conf: PipelineConf<Input, Output, MemoryData>
 			) => {
-				const pipelineConf: PipelineConf<Input, Output, Memory> = {
+				const pipelineConf: PipelineConf<Input, Output, MemoryData> = {
 					...conf,
+					memory: opts.memory,
 					retries: conf.retries ?? DEFAULT_RETRIES,
 					retryDelayInMs: conf.retryDelayInMs ?? RETRY_DELAY_IN_MS,
 					eventListener: opts.eventListener,
 					eventPublisher: opts.eventPublisher,
 				};
 				const flow = conf.flow(new FlowBuilder<Input, Output, [], null>([]));
-				return new Pipeline<Input, Output, Memory>(pipelineConf, flow, apiKeys);
+				return new Pipeline<Input, Output, MemoryData>(pipelineConf, flow, apiKeys);
 			},
 		},
 	};

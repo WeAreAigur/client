@@ -1,0 +1,32 @@
+{
+  "name": "eslint-config-turbo",
+  "version": "0.0.8",
+  "description": "ESLint config for Turborepo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vercel/turbo",
+    "directory": "packages/eslint-config-turbo"
+  },
+  "bugs": {
+    "url": "https://github.com/vercel/turbo/issues"
+  },
+  "keywords": [
+    "turbo",
+    "eslint",
+    "turborepo",
+    "eslintconfig",
+    "eslint-config"
+  ],
+  "main": "index.js",
+  "author": "Vercel",
+  "dependencies": {
+    "eslint-plugin-turbo": "0.0.8"
+  },
+  "peerDependencies": {
+    "eslint": ">6.6.0"
+  },
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "@types/eslint": "^8.4.5"
+  }
+}

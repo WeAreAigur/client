@@ -1,0 +1,240 @@
+import { GenericSchema } from './types';
+declare type Whitespace = ' ' | '\n' | '\t';
+declare type LowerAlphabet = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z';
+declare type Alphabet = LowerAlphabet | Uppercase<LowerAlphabet>;
+declare type Digit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0';
+declare type Letter = Alphabet | Digit | '_';
+declare type Json = string | number | boolean | null | {
+    [key: string]: Json;
+} | Json[];
+/**
+ * Parser errors.
+ */
+declare type ParserError<Message extends string> = {
+    error: true;
+} & Message;
+declare type GenericStringError = ParserError<'Received a generic string'>;
+/**
+ * Trims whitespace from the left of the input.
+ */
+declare type EatWhitespace<Input extends string> = string extends Input ? GenericStringError : Input extends `${Whitespace}${infer Remainder}` ? EatWhitespace<Remainder> : Input;
+/**
+ * Constructs a type definition for a single field of an object.
+ *
+ * @param Definitions Record of definitions, possibly generated from PostgREST's OpenAPI spec.
+ * @param Name Name of the table being queried.
+ * @param Field Single field parsed by `ParseQuery`.
+ */
+declare type ConstructFieldDefinition<Schema extends GenericSchema, Row extends Record<string, unknown>, Field> = Field extends {
+    star: true;
+} ? Row : Field extends {
+    name: string;
+    original: string;
+    children: unknown[];
+} ? {
+    [_ in Field['name']]: GetResultHelper<Schema, (Schema['Tables'] & Schema['Views'])[Field['original']]['Row'], Field['children'], unknown> extends infer Child ? Child | Child[] | null : never;
+} : Field extends {
+    name: string;
+    original: string;
+} ? {
+    [K in Field['name']]: Row[Field['original']];
+} : Field extends {
+    name: string;
+    type: infer T;
+} ? {
+    [K in Field['name']]: T;
+} : Record<string, unknown>;
+/**
+ * Notes: all `Parse*` types assume that their input strings have their whitespace
+ * removed. They return tuples of ["Return Value", "Remainder of text"] or
+ * a `ParserError`.
+ */
+/**
+ * Reads a consecutive sequence of more than 1 letter,
+ * where letters are `[0-9a-zA-Z_]`.
+ */
+declare type ReadLetters<Input extends string> = string extends Input ? GenericStringError : ReadLettersHelper<Input, ''> extends [`${infer Letters}`, `${infer Remainder}`] ? Letters extends '' ? ParserError<`Expected letter at \`${Input}\``> : [Letters, Remainder] : ReadLettersHelper<Input, ''>;
+declare type ReadLettersHelper<Input extends string, Acc extends string> = string extends Input ? GenericStringError : Input extends `${infer L}${infer Remainder}` ? L extends Letter ? ReadLettersHelper<Remainder, `${Acc}${L}`> : [Acc, Input] : [Acc, ''];
+/**
+ * Parses an identifier.
+ * For now, identifiers are just sequences of more than 1 letter.
+ *
+ * TODO: allow for double quoted strings.
+ */
+declare type ParseIdentifier<Input extends string> = ReadLetters<Input>;
+/**
+ * Parses a node.
+ * A node is one of the following:
+ * - `*`
+ * - `field`
+ * - `field->json...`
+ * - `field(nodes)`
+ * - `field!hint(nodes)`
+ * - `field!inner(nodes)`
+ * - `field!hint!inner(nodes)`
+ * - `renamed_field:field`
+ * - `renamed_field:field->json...`
+ * - `renamed_field:field(nodes)`
+ * - `renamed_field:field!hint(nodes)`
+ * - `renamed_field:field!inner(nodes)`
+ * - `renamed_field:field!hint!inner(nodes)`
+ *
+ * TODO: casting operators `::text`, more support for JSON operators `->`, `->>`.
+ */
+declare type ParseNode<Input extends string> = Input extends '' ? ParserError<'Empty string'> : Input extends `*${infer Remainder}` ? [{
+    star: true;
+}, EatWhitespace<Remainder>] : ParseIdentifier<Input> extends [infer Name, `${infer Remainder}`] ? EatWhitespace<Remainder> extends `!inner${infer Remainder}` ? ParseEmbeddedResource<EatWhitespace<Remainder>> extends [infer Fields, `${infer Remainder}`] ? [
+    {
+        name: Name;
+        original: Name;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : ParserError<'Expected embedded resource after `!inner`'> : EatWhitespace<Remainder> extends `!${infer Remainder}` ? ParseIdentifier<EatWhitespace<Remainder>> extends [infer _Hint, `${infer Remainder}`] ? EatWhitespace<Remainder> extends `!inner${infer Remainder}` ? ParseEmbeddedResource<EatWhitespace<Remainder>> extends [
+    infer Fields,
+    `${infer Remainder}`
+] ? [
+    {
+        name: Name;
+        original: Name;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : ParserError<'Expected embedded resource after `!inner`'> : ParseEmbeddedResource<EatWhitespace<Remainder>> extends [
+    infer Fields,
+    `${infer Remainder}`
+] ? [
+    {
+        name: Name;
+        original: Name;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : ParserError<'Expected embedded resource after `!hint`'> : ParserError<'Expected identifier after `!`'> : EatWhitespace<Remainder> extends `:${infer Remainder}` ? ParseIdentifier<EatWhitespace<Remainder>> extends [infer OriginalName, `${infer Remainder}`] ? EatWhitespace<Remainder> extends `!inner${infer Remainder}` ? ParseEmbeddedResource<EatWhitespace<Remainder>> extends [
+    infer Fields,
+    `${infer Remainder}`
+] ? [
+    {
+        name: Name;
+        original: OriginalName;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : ParserError<'Expected embedded resource after `!inner`'> : EatWhitespace<Remainder> extends `!${infer Remainder}` ? ParseIdentifier<EatWhitespace<Remainder>> extends [infer _Hint, `${infer Remainder}`] ? EatWhitespace<Remainder> extends `!inner${infer Remainder}` ? ParseEmbeddedResource<EatWhitespace<Remainder>> extends [
+    infer Fields,
+    `${infer Remainder}`
+] ? [
+    {
+        name: Name;
+        original: OriginalName;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : ParserError<'Expected embedded resource after `!inner`'> : ParseEmbeddedResource<EatWhitespace<Remainder>> extends [
+    infer Fields,
+    `${infer Remainder}`
+] ? [
+    {
+        name: Name;
+        original: OriginalName;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : ParserError<'Expected embedded resource after `!hint`'> : ParserError<'Expected identifier after `!`'> : ParseEmbeddedResource<EatWhitespace<Remainder>> extends [
+    infer Fields,
+    `${infer Remainder}`
+] ? [
+    {
+        name: Name;
+        original: OriginalName;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseJsonAccessor<EatWhitespace<Remainder>> extends [
+    infer _PropertyName,
+    infer PropertyType,
+    `${infer Remainder}`
+] ? [
+    {
+        name: Name;
+        type: PropertyType;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : [
+    {
+        name: Name;
+        original: OriginalName;
+    },
+    EatWhitespace<Remainder>
+] : ParseIdentifier<EatWhitespace<Remainder>> : ParseEmbeddedResource<EatWhitespace<Remainder>> extends [infer Fields, `${infer Remainder}`] ? [
+    {
+        name: Name;
+        original: Name;
+        children: Fields;
+    },
+    EatWhitespace<Remainder>
+] : ParseJsonAccessor<EatWhitespace<Remainder>> extends [
+    infer PropertyName,
+    infer PropertyType,
+    `${infer Remainder}`
+] ? [
+    {
+        name: PropertyName;
+        type: PropertyType;
+    },
+    EatWhitespace<Remainder>
+] : ParseEmbeddedResource<EatWhitespace<Remainder>> extends ParserError<string> ? ParseEmbeddedResource<EatWhitespace<Remainder>> : [
+    {
+        name: Name;
+        original: Name;
+    },
+    EatWhitespace<Remainder>
+] : ParserError<`Expected identifier at \`${Input}\``>;
+/**
+ * Parses a JSON property accessor of the shape `->a->b->c`. The last accessor in
+ * the series may convert to text by using the ->> operator instead of ->.
+ *
+ * Returns a tuple of ["Last property name", "Last property type", "Remainder of text"]
+ * or the original string input indicating that no opening `->` was found.
+ */
+declare type ParseJsonAccessor<Input extends string> = Input extends `->${infer Remainder}` ? Remainder extends `>${infer Remainder}` ? ParseIdentifier<Remainder> extends [infer Name, `${infer Remainder}`] ? [Name, string, EatWhitespace<Remainder>] : ParserError<'Expected property name after `->>`'> : ParseIdentifier<Remainder> extends [infer Name, `${infer Remainder}`] ? ParseJsonAccessor<Remainder> extends [
+    infer PropertyName,
+    infer PropertyType,
+    `${infer Remainder}`
+] ? [PropertyName, PropertyType, EatWhitespace<Remainder>] : [Name, Json, EatWhitespace<Remainder>] : ParserError<'Expected property name after `->`'> : Input;
+/**
+ * Parses an embedded resource, which is an opening `(`, followed by a sequence of
+ * nodes, separated by `,`, then a closing `)`.
+ *
+ * Returns a tuple of ["Parsed fields", "Remainder of text"], an error,
+ * or the original string input indicating that no opening `(` was found.
+ */
+declare type ParseEmbeddedResource<Input extends string> = Input extends `(${infer Remainder}` ? ParseNodes<EatWhitespace<Remainder>> extends [infer Fields, `${infer Remainder}`] ? EatWhitespace<Remainder> extends `)${infer Remainder}` ? Fields extends [] ? ParserError<'Expected fields after `(`'> : [Fields, EatWhitespace<Remainder>] : ParserError<`Expected ")"`> : ParseNodes<EatWhitespace<Remainder>> : Input;
+/**
+ * Parses a sequence of nodes, separated by `,`.
+ *
+ * Returns a tuple of ["Parsed fields", "Remainder of text"] or an error.
+ */
+declare type ParseNodes<Input extends string> = string extends Input ? GenericStringError : ParseNodesHelper<Input, []>;
+declare type ParseNodesHelper<Input extends string, Fields extends unknown[]> = ParseNode<Input> extends [
+    infer Field,
+    `${infer Remainder}`
+] ? EatWhitespace<Remainder> extends `,${infer Remainder}` ? ParseNodesHelper<EatWhitespace<Remainder>, [Field, ...Fields]> : [[Field, ...Fields], EatWhitespace<Remainder>] : ParseNode<Input>;
+/**
+ * Parses a query.
+ * A query is a sequence of nodes, separated by `,`, ensuring that there is
+ * no remaining input after all nodes have been parsed.
+ *
+ * Returns an array of parsed nodes, or an error.
+ */
+declare type ParseQuery<Query extends string> = string extends Query ? GenericStringError : ParseNodes<EatWhitespace<Query>> extends [infer Fields, `${infer Remainder}`] ? EatWhitespace<Remainder> extends '' ? Fields : ParserError<`Unexpected input: ${Remainder}`> : ParseNodes<EatWhitespace<Query>>;
+declare type GetResultHelper<Schema extends GenericSchema, Row extends Record<string, unknown>, Fields extends unknown[], Acc> = Fields extends [infer R] ? GetResultHelper<Schema, Row, [], ConstructFieldDefinition<Schema, Row, R> & Acc> : Fields extends [infer R, ...infer Rest] ? GetResultHelper<Schema, Row, Rest, ConstructFieldDefinition<Schema, Row, R> & Acc> : Acc;
+/**
+ * Constructs a type definition for an object based on a given PostgREST query.
+ *
+ * @param Row Record<string, unknown>.
+ * @param Query Select query string literal to parse.
+ */
+export declare type GetResult<Schema extends GenericSchema, Row extends Record<string, unknown>, Query extends string> = ParseQuery<Query> extends unknown[] ? GetResultHelper<Schema, Row, ParseQuery<Query>, unknown> : ParseQuery<Query>;
+export {};
+//# sourceMappingURL=select-query-parser.d.ts.map

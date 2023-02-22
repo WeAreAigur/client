@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.0.3
+
+### Patch Changes
+
+- 23e925f5: pipeline context to save internal invocation data
+
 ## 1.0.2
 
 ### Patch Changes

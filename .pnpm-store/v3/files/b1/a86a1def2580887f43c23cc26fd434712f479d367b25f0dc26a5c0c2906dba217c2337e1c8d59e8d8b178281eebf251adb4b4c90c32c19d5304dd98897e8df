@@ -1,0 +1,8 @@
+import 'next';
+import 'mdast';
+import '@mdx-js/mdx';
+import 'rehype-pretty-code';
+import 'gray-matter';
+export { v as DynamicFolder, x as DynamicMeta, D as DynamicMetaDescriptor, w as DynamicMetaItem, c as DynamicMetaJsonFile, F as FileMap, b as Folder, y as FrontMatter, H as Heading, L as LoaderOptions, e as MdxFile, A as MdxPath, M as Meta, u as MetaJsonFile, z as MetaJsonPath, G as Nextra, B as NextraConfig, K as NextraInternalGlobal, J as NextraThemeLayoutProps, P as Page, a as PageMapItem, d as PageOpts, R as ReadingTime, T as ThemeConfig, t as default } from './types-cb47bdaf.js';
+import 'react';
+import 'webpack';

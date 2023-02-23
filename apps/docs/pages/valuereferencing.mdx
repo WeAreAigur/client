@@ -1,8 +1,9 @@
 Composing a Pipeline consists of chaining different Nodes together.
 Each Node can reference a value from any previous executed nodes (all fully typed of course 🎉).
 
-Node builder functions receive a callback that accepts three arguments:
-`input`, `prev` and `nodes`
+You can configure the input of a Node using the `Input Function` which is the second parameter of the `flow.node` function. 
+The `Input Function` receives a callback that accepts four arguments:
+`input`, `prev`, `nodes` and `memory`
 
 ### Input
 
@@ -66,3 +67,7 @@ flow.node(replaceString, ({ input }) => ({
 // ...
 ```
 </CH.Code>
+
+### Memory
+
+See [Memory](/memory) for more details.

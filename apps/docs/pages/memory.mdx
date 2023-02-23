@@ -1,1 +1,92 @@
-Coming soon
+You can save and reuse values from one Pipeline invocation to another.
+This lets you create complex Pipelines that change according to the results of previous runs. Check out the [Chatbot example](/#chatbot-with-memory) for an interactive example.
+
+## Memory Manager
+
+To enable Pipeline Memory you first need to define your Memory Manager when creating the Aigur Client instance.
+
+Here is an example of using [Upstash Redis](https://upstash.com/) as your Memory Manager.
+
+```ts index.ts
+import { createClient } from '@aigur/client';
+import { createUpstashRedisMemory } from '@aigur/memory-upstash-redis';
+
+const aigur = createClient({
+  apiKeys: {},
+  memoryManager: createUpstashRedisMemory(),
+});
+
+```
+
+### Current available Memory Managers
+- `@aigur/memory-upstash-redis` - Uses [Upstash Redis](https://upstash.com/) to manage your persistent memory. Looks for the `UPSTASH_REDIS_REST_TOKEN` and `UPSTASH_REDIS_REST_URL` environment variables.
+- More to come soon...
+
+
+## Define Your Memory Data Type
+
+The `aigur.pipeline.create` function accepts an optional third generic type parameter that defines the type of your memory data. This is the data that will be saved and loaded between Pipeline invocations.
+
+```ts index.ts
+aigur.pipeline.create<
+  { text: string },
+  ReadableStream,
+  { name: string } //  <-- Your memory data type
+>({/*...*/});
+```
+
+## Consume Memory Data
+
+When [configuring](/valuereferencing) the input of a Node using the `Input Function` (the second parameter of the `flow.node` function), you can access the memory data by using the `memory` parameter.
+
+```ts index.ts focus=4,7:15 mark=4[5:16],11[12:17],12[25:35]
+aigur.pipeline.create<
+  { text: string },
+  ReadableStream,
+  { name: string }
+>({
+  id: 'myPipeline',
+  flow: (flow) =>
+    flow
+      .node(
+        someNode,
+        ({ memory }) => ({
+          someProperty: memory.name // <-- Consume memory data
+        }),
+      )
+  })
+```
+
+## Saving Memory Data
+
+To save memory data, the `flow.node` function accepts an optional third parameter that is a function that returns an object which is the memory data to save.
+It can be partial data of the type you defined in the Pipeline creation.
+The memory update function receives 5 parameters:
+- `input` - The input data of the Node
+- `output` - The output data of the Node (even if it's a Stream node)
+- `nodes` - The Nodes of the Pipeline that were executed before the current Node
+- `prev` - The output of the immediate previous Node
+- `memory` - The current memory data
+
+```ts index.ts focus=4,14:16 mark=4[5:8],15[11:14]
+aigur.pipeline.create<
+  { text: string },
+  ReadableStream,
+  { name: string, age: number }
+>({
+  id: 'myPipeline',
+  flow: (flow) =>
+    flow
+      .node(
+        someNode,
+        () => ({
+          // configure node input
+        }),
+        ({ input, output, nodes, prev, memory }) => ({
+          name: output.text, // <-- We save only the "name" property here and not "age"
+        }
+      )
+  })
+```
+
+## Example

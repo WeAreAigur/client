@@ -14,7 +14,7 @@ export interface PipelineNodeProps {
 			type: 'target' | 'source';
 			position: Position;
 		}[];
-		pipeline: Pipeline<any, any>;
+		pipeline: Pipeline<any, any, any>;
 	};
 }
 

@@ -1,33 +1,43 @@
-import { ConcreteNode, NodeAction } from './types';
 import { output } from './nodes/output/output';
+import { ConcreteNode, NodeAction } from './types';
 
 export class FlowBuilder<
 	Input extends Record<string, unknown>,
 	Output extends Record<string, unknown> | ReadableStream,
-	NodeDefinitions extends ConcreteNode<any, any>[],
-	PrevNode extends ConcreteNode<any, any> | null
+	MemoryData extends Record<string, unknown>,
+	NodeDefinitions extends ConcreteNode<any, any, any>[],
+	PrevNode extends ConcreteNode<any, any, any> | null
 > {
 	constructor(private nodes: NodeDefinitions) {}
-
-	static create<
-		Input extends Record<string, unknown>,
-		Output extends Record<string, unknown> | ReadableStream
-	>() {
-		return new FlowBuilder<Input, Output, [], null>([]);
-	}
 
 	public node<NodeDef extends NodeAction<any, any>>(
 		nodeDefinition: NodeDef,
 		getUserInput: (data: {
 			nodes: NodeDefinitions;
-			prev: PrevNode extends ConcreteNode<any, any>
+			prev: PrevNode extends ConcreteNode<any, any, any>
 				? Awaited<ReturnType<PrevNode['action']>>
 				: Input;
 			input: Input;
-		}) => Parameters<NodeDef>['0']
+			memory: MemoryData;
+		}) => Parameters<NodeDef>['0'],
+		getMemory?: (data: {
+			nodes: NodeDefinitions;
+			prev: PrevNode extends ConcreteNode<any, any, any>
+				? Awaited<ReturnType<PrevNode['action']>>
+				: Input;
+			input: Input;
+			output: Awaited<ReturnType<NodeDef>> extends ReadableStream
+				? string
+				: Awaited<ReturnType<NodeDef>>;
+			memory: MemoryData;
+		}) => Partial<MemoryData>
 	) {
-		type NewNode = ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>>;
+		type NewNode = ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>, MemoryData>;
+		// configure to return a placeholder for any property accessed (e.g. $context.0.url$)
+		const memory = this.createDynamicPlaceholders('memory');
 		const input = this.createDynamicPlaceholders('input');
+		// using this.nodes.length and not this.nodes.length - 1 because we want to setup a new node that we didnt add yet to the array
+		const output = this.createDynamicPlaceholders(this.nodes.length);
 		const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
 		const node = {
 			action: nodeDefinition,
@@ -35,20 +45,30 @@ export class FlowBuilder<
 				nodes: this.nodes,
 				prev: prev.output,
 				input,
+				memory,
 			}),
 			// configure output to return a placeholder for any property accessed (e.g. $context.0.url$)
 			output: this.createDynamicPlaceholders(this.nodes.length),
+			memoryToSave: getMemory
+				? getMemory({ nodes: this.nodes, prev: prev.output, output, input, memory })
+				: null,
 		} as NewNode;
 
 		this.nodes.push(node);
-		return this as unknown as FlowBuilder<Input, Output, [...NodeDefinitions, NewNode], NewNode>;
+		return this as unknown as FlowBuilder<
+			Input,
+			Output,
+			MemoryData,
+			[...NodeDefinitions, NewNode],
+			NewNode
+		>;
 	}
 
-	private createDynamicPlaceholders(nodeIndex: number | 'input') {
+	private createDynamicPlaceholders(source: number | 'input' | 'memory') {
 		const output = {};
 		const safeNotInstanciatedWarningProxy = {
 			get: function (object, prop) {
-				return `$context.${nodeIndex}.${prop}$`;
+				return `$context.${source}.${prop}$`;
 			},
 		};
 
@@ -60,13 +80,23 @@ export class FlowBuilder<
 	output(
 		getUserInput: (data: {
 			nodes: NodeDefinitions;
-			prev: PrevNode extends ConcreteNode<any, any>
+			prev: PrevNode extends ConcreteNode<any, any, any>
 				? Awaited<ReturnType<PrevNode['action']>>
 				: Input;
 			input: Input;
-		}) => Output
+			memory: MemoryData;
+		}) => Output,
+		getMemory?: (data: {
+			nodes: NodeDefinitions;
+			prev: PrevNode extends ConcreteNode<any, any, any>
+				? Awaited<ReturnType<PrevNode['action']>>
+				: Input;
+			input: Input;
+			output: Output extends ReadableStream ? string : Output;
+			memory: MemoryData;
+		}) => Partial<MemoryData>
 	) {
-		return this.node(output<Output>, getUserInput);
+		return this.node(output<Output>, getUserInput, getMemory);
 	}
 
 	getNodes() {

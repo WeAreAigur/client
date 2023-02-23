@@ -1,12 +1,15 @@
 import { FlowBuilder } from './builder';
 import { delay } from './delay';
-import { getConcreteNodeInput } from './getInputByContext';
+import { placeholdersToConcreteValues } from './getConcreteNodeInput';
 import { makeid } from './makeid';
-import { createContext, PipelineContext } from './PipelineContext';
+import { createContext } from './PipelineContext';
+import { retrieveConcreteMemoryData } from './retrieveMemoryData';
 import {
 	APIKeys,
+	ConcreteNode,
 	EventType,
 	PipelineConf,
+	PipelineContext,
 	PipelineProgressEvent,
 	PipelineStatusEvent,
 } from './types';
@@ -16,7 +19,8 @@ const RETRY_DELAY_IN_MS = 350;
 
 export class Pipeline<
 	Input extends Record<string, unknown>,
-	Output extends Record<string, unknown> | ReadableStream
+	Output extends Record<string, unknown> | ReadableStream,
+	MemoryData extends Record<string, unknown>
 > {
 	public readonly onProgressListeners: Map<string, (event: PipelineProgressEvent) => void> =
 		new Map();
@@ -26,23 +30,61 @@ export class Pipeline<
 	private eventIndex = 0;
 
 	constructor(
-		public readonly conf: PipelineConf<Input, Output>,
-		public readonly flow: FlowBuilder<Input, Output, any, any>,
+		public readonly conf: PipelineConf<Input, Output, MemoryData>,
+		public readonly flow: FlowBuilder<Input, Output, MemoryData, any, any>,
 		private readonly apiKeys: APIKeys
 	) {
 		this.listenToEvents();
 	}
 
-	public async invoke(input: Input, pipelineInstanceId: string = this.pipelineInstanceId) {
-		const context = createContext({
+	public async invoke(
+		input: Input,
+		opts?: {
+			pipelineInstanceId?: string;
+			userId?: string;
+		}
+	) {
+		const memory = await this.loadMemory(opts?.userId);
+		const context = createContext<Input, Output, MemoryData>({
 			input,
-			pipelineInstanceId,
+			pipelineInstanceId: opts?.pipelineInstanceId ?? this.pipelineInstanceId,
+			userId: opts?.userId ?? '',
+			memory,
 		});
 		await this.processPipeline(context);
 		return context.output;
 	}
 
-	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
+	private async saveMemory(
+		context: PipelineContext<Input, Output, MemoryData>,
+		memoryToSavePromise: Promise<Partial<MemoryData> | null>
+	) {
+		const memoryToSave = await memoryToSavePromise;
+		if (!this.conf.memoryManager || !memoryToSave) {
+			return;
+		}
+
+		this.conf.memoryManager.saveMemory(this.getMemoryId(context.userId), memoryToSave);
+	}
+
+	private getMemoryId(userId?: string) {
+		return `${this.conf.id}${userId ? `-${userId}` : ''}`;
+	}
+
+	private loadMemory(userId?: string): Promise<MemoryData | null> {
+		if (!this.conf.memoryManager) {
+			return Promise.resolve(null);
+		}
+		return this.conf.memoryManager.loadMemory(this.getMemoryId(userId));
+	}
+
+	public invokeRemote(
+		endpoint: string,
+		input: Input,
+		opts?: {
+			userId?: string;
+		}
+	): Promise<Output> {
 		return (
 			fetch(endpoint, {
 				method: 'POST',
@@ -52,6 +94,7 @@ export class Pipeline<
 				body: JSON.stringify({
 					input,
 					pipelineInstanceId: this.pipelineInstanceId,
+					userId: opts?.userId ?? '',
 				}),
 			})
 				// TODO: check response.ok
@@ -65,7 +108,10 @@ export class Pipeline<
 	public async invokeStream(
 		endpoint: string,
 		input: Input,
-		cb: (chunk: string) => void
+		cb: (chunk: string) => void,
+		opts?: {
+			userId?: string;
+		}
 	): Promise<void> {
 		const response = await fetch(endpoint, {
 			method: 'POST',
@@ -75,6 +121,7 @@ export class Pipeline<
 			body: JSON.stringify({
 				input,
 				pipelineInstanceId: this.pipelineInstanceId,
+				userId: opts?.userId ?? '',
 			}),
 		});
 		if (!response.ok) {
@@ -97,13 +144,26 @@ export class Pipeline<
 	}
 
 	public vercel = {
-		invoke: (input: Input): Promise<Output> => {
+		invoke: (
+			input: Input,
+			opts?: {
+				userId?: string;
+			}
+		): Promise<Output> => {
 			// TODO: move base url to "create" optional param
-			return this.invokeRemote(`/api/pipelines/${this.conf.id}`, input);
+			return this.invokeRemote(`/api/pipelines/${this.conf.id}`, input, { userId: opts?.userId });
 		},
-		invokeStream: (input: Input, cb: (chunk: string) => void) => {
+		invokeStream: (
+			input: Input,
+			cb: (chunk: string) => void,
+			opts?: {
+				userId?: string;
+			}
+		) => {
 			// TODO: move base url to "create" optional param
-			return this.invokeStream(`/api/pipelines/${this.conf.id}`, input, cb);
+			return this.invokeStream(`/api/pipelines/${this.conf.id}`, input, cb, {
+				userId: opts?.userId,
+			});
 		},
 	};
 
@@ -131,7 +191,9 @@ export class Pipeline<
 		};
 	}
 
-	private async processPipeline(context: PipelineContext<Input>): Promise<PipelineContext<Input>> {
+	private async processPipeline(
+		context: PipelineContext<Input, Output, MemoryData>
+	): Promise<PipelineContext<Input, Output, MemoryData>> {
 		const retriesCount = this.conf.retries ?? DEFAULT_RETRIES;
 		try {
 			const pipelineStartPromise = this.notifyEvent({ type: 'pipeline:start', context });
@@ -145,14 +207,14 @@ export class Pipeline<
 					throw new Error(result.message);
 				}
 			}
-			const nodes: any[] = this.flow.getNodes();
+			const nodes: ConcreteNode<any, any, any>[] = this.flow.getNodes();
 
 			for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
 				const nodeStartPromise = this.notifyEvent({
 					type: 'node:start',
 					context,
 					data: {
-						node: nodes[nodeIndex].name,
+						node: nodes[nodeIndex].action.name,
 						index: nodeIndex,
 					},
 				});
@@ -164,9 +226,12 @@ export class Pipeline<
 				do {
 					attemptCount++;
 					try {
-						const { action, input: inputPlaceholders } = nodes[nodeIndex];
-						const nodeInput = getConcreteNodeInput(inputPlaceholders, context.values);
-						context.values[nodeIndex] = await action(nodeInput, this.apiKeys);
+						const { action, input: inputPlaceholders, memoryToSave } = nodes[nodeIndex];
+						const contextNode = (context.values[nodeIndex] = { input: null, output: null });
+						contextNode.input = placeholdersToConcreteValues(inputPlaceholders, context.values);
+						contextNode.output = await action(contextNode.input, this.apiKeys);
+						const memoryValuesPromise = retrieveConcreteMemoryData(context, nodes[nodeIndex]);
+						this.saveMemory(context, memoryValuesPromise);
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {
@@ -179,7 +244,7 @@ export class Pipeline<
 					type: 'node:finish',
 					context,
 					data: {
-						node: nodes[nodeIndex].name,
+						node: nodes[nodeIndex].action.name,
 						index: nodeIndex,
 					},
 				});
@@ -195,7 +260,7 @@ export class Pipeline<
 				await pipelineFinishPromise;
 			}
 
-			context.output = context.values[nodes.length - 1];
+			context.output = context.values[nodes.length - 1].output;
 			return context;
 		} catch (e) {
 			console.error(e);
@@ -231,7 +296,7 @@ export class Pipeline<
 
 	private notifyEvent(opts: {
 		type: EventType;
-		context: PipelineContext<Input>;
+		context: PipelineContext<Input, Output, MemoryData>;
 		data?: Record<any, any>;
 	}) {
 		if (!this.conf.updateProgress || !this.conf.eventPublisher) {

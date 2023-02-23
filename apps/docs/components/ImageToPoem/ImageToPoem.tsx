@@ -1,11 +1,12 @@
-import { pipelines } from '#/pipelines/pipelines';
-import { logsnag } from '#/services/logsnag';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { getUserId } from '#/services/user';
+import { logsnag } from '#/services/logsnag';
+import { pipelines } from '#/pipelines/pipelines';
 
-import { Tabs } from '../Tabs';
-import { ImageToPoemPipelineView } from './ImageToPoemPipelineView';
 import { ImageUpload } from './ImageUpload';
+import { ImageToPoemPipelineView } from './ImageToPoemPipelineView';
+import { Tabs } from '../Tabs';
 
 interface ImageToPoemProps {
 	children: React.ReactNode;
@@ -27,6 +28,9 @@ export function ImageToPoem(props: ImageToPoemProps) {
 			channel: 'client',
 			notify: true,
 			event: 'ImageToPoem',
+			tags: {
+				user: getUserId(),
+			},
 		});
 		setInProgress(true);
 		setPoem('');

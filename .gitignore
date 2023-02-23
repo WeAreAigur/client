@@ -38,3 +38,5 @@ dist
 **/dist
 
 apps/docs/playground.js
+
+.pnpm-store

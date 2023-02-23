@@ -6,16 +6,29 @@ export interface AigurConfiguration {
 	apiKeys: APIKeys;
 	eventListener?: (pipelineInstanceId: string, cb: (event: PipelineEvent) => void) => void;
 	eventPublisher?: (pipelineInstanceId: string, event: PipelineEvent) => Promise<any>;
+	memoryManager?: MemoryManager<any>;
 }
+
+export type PipelineContext<Input, Output, MemoryData> = {
+	pipelineInstanceId: string;
+	input: Input;
+	output: Output extends ReadableStream ? string : Output;
+	values: Record<string, NodeContext<any, any>>;
+	memory: MemoryData | null;
+	userId: string;
+};
 
 export interface PipelineConf<
 	Input extends Record<string, unknown>,
-	Output extends Record<string, unknown> | ReadableStream
+	Output extends Record<string, unknown> | ReadableStream,
+	MemoryData extends Record<string, unknown>
 > {
 	id: string;
 	flow: (
-		builder: FlowBuilder<Input, Output, [], null>
-	) => FlowBuilder<Input, Output, any, ConcreteNode<Output, Output>>;
+		builder: FlowBuilder<Input, Output, MemoryData, [], null>
+	) => FlowBuilder<Input, Output, MemoryData, any, ConcreteNode<Output, Output, MemoryData>>;
+	updateMemory?: (pipelineContext: PipelineContext<Input, Output, MemoryData>) => MemoryData;
+	memoryManager?: MemoryManager<MemoryData>;
 	retries?: number;
 	stream?: boolean;
 	retryDelayInMs?: number;
@@ -32,11 +45,13 @@ export type NodeAction<
 
 export type ConcreteNode<
 	Input extends Record<string, unknown> | ReadableStream,
-	Output extends Record<string, unknown> | ReadableStream
+	Output extends Record<string, unknown> | ReadableStream,
+	MemoryData extends Record<string, unknown>
 > = {
 	action: NodeAction<Input, Output>;
 	input: Input;
 	output: Output;
+	memoryToSave: Partial<MemoryData> | null;
 };
 export type NodeContext<
 	Input extends Record<string, unknown> | ReadableStream,
@@ -75,3 +90,8 @@ export type APIKeys = Record<string, string> & {
 	googleapis?: string;
 	whisperapi?: string;
 };
+
+export interface MemoryManager<T> {
+	saveMemory: (id: string, value: any) => Promise<T | null>;
+	loadMemory: (id: string) => Promise<T | null>;
+}

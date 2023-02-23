@@ -1,6 +1,7 @@
-import { jokeGptPipeline } from '#/pipelines/jokegpt';
-import { logsnag } from '#/services/logsnag';
 import { useState } from 'react';
+import { getUserId } from '#/services/user';
+import { logsnag } from '#/services/logsnag';
+import { jokeGptPipeline } from '#/pipelines/jokegpt';
 
 interface JokeFormProps {}
 
@@ -14,6 +15,9 @@ export function JokeForm(props: JokeFormProps) {
 			channel: 'client',
 			notify: true,
 			event: 'Joke',
+			tags: {
+				user: getUserId(),
+			},
 		});
 		e.preventDefault();
 		setInProgress(true);

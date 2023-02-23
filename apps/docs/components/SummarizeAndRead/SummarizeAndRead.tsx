@@ -1,10 +1,11 @@
-import { pipelines } from '#/pipelines/pipelines';
-import { logsnag } from '#/services/logsnag';
 import { useState } from 'react';
+import { getUserId } from '#/services/user';
+import { logsnag } from '#/services/logsnag';
+import { pipelines } from '#/pipelines/pipelines';
 
-import { Tabs } from '../Tabs';
-import { PlayAudio } from './PlayAudio';
 import { SummarizeAndReadPipelineView } from './SummarizeAndReadPipelineView';
+import { PlayAudio } from './PlayAudio';
+import { Tabs } from '../Tabs';
 
 interface SummarizeAndReadProps {
 	children: React.ReactNode;
@@ -34,6 +35,9 @@ export function SummarizeAndRead(props: SummarizeAndReadProps) {
 			channel: 'client',
 			notify: true,
 			event: 'SummarizeAndRead',
+			tags: {
+				user: getUserId(),
+			},
 		});
 		setInProgress(true);
 		setAudioUrl(null);

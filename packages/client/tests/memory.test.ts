@@ -21,18 +21,21 @@ test('use memory', async () => {
 		id: 'testPipeline',
 		flow: (flow) =>
 			flow
-				.node(replaceString, ({ input, memory }) => ({
-					text: `${input.subject}${
-						memory?.previousSubject ? ` and ${memory.previousSubject}` : ''
-					}`,
-					modifier: 'Tell me a joke about $(text)$',
-				}))
+				.node(
+					replaceString,
+					({ input, memory }) => ({
+						text: `${input.subject}${
+							memory?.previousSubject ? ` and ${memory.previousSubject}` : ''
+						}`,
+						modifier: 'Tell me a joke about $(text)$',
+					}),
+					({ input }) => ({
+						previousSubject: input.subject,
+					})
+				)
 				.output(({ prev }) => ({
 					joke: prev.text,
 				})),
-		updateMemory: ({ input }) => ({
-			previousSubject: input.subject,
-		}),
 	});
 
 	let result = await pipeline.invoke({ subject: 'mice' });

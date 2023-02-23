@@ -27,7 +27,8 @@
 				"GOOGLE_KEY",
 				"ABLY_KEY",
 				"NEXT_PUBLIC_ABLY_SUBSCRIBE_KEY",
-				"WHISPERAPI_KEY"
+				"WHISPERAPI_KEY",
+				"REDIS_URL"
 			],
 			"outputs": [".next/**"]
 		}

@@ -1,31 +1,24 @@
-interface Redis {
-	get: (key: string) => Promise<string | null>;
-	set: (key: string, value: string) => Promise<string | null>;
-}
+import { Redis } from '@upstash/redis';
 
-export function createRedisMemory(redis: Redis) {
-	return {
-		saveMemory,
-		loadMemory,
-	};
+export function createRedisMemory() {
+	try {
+		const redis = Redis.fromEnv();
 
-	function saveMemory(id: string, value: any) {
-		try {
-			return redis.set(id, JSON.stringify(value));
-		} catch (e) {
-			throw new Error('Could not save memory to redis:' + e);
+		function saveMemory(id: string, value: Record<string, any>) {
+			return redis.hset(id, value);
 		}
-	}
 
-	async function loadMemory(id: string) {
-		const item = await redis.get(id);
-		if (item === null) {
-			return item;
+		async function loadMemory<T extends Record<string, unknown>>(id: string): Promise<T | null> {
+			return redis.hgetall<T>(id);
 		}
-		try {
-			return JSON.parse(item);
-		} catch (e) {
-			return item;
-		}
+		return {
+			saveMemory,
+			loadMemory,
+		};
+	} catch (e) {
+		return {
+			saveMemory: async (id: string, value: Record<string, any>) => 1,
+			loadMemory: async <T>(id: string) => null,
+		};
 	}
 }

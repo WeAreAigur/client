@@ -1,9 +1,6 @@
-import { Redis } from '@upstash/redis';
-import { createRedisMemory } from '@aigur/memory-redis';
-import { Aigur, createClient } from '@aigur/client';
 import { createAblyNotifier } from '@aigur/ably';
-
-export const redis = typeof window === 'undefined' ? Redis.fromEnv() : null;
+import { Aigur, createClient } from '@aigur/client';
+import { createRedisMemory } from '@aigur/memory-redis';
 
 const ably = createAblyNotifier(
 	process.env.ABLY_KEY!,
@@ -18,7 +15,7 @@ export const aigur: Aigur = createClient({
 		googleapis: process.env.GOOGLE_KEY!,
 		whisperapi: process.env.WHISPERAPI_KEY!,
 	},
-	memoryManager: typeof window === 'undefined' ? createRedisMemory(redis!) : undefined,
+	memoryManager: createRedisMemory(),
 	eventListener: ably.eventListener,
 	eventPublisher: ably.eventPublisher,
 });

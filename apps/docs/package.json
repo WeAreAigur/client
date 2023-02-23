@@ -20,7 +20,6 @@
 		"@types/node": "18.11.19",
 		"@types/react": "18.0.27",
 		"@types/react-dom": "18.0.10",
-		"@upstash/redis": "^1.20.0",
 		"@vercel/analytics": "^0.1.10",
 		"compressorjs": "^1.1.1",
 		"daisyui": "^2.50.0",

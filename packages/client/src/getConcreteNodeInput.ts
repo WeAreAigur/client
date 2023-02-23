@@ -1,6 +1,6 @@
 import { NodeContext } from './types';
 
-export function getConcreteNodeInput(
+export function placeholdersToConcreteValues(
 	inputPlaceholders: Record<string, any>,
 	values: Record<string, NodeContext<any, any>>
 ) {
@@ -54,24 +54,26 @@ export function getConcreteNodeInput(
 		return newValue;
 	}
 
-	function getContextReferences(value: string) {
-		if (typeof value !== 'string') return [];
-		const contextRegex = /\$context\.(\d+|input|memory)\.(\w+)\$/g;
-		const matches = value.matchAll(contextRegex);
-		const references: any[] = [];
-
-		for (let match of matches) {
-			references.push({
-				value: match[0],
-				nodeId: match[1],
-				property: match[2],
-			});
-		}
-
-		return references;
-	}
-
 	function escapeRegExp(string: string) {
 		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 	}
+}
+
+export function getContextReferences(
+	value: string
+): { value: string; nodeId: string; property: string }[] {
+	if (typeof value !== 'string') return [];
+	const contextRegex = /\$context\.(\d+|input|memory)\.(\w+)\$/g;
+	const matches = value.matchAll(contextRegex);
+	const references: any[] = [];
+
+	for (let match of matches) {
+		references.push({
+			value: match[0],
+			nodeId: match[1],
+			property: match[2],
+		});
+	}
+
+	return references;
 }

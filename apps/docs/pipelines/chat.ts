@@ -14,10 +14,16 @@ export const chatPipeline = aigur.pipeline.create<
 	updateProgress: true,
 	flow: (flow) =>
 		flow
-			.node(replaceString, ({ input, memory }) => ({
-				text: input.text,
-				modifier: `${memory.previousChat}\n Human: $(text)$\n Assistant:`,
-			}))
+			.node(
+				replaceString,
+				({ input, memory }) => ({
+					text: input.text,
+					modifier: `${memory.previousChat}\n Human: $(text)$\n Assistant:`,
+				}),
+				({ output }) => ({
+					previousChat: output.text,
+				})
+			)
 			.node(replaceString, ({ prev }) => ({
 				text: prev.text,
 				modifier: `${chatPrompt}\n $(text)$`,
@@ -26,7 +32,4 @@ export const chatPipeline = aigur.pipeline.create<
 				prompt: prev.text,
 			}))
 			.output(({ prev }) => prev.stream),
-	updateMemory: ({ values, output }) => ({
-		previousChat: `${values[0].output.text} ${output}`,
-	}),
 });

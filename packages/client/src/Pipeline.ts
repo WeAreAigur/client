@@ -1,9 +1,16 @@
 import {
-    APIKeys, EventType, PipelineConf, PipelineContext, PipelineProgressEvent, PipelineStatusEvent
+	APIKeys,
+	ConcreteNode,
+	EventType,
+	PipelineConf,
+	PipelineContext,
+	PipelineProgressEvent,
+	PipelineStatusEvent,
 } from './types';
+import { retrieveConcreteMemoryData } from './retrieveMemoryData';
 import { createContext } from './PipelineContext';
 import { makeid } from './makeid';
-import { getConcreteNodeInput } from './getConcreteNodeInput';
+import { placeholdersToConcreteValues } from './getConcreteNodeInput';
 import { delay } from './delay';
 import { FlowBuilder } from './builder';
 
@@ -45,41 +52,19 @@ export class Pipeline<
 			memory,
 		});
 		await this.processPipeline(context);
-		let pipelineOutput: any = context.output;
-		if (this.conf.stream && context.output instanceof ReadableStream) {
-			const [output, memoryStream] = context.output.tee();
-			pipelineOutput = output as Output;
-			readStreamUntilEnd(memoryStream).then((output: any) => {
-				this.saveMemory({ ...context, output });
-			});
-		} else {
-			await this.saveMemory(context);
-		}
-		return pipelineOutput;
-
-		function readStreamUntilEnd(stream: ReadableStream) {
-			return new Promise(async (resolve) => {
-				const reader = stream.getReader();
-				const decoder = new TextDecoder();
-				let done = false;
-				let output = '';
-				while (!done) {
-					const { value, done: doneReading } = await reader.read();
-					done = doneReading;
-					const chunkValue = decoder.decode(value);
-					output += chunkValue;
-				}
-				resolve(output);
-			});
-		}
+		return context.output;
 	}
-	private async saveMemory(context: PipelineContext<Input, Output, MemoryData>) {
-		if (!this.conf.updateMemory || !this.conf.memoryManager) {
+
+	private async saveMemory(
+		context: PipelineContext<Input, Output, MemoryData>,
+		memoryToSavePromise: Promise<Partial<MemoryData> | null>
+	) {
+		const memoryToSave = await memoryToSavePromise;
+		if (!this.conf.memoryManager || !memoryToSave) {
 			return;
 		}
-		const memoryToSave = this.conf.updateMemory(context);
-		console.log(`***memoryToSave`, memoryToSave);
-		return this.conf.memoryManager.saveMemory(this.getMemoryId(context.userId), memoryToSave);
+
+		this.conf.memoryManager.saveMemory(this.getMemoryId(context.userId), memoryToSave);
 	}
 
 	private getMemoryId(userId?: string) {
@@ -198,14 +183,14 @@ export class Pipeline<
 					throw new Error(result.message);
 				}
 			}
-			const nodes: any[] = this.flow.getNodes();
+			const nodes: ConcreteNode<any, any, any>[] = this.flow.getNodes();
 
 			for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
 				const nodeStartPromise = this.notifyEvent({
 					type: 'node:start',
 					context,
 					data: {
-						node: nodes[nodeIndex].name,
+						node: nodes[nodeIndex].action.name,
 						index: nodeIndex,
 					},
 				});
@@ -217,10 +202,12 @@ export class Pipeline<
 				do {
 					attemptCount++;
 					try {
-						const { action, input: inputPlaceholders } = nodes[nodeIndex];
+						const { action, input: inputPlaceholders, memoryToSave } = nodes[nodeIndex];
 						const contextNode = (context.values[nodeIndex] = { input: null, output: null });
-						contextNode.input = getConcreteNodeInput(inputPlaceholders, context.values);
+						contextNode.input = placeholdersToConcreteValues(inputPlaceholders, context.values);
 						contextNode.output = await action(contextNode.input, this.apiKeys);
+						const memoryValuesPromise = retrieveConcreteMemoryData(context, nodes[nodeIndex]);
+						this.saveMemory(context, memoryValuesPromise);
 						isSuccess = true;
 					} catch (e) {
 						if (attemptCount > retriesCount) {
@@ -233,7 +220,7 @@ export class Pipeline<
 					type: 'node:finish',
 					context,
 					data: {
-						node: nodes[nodeIndex].name,
+						node: nodes[nodeIndex].action.name,
 						index: nodeIndex,
 					},
 				});

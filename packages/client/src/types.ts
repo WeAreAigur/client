@@ -26,7 +26,7 @@ export interface PipelineConf<
 	id: string;
 	flow: (
 		builder: FlowBuilder<Input, Output, MemoryData, [], null>
-	) => FlowBuilder<Input, Output, MemoryData, any, ConcreteNode<Output, Output>>;
+	) => FlowBuilder<Input, Output, MemoryData, any, ConcreteNode<Output, Output, MemoryData>>;
 	updateMemory?: (pipelineContext: PipelineContext<Input, Output, MemoryData>) => MemoryData;
 	memoryManager?: MemoryManager<MemoryData>;
 	retries?: number;
@@ -45,11 +45,13 @@ export type NodeAction<
 
 export type ConcreteNode<
 	Input extends Record<string, unknown> | ReadableStream,
-	Output extends Record<string, unknown> | ReadableStream
+	Output extends Record<string, unknown> | ReadableStream,
+	MemoryData extends Record<string, unknown>
 > = {
 	action: NodeAction<Input, Output>;
 	input: Input;
 	output: Output;
+	memoryToSave: Partial<MemoryData> | null;
 };
 export type NodeContext<
 	Input extends Record<string, unknown> | ReadableStream,

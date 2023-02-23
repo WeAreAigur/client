@@ -1,6 +1,6 @@
 import { aigur } from '#/services/aigur';
 
-import { gpt3PredictionStream, replaceString } from '@aigur/client';
+import { gpt3PredictionStream, replaceMultipleStrings } from '@aigur/client';
 
 import { chatPrompt } from './chatPrompt';
 
@@ -15,18 +15,24 @@ export const chatPipeline = aigur.pipeline.create<
 	flow: (flow) =>
 		flow
 			.node(
-				replaceString,
+				replaceMultipleStrings,
 				({ input, memory }) => ({
-					text: input.text,
-					modifier: `${memory.previousChat}\n Human: $(text)$\n Assistant:`,
+					strings: {
+						text: input.text,
+						previousChat: memory.previousChat,
+					},
+					modifier: `$(previousChat)$\n Human: $(text)$\n Assistant:`,
 				}),
 				({ output }) => ({
 					previousChat: output.text,
 				})
 			)
-			.node(replaceString, ({ prev }) => ({
-				text: prev.text,
-				modifier: `${chatPrompt}\n $(text)$`,
+			.node(replaceMultipleStrings, ({ prev }) => ({
+				strings: {
+					text: prev.text,
+					chatPrompt,
+				},
+				modifier: `$(chatPrompt)$\n $(text)$`,
 			}))
 			.node(gpt3PredictionStream, ({ prev }) => ({
 				prompt: prev.text,

@@ -1,4 +1,6 @@
-- readme for client package
+- stream protocol
+- split
+- loop
 - fix enum in pipelines (cant set string)
 - nodes
   - image to image

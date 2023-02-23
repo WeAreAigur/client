@@ -11,7 +11,7 @@
 	"dependencies": {
 		"@aigur/ably": "workspace:*",
 		"@aigur/client": "workspace:*",
-		"@aigur/memory-redis": "workspace:*",
+		"@aigur/memory-upstash-redis": "workspace:*",
 		"@aigur/supabase": "workspace:*",
 		"@aigur/validate": "workspace:*",
 		"@code-hike/mdx": "^0.8.0",

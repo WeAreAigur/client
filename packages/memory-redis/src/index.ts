@@ -1,1 +1,1 @@
-export * from './redis';
+export * from './upstash-redis';

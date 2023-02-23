@@ -1,6 +1,6 @@
-import { createAblyNotifier } from '@aigur/ably';
+import { createRedisMemory } from '@aigur/memory-upstash-redis';
 import { Aigur, createClient } from '@aigur/client';
-import { createRedisMemory } from '@aigur/memory-redis';
+import { createAblyNotifier } from '@aigur/ably';
 
 const ably = createAblyNotifier(
 	process.env.ABLY_KEY!,

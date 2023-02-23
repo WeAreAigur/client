@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.1.0
+
+### Minor Changes
+
+- a3d208c5: Support Pipeline Memory
+
 ## 1.0.3
 
 ### Patch Changes

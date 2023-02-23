@@ -1,5 +1,11 @@
 # @aigur/ably
 
+## 0.2.0
+
+### Minor Changes
+
+- a3d208c5: Support Pipeline Memory
+
 ## 1.0.0
 
 ### Major Changes

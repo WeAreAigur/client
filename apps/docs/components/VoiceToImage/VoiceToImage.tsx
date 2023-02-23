@@ -1,6 +1,7 @@
 import { useRecord } from '#/hooks/useRecord';
 import { pipelines } from '#/pipelines/pipelines';
 import { logsnag } from '#/services/logsnag';
+import { getUserId } from '#/services/user';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -31,6 +32,9 @@ export function VoiceToImage(props: VoiceToImageProps) {
 			channel: 'client',
 			notify: true,
 			event: 'VoiceToImage',
+			tags: {
+				user: getUserId(),
+			},
 		});
 		setInProgress(true);
 		setEnhancedPrompt(null);

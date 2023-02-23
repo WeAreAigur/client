@@ -1,9 +1,10 @@
-import { pipelines } from '#/pipelines/pipelines';
-import { logsnag } from '#/services/logsnag';
 import { useEffect, useRef, useState } from 'react';
+import { getUserId } from '#/services/user';
+import { logsnag } from '#/services/logsnag';
+import { pipelines } from '#/pipelines/pipelines';
 
-import { Tabs } from '../Tabs';
 import { ChatPipelineView } from './ChatPipelineView';
+import { Tabs } from '../Tabs';
 
 interface SummarizeAndReadProps {
 	children: React.ReactNode;
@@ -29,6 +30,9 @@ export function Chat(props: SummarizeAndReadProps) {
 			notify: true,
 			event: 'Chat',
 			description: `User entered: ${text}`,
+			tags: {
+				user: getUserId(),
+			},
 		});
 		if (inputRef.current) {
 			inputRef.current.setSelectionRange(0, inputRef.current.value.length);
@@ -40,14 +44,18 @@ export function Chat(props: SummarizeAndReadProps) {
 		]);
 		setInProgress(true);
 		setChatBotResponse({ text: '', speaker: 'Bot' });
-		pipelines.chat.vercel.invokeStream({ text }, (res) => {
-			setInProgress(false);
-			setChatBotResponse((botResponse) => ({
-				text: (botResponse ? botResponse.text : '') + res,
-				speaker: 'Bot',
-			}));
-			scrollToBottom();
-		});
+		pipelines.chat.vercel.invokeStream(
+			{ text },
+			(res) => {
+				setInProgress(false);
+				setChatBotResponse((botResponse) => ({
+					text: (botResponse ? botResponse.text : '') + res,
+					speaker: 'Bot',
+				}));
+				scrollToBottom();
+			},
+			{ userId: getUserId() }
+		);
 	};
 
 	useEffect(() => {

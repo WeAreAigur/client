@@ -1,3 +1,9 @@
+import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { placeholdersToConcreteValues } from './getConcreteNodeInput';
+import { makeid } from './makeid';
+import { createContext } from './PipelineContext';
+import { retrieveConcreteMemoryData } from './retrieveMemoryData';
 import {
 	APIKeys,
 	ConcreteNode,
@@ -7,12 +13,6 @@ import {
 	PipelineProgressEvent,
 	PipelineStatusEvent,
 } from './types';
-import { retrieveConcreteMemoryData } from './retrieveMemoryData';
-import { createContext } from './PipelineContext';
-import { makeid } from './makeid';
-import { placeholdersToConcreteValues } from './getConcreteNodeInput';
-import { delay } from './delay';
-import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -78,7 +78,13 @@ export class Pipeline<
 		return this.conf.memoryManager.loadMemory(this.getMemoryId(userId));
 	}
 
-	public invokeRemote(endpoint: string, input: Input): Promise<Output> {
+	public invokeRemote(
+		endpoint: string,
+		input: Input,
+		opts?: {
+			userId?: string;
+		}
+	): Promise<Output> {
 		return (
 			fetch(endpoint, {
 				method: 'POST',
@@ -88,6 +94,7 @@ export class Pipeline<
 				body: JSON.stringify({
 					input,
 					pipelineInstanceId: this.pipelineInstanceId,
+					userId: opts?.userId ?? '',
 				}),
 			})
 				// TODO: check response.ok
@@ -101,7 +108,10 @@ export class Pipeline<
 	public async invokeStream(
 		endpoint: string,
 		input: Input,
-		cb: (chunk: string) => void
+		cb: (chunk: string) => void,
+		opts?: {
+			userId?: string;
+		}
 	): Promise<void> {
 		const response = await fetch(endpoint, {
 			method: 'POST',
@@ -111,6 +121,7 @@ export class Pipeline<
 			body: JSON.stringify({
 				input,
 				pipelineInstanceId: this.pipelineInstanceId,
+				userId: opts?.userId ?? '',
 			}),
 		});
 		if (!response.ok) {
@@ -133,13 +144,26 @@ export class Pipeline<
 	}
 
 	public vercel = {
-		invoke: (input: Input): Promise<Output> => {
+		invoke: (
+			input: Input,
+			opts?: {
+				userId?: string;
+			}
+		): Promise<Output> => {
 			// TODO: move base url to "create" optional param
-			return this.invokeRemote(`/api/pipelines/${this.conf.id}`, input);
+			return this.invokeRemote(`/api/pipelines/${this.conf.id}`, input, { userId: opts?.userId });
 		},
-		invokeStream: (input: Input, cb: (chunk: string) => void) => {
+		invokeStream: (
+			input: Input,
+			cb: (chunk: string) => void,
+			opts?: {
+				userId?: string;
+			}
+		) => {
 			// TODO: move base url to "create" optional param
-			return this.invokeStream(`/api/pipelines/${this.conf.id}`, input, cb);
+			return this.invokeStream(`/api/pipelines/${this.conf.id}`, input, cb, {
+				userId: opts?.userId,
+			});
 		},
 	};
 

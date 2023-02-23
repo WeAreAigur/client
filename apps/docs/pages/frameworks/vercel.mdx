@@ -2,36 +2,7 @@ import { Callout, Tab, Tabs } from 'nextra-theme-docs'
 
 **All Pipeline Nodes support Vercel Edge Functions out of the box 🎉**
 
-You can define them manually and invoke them as usual or read on for the built-in helpers.
-
-## Define Your Edge Function
-You can define your Pipeline server endpoints as Edge Functions:
-<CH.Code>
-
-```ts /api/joke.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { jokeGptPipeline } from '#/pipelines/jokegpt'; // <-- import your pipeline
-
-export default async function handler(req: NextRequest) {
-  const { input } = input = await req.json(); // <-- receive the input
-  const output = await jokeGptPipeline.invoke(input); // <-- invoke the pipeline
-  return NextResponse.json(output); // <-- return the output
-}
-
-export const config = {
-  runtime: 'edge', // <-- define the runtime as edge
-};
-```
----
-
-```ts client.ts
-import { jokeGptPipeline } from '#/pipelines/jokegpt'; // <-- import same pipeline
-
-jokeGptPipeline.invokeRemote('/api/joke', { subject }) // <-- invoke the pipeline
-  .then(({ joke }) => {}); 
-```
-</CH.Code>
-
+You can define them manually and invoke them as usual or use the built-in helpers.
 
 ## Aigur Vercel Helpers
 
@@ -70,24 +41,13 @@ You can now invoke any Pipeline and it will automatically run on Vercel Edge Fun
 
 <CH.Code lineNumbers={true}>
 ```ts /api/pipelines/[...id].ts
-import { NextRequest, NextResponse } from 'next/server';
-import { pipelines } from '#/pipelines/pipelines'; // <-- import the pipelines
-import { vercelGenericEdge } from '@aigur/client'; // <-- import the helper
+import { pipelines } from '#/pipelines/pipelines'; // import your pipeline repository
+import { vercelEdgeFunction } from '@aigur/client'; // import the helper
 
-export default async function handler(req: NextRequest) {
-	const result = await vercelGenericEdge(pipelines, req); // <-- invoke the helper
-	if (result instanceof Response) { // <-- the helper function can return error responses
-		return result;
-	}
-
-	if (result.pipeline.conf.stream) { // <-- support streaming
-		return new Response(result.output);
-	}
-	return NextResponse.json(result.output); // <-- regular output
-}
-
-export const config = {
-	runtime: 'edge', // <-- define the runtime as edge
+// export default the helper with your pipeline repository
+export default vercelEdgeFunction(pipelines);
+export const config = { // export the config
+	runtime: 'edge',
 };
 
 ```
@@ -113,3 +73,33 @@ jokeGptStreamPipeline.vercel.invokeStream({ subject }, (res) => {
 });
 ```
 </CH.Code>
+
+## Define Your Edge Function Manually
+If you don't want to use the helper function, you can define your Pipeline Edge Functions manually:
+<CH.Code>
+
+```ts /api/joke.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { jokeGptPipeline } from '#/pipelines/jokegpt'; // <-- import your pipeline
+
+export default async function handler(req: NextRequest) {
+  const { input } = input = await req.json(); // <-- receive the input
+  const output = await jokeGptPipeline.invoke(input); // <-- invoke the pipeline
+  return NextResponse.json(output); // <-- return the output
+}
+
+export const config = {
+  runtime: 'edge', // <-- define the runtime as edge
+};
+```
+---
+
+```ts client.ts
+import { jokeGptPipeline } from '#/pipelines/jokegpt'; // <-- import same pipeline
+
+jokeGptPipeline.invokeRemote('/api/joke', { subject }) // <-- invoke the pipeline
+  .then(({ joke }) => {}); 
+```
+</CH.Code>
+
+

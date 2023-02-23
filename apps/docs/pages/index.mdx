@@ -120,31 +120,61 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }
 ```
 </ImageToPoem>
 
-### Chatbot
+### Chatbot with Memory
 
-A simple chatbot in a few lines of code.
+A simple chatbot with memory in a few lines of code. Try asking it about facts from previous messages:
+
+```
+> `My name is John`
+> `What is my name?`
+```
 
 <Chat>
 ```ts index.ts
-import { aigur } from '#/services/aigur';
+import { createClient } from '@aigur/client';
+import { createUpstashRedisMemory } from '@aigur/memory-upstash-redis';
 import { gpt3PredictionStream, replaceString } from '@aigur/client';
 import { chatPrompt } from './chatPrompt';
 
-export const chatPipeline = aigur.pipeline
-  .create<{ text: string }, ReadableStream>({
-    id: 'chat',
-    stream: true,
-    flow: (flow) =>
-      flow
-        .node(replaceString, ({ input }) => ({
-          text: input.text,
-          modifier: `${chatPrompt}\n Human: $(text)$\n Assistant:`,
-        }))
-        .node(gpt3PredictionStream, ({ prev }) => ({
-          prompt: prev.text,
-        }))
-        .output(({ prev }) => prev.stream),
-  });
+export const aigur = createClient({
+	apiKeys: {
+		openai: process.env.OPENAI_KEY!,
+	},
+	memoryManager: createUpstashRedisMemory(),
+});
+
+
+export const chatPipeline = aigur.pipeline.create<
+ { text: string },
+ ReadableStream,
+ { previousChat: string }
+>({
+ id: 'chat',
+ stream: true,
+ flow: (flow) =>
+  flow
+   .node(replaceMultipleStrings, ({ input, memory }) => ({
+     strings: {
+      text: input.text,
+      previousChat: memory.previousChat,
+     },
+     modifier: `$(previousChat)$\n Human: $(text)$\n Assistant:`,
+    }), ({ output }) => ({
+     previousChat: output.text,
+    })
+   )
+   .node(replaceMultipleStrings, ({ prev }) => ({
+    strings: {
+     text: prev.text,
+     chatPrompt,
+    },
+    modifier: `$(chatPrompt)$\n $(text)$`,
+   }))
+   .node(gpt3PredictionStream, ({ prev }) => ({
+    prompt: prev.text,
+   }))
+   .output(({ prev }) => prev.stream),
+});
 
 ```
 </Chat>

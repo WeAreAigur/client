@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.3.0
+
+### Minor Changes
+
+- 65170a1d: Support User Id in Node and Memory input functions
+
 ## 1.2.0
 
 ### Minor Changes

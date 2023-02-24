@@ -10,10 +10,10 @@ myPipeline.invoke({ someProperty: someValue }, { userId: 'someUserId' });
 
 ```ts pipeline.ts
 aigur.pipeline.create<{ subject: string }, { joke: string }>(
-	{
-		id: 'jokegpt',
-		flow: (flow) =>
-			flow
+  {
+    id: 'jokegpt',
+    flow: (flow) =>
+      flow
         // access the userId that was passed
         .node(dbQuery, ({ userId }) => ({
           type: 'select',
@@ -24,20 +24,20 @@ aigur.pipeline.create<{ subject: string }, { joke: string }>(
           single: true
         }))
         // prev is the result of the previous node
-				.node(replaceMultipleStrings, ({ input, prev }) => ({
-					strings: {
+        .node(replaceMultipleStrings, ({ input, prev }) => ({
+          strings: {
             subject: input.subject,
             userAnimal: prev.favorite_animal
           },
-					modifier: 'tell me a joke about $(subject)$ or $(userAnimal)$',
-				}))
-				.node(gpt3Prediction, ({ prev }) => ({
-					prompt: prev.text,
-				}))
-				.output(({ prev }) => ({
-					joke: prev.text,
-				})),
-	}
+          modifier: 'tell me a joke about $(subject)$ or $(userAnimal)$',
+        }))
+        .node(gpt3Prediction, ({ prev }) => ({
+          prompt: prev.text,
+        }))
+        .output(({ prev }) => ({
+          joke: prev.text,
+        })),
+  }
 );
 ```
 

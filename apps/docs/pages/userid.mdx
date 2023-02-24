@@ -15,7 +15,8 @@ aigur.pipeline.create<{ subject: string }, { joke: string }>(
 		flow: (flow) =>
 			flow
         // access the userId that was passed
-        .node(supabaseQuery, ({ userId }) => ({
+        .node(dbQuery, ({ userId }) => ({
+          type: 'select',
           table: 'favorite_animals',
           query: {
             user_id: userId,

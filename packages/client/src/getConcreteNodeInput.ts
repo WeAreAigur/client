@@ -63,7 +63,7 @@ export function getContextReferences(
 	value: string
 ): { value: string; nodeId: string; property: string }[] {
 	if (typeof value !== 'string') return [];
-	const contextRegex = /\$context\.(\d+|input|memory)\.(\w+)\$/g;
+	const contextRegex = /\$context\.(\d+|input|memory|pipeline)\.(\w+)\$/g;
 	const matches = value.matchAll(contextRegex);
 	const references: any[] = [];
 

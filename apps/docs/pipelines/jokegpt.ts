@@ -1,8 +1,8 @@
-import { aigur } from '#/services/aigur';
 import { z } from 'zod';
+import { aigur } from '#/services/aigur';
 
-import { gpt3Prediction, replaceString } from '@aigur/client';
 import { validateInput } from '@aigur/validate';
+import { gpt3Prediction, replaceString } from '@aigur/client';
 
 const inputSchema = z.object({
 	subject: z.string(),

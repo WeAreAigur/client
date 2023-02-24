@@ -1,5 +1,5 @@
-import { output } from './nodes/output/output';
 import { ConcreteNode, NodeAction } from './types';
+import { output } from './nodes/output/output';
 
 export class FlowBuilder<
 	Input extends Record<string, unknown>,
@@ -19,6 +19,7 @@ export class FlowBuilder<
 				: Input;
 			input: Input;
 			memory: MemoryData;
+			userId: string;
 		}) => Parameters<NodeDef>['0'],
 		getMemory?: (data: {
 			nodes: NodeDefinitions;
@@ -30,6 +31,7 @@ export class FlowBuilder<
 				? string
 				: Awaited<ReturnType<NodeDef>>;
 			memory: MemoryData;
+			userId: string;
 		}) => Partial<MemoryData>
 	) {
 		type NewNode = ConcreteNode<Parameters<NodeDef>['0'], Awaited<ReturnType<NodeDef>>, MemoryData>;
@@ -39,6 +41,7 @@ export class FlowBuilder<
 		// using this.nodes.length and not this.nodes.length - 1 because we want to setup a new node that we didnt add yet to the array
 		const output = this.createDynamicPlaceholders(this.nodes.length);
 		const prev = this.nodes.length > 0 ? this.nodes[this.nodes.length - 1] : input;
+		const userId = '$context.pipeline.userId$';
 		const node = {
 			action: nodeDefinition,
 			input: getUserInput({
@@ -46,11 +49,12 @@ export class FlowBuilder<
 				prev: prev.output,
 				input,
 				memory,
+				userId,
 			}),
 			// configure output to return a placeholder for any property accessed (e.g. $context.0.url$)
 			output: this.createDynamicPlaceholders(this.nodes.length),
 			memoryToSave: getMemory
-				? getMemory({ nodes: this.nodes, prev: prev.output, output, input, memory })
+				? getMemory({ nodes: this.nodes, prev: prev.output, output, input, memory, userId })
 				: null,
 		} as NewNode;
 
@@ -85,6 +89,7 @@ export class FlowBuilder<
 				: Input;
 			input: Input;
 			memory: MemoryData;
+			userId: string;
 		}) => Output,
 		getMemory?: (data: {
 			nodes: NodeDefinitions;
@@ -94,6 +99,7 @@ export class FlowBuilder<
 			input: Input;
 			output: Output extends ReadableStream ? string : Output;
 			memory: MemoryData;
+			userId: string;
 		}) => Partial<MemoryData>
 	) {
 		return this.node(output<Output>, getUserInput, getMemory);

@@ -1,4 +1,5 @@
 {
 	"replaceString": "ReplaceString",
+	"replaceMultipleStrings": "ReplaceMultipleStrings",
 	"enhanceWithKeywords": "EnhanceWithKeywords"
 }

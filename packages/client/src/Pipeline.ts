@@ -1,18 +1,13 @@
-import { FlowBuilder } from './builder';
-import { delay } from './delay';
-import { placeholdersToConcreteValues } from './getConcreteNodeInput';
-import { makeid } from './makeid';
-import { createContext } from './PipelineContext';
-import { retrieveConcreteMemoryData } from './retrieveMemoryData';
 import {
-	APIKeys,
-	ConcreteNode,
-	EventType,
-	PipelineConf,
-	PipelineContext,
-	PipelineProgressEvent,
-	PipelineStatusEvent,
+    APIKeys, ConcreteNode, EventType, PipelineConf, PipelineContext, PipelineProgressEvent,
+    PipelineStatusEvent
 } from './types';
+import { retrieveConcreteMemoryData } from './retrieveMemoryData';
+import { createContext } from './PipelineContext';
+import { makeid } from './makeid';
+import { placeholdersToConcreteValues } from './getConcreteNodeInput';
+import { delay } from './delay';
+import { FlowBuilder } from './builder';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -226,7 +221,7 @@ export class Pipeline<
 				do {
 					attemptCount++;
 					try {
-						const { action, input: inputPlaceholders, memoryToSave } = nodes[nodeIndex];
+						const { action, input: inputPlaceholders } = nodes[nodeIndex];
 						const contextNode = (context.values[nodeIndex] = { input: null, output: null });
 						contextNode.input = placeholdersToConcreteValues(inputPlaceholders, context.values);
 						contextNode.output = await action(contextNode.input, this.apiKeys);

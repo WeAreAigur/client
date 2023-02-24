@@ -10,11 +10,21 @@ export function createContext<Input, Output, MemoryData>(opts: {
 	const values = {
 		input: { input: opts.input, output: opts.input },
 		memory: { input: opts.memory, output: opts.memory },
+		pipeline: {
+			input: {
+				pipelineInstanceId: opts.pipelineInstanceId,
+				userId: opts.userId,
+			},
+			output: {
+				pipelineInstanceId: opts.pipelineInstanceId,
+				userId: opts.userId,
+			},
+		},
 	} as Record<string, NodeContext<any, any>>;
 	return {
 		pipelineInstanceId: opts.pipelineInstanceId,
 		input: opts.input,
-		output: {} as Output,
+		output: {} as Output extends ReadableStream<any> ? string : Output,
 		values,
 		memory: opts.memory,
 		userId: opts.userId,

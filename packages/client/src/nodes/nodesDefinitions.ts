@@ -3,6 +3,7 @@ export * from './image/textToImage/dalleBase64';
 export * from './image/textToImage/dalleUrl';
 export * from './image/textToImage/stability';
 export * from './output/output';
+export * from './text/modify/cleanContextVars';
 export * from './text/modify/enhanceWithKeywords';
 export * from './text/modify/replaceMultipleStrings';
 export * from './text/modify/replaceString';

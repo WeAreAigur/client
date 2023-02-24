@@ -1,0 +1,45 @@
+You can change the behavior of your Pipeline per user by sending the `userId` parameter when invoking a Pipeline.
+
+## Invoking With a User Id
+
+```ts invoke.ts
+myPipeline.invoke({ someProperty: someValue }, { userId: 'someUserId' });
+```
+
+## Accessing the User Id
+
+```ts pipeline.ts
+aigur.pipeline.create<{ subject: string }, { joke: string }>(
+	{
+		id: 'jokegpt',
+		flow: (flow) =>
+			flow
+        // access the userId that was passed
+        .node(supabaseQuery, ({ userId }) => ({
+          table: 'favorite_animals',
+          query: {
+            user_id: userId,
+          },
+          single: true
+        }))
+        // prev is the result of the previous node
+				.node(replaceMultipleStrings, ({ input, prev }) => ({
+					strings: {
+            subject: input.subject,
+            userAnimal: prev.favorite_animal
+          },
+					modifier: 'tell me a joke about $(subject)$ or $(userAnimal)$',
+				}))
+				.node(gpt3Prediction, ({ prev }) => ({
+					prompt: prev.text,
+				}))
+				.output(({ prev }) => ({
+					joke: prev.text,
+				})),
+	}
+);
+```
+
+## Pipeline Memory
+
+When using [Pipeline Memory](/memory) the `userId` is combined with the `pipelineId` to be the key for the memory. This way you can save memory per user per pipeline.

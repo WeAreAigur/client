@@ -24,3 +24,5 @@ export async function replaceMultipleStrings(
 		text: payload.modifier,
 	};
 }
+
+// const text = payload.modifier.replace(/\$context\..*?\..*?\$/gm, '').trim();

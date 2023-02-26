@@ -1,10 +1,8 @@
 import { NextRequest } from 'next/server';
+import { spammerIds } from '#/services/spammers';
 import { pipelines } from '#/pipelines/pipelines';
 
 import { vercelEdgeFunction } from '@aigur/client';
-
-// TODO: migrate to redis
-const spammerIds = ['vyt968pycrbfywqo', 'x4lwznbeoa7bxtmz'];
 
 export default async function handler(req: NextRequest) {
 	const { userId } = await req.clone().json();

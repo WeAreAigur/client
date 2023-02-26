@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getUserId } from '#/services/user';
+import { spammerIds } from '#/services/spammers';
 import { logsnag } from '#/services/logsnag';
 import { pipelines } from '#/pipelines/pipelines';
 
@@ -35,6 +36,9 @@ export function Chat(props: SummarizeAndReadProps) {
 				user: userId,
 			},
 		});
+		if (spammerIds.includes(userId)) {
+			return;
+		}
 
 		if (inputRef.current) {
 			inputRef.current.setSelectionRange(0, inputRef.current.value.length);

@@ -210,6 +210,7 @@ export class Pipeline<
 					context,
 					data: {
 						node: nodes[nodeIndex].action.name,
+						tag: nodes[nodeIndex].tag ?? '',
 						index: nodeIndex,
 					},
 				});
@@ -240,6 +241,7 @@ export class Pipeline<
 					context,
 					data: {
 						node: nodes[nodeIndex].action.name,
+						tag: nodes[nodeIndex].tag ?? '',
 						index: nodeIndex,
 					},
 				});

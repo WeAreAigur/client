@@ -5,7 +5,8 @@ import { pipelines } from '#/pipelines/pipelines';
 import { vercelEdgeFunction } from '@aigur/client';
 
 export default async function handler(req: NextRequest) {
-	const { userId } = await req.clone().json();
+	const { userId, input } = await req.clone().json();
+	console.log(`***userId`, userId, input);
 	if (spammerIds.includes(userId)) {
 		return new Response(JSON.stringify({}, null, 2), {
 			status: 500,

@@ -48,6 +48,7 @@ export type ConcreteNode<
 	Output extends Record<string, unknown> | ReadableStream,
 	MemoryData extends Record<string, unknown>
 > = {
+	tag?: string;
 	action: NodeAction<Input, Output>;
 	input: Input;
 	output: Output;

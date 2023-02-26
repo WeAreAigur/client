@@ -15,8 +15,6 @@ type TranscriptLine = {
 	speaker: 'You' | 'Bot';
 };
 
-const spammerIds = ['vyt968pycrbfywqo'];
-
 export function Chat(props: SummarizeAndReadProps) {
 	const [text, setText] = useState<string>('');
 	const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
@@ -37,9 +35,7 @@ export function Chat(props: SummarizeAndReadProps) {
 				user: userId,
 			},
 		});
-		if (spammerIds.includes(userId)) {
-			return;
-		}
+
 		if (inputRef.current) {
 			inputRef.current.setSelectionRange(0, inputRef.current.value.length);
 		}

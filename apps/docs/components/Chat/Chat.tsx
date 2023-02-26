@@ -101,7 +101,11 @@ export function Chat(props: SummarizeAndReadProps) {
 								value={text}
 								onChange={(e) => setText(e.currentTarget.value)}
 							/>
-							<button type="submit" className={`btn btn-square ${inProgress ? 'loading' : ''}`}>
+							<button
+								type="submit"
+								className={`btn btn-square ${inProgress ? 'loading' : ''}`}
+								disabled={!text}
+							>
 								{inProgress ? '' : 'GO'}
 							</button>
 						</div>

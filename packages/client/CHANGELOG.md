@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.4.0
+
+### Minor Changes
+
+- 8fcb638d: Add node tag property to help with cross-server notifications
+
 ## 1.3.0
 
 ### Minor Changes

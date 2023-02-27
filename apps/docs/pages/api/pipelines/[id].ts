@@ -8,7 +8,7 @@ export default async function handler(req: NextRequest) {
 	const { userId, input } = await req.clone().json();
 	console.log(`***spammerIds`, spammerIds);
 	console.log(`***userId`, userId, input);
-	if (spammerIds.includes(userId)) {
+	if (spammerIds.includes(userId.toLowerCase())) {
 		console.log(`spammer!`);
 		return new Response(JSON.stringify({}, null, 2), {
 			status: 500,

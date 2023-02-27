@@ -36,7 +36,7 @@ export function Chat(props: SummarizeAndReadProps) {
 				user: userId,
 			},
 		});
-		if (spammerIds.includes(userId)) {
+		if (spammerIds.includes(userId.toLowerCase())) {
 			return;
 		}
 

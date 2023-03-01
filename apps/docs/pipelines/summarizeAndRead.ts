@@ -1,12 +1,9 @@
 import { aigur } from '#/services/aigur';
 
-import {
-	googleTextToSpeech,
-	gpt3Prediction,
-	replaceString,
-	stringToArrayBuffer,
-} from '@aigur/client';
 import { supabaseUpload } from '@aigur/supabase';
+import {
+    googleTextToSpeech, gpt3TurboPrediction, replaceString, stringToArrayBuffer
+} from '@aigur/client';
 
 export const summarizeAndReadPipeline = aigur.pipeline.create<
 	{ text: string },
@@ -20,8 +17,13 @@ export const summarizeAndReadPipeline = aigur.pipeline.create<
 				text: input.text,
 				modifier: '$(text)$\n\nTl;dr',
 			}))
-			.node(gpt3Prediction, ({ prev }) => ({
-				prompt: prev.text,
+			.node(gpt3TurboPrediction, ({ prev }) => ({
+				messages: [
+					{
+						role: 'user',
+						content: prev.text,
+					},
+				] as any,
 			}))
 			.node(googleTextToSpeech, ({ prev }) => ({
 				text: prev.text,

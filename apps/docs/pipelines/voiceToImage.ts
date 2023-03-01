@@ -1,14 +1,10 @@
 import { aigur } from '#/services/aigur';
 
-import {
-	enhanceWithKeywords,
-	gpt3Prediction,
-	replaceString,
-	stabilityTextToImage,
-	stringToArrayBuffer,
-	whisperApi,
-} from '@aigur/client';
 import { supabaseUpload } from '@aigur/supabase';
+import {
+    enhanceWithKeywords, gpt3TurboPrediction, replaceString, stabilityTextToImage,
+    stringToArrayBuffer, whisperApi
+} from '@aigur/client';
 
 export const voiceToImagePipeline = aigur.pipeline.create<
 	{ audio: string },
@@ -34,8 +30,13 @@ export const voiceToImagePipeline = aigur.pipeline.create<
 			.node(enhanceWithKeywords, ({ prev }) => ({
 				text: prev.text,
 			}))
-			.node(gpt3Prediction, ({ prev }) => ({
-				prompt: prev.text,
+			.node(gpt3TurboPrediction, ({ prev }) => ({
+				messages: [
+					{
+						role: 'user',
+						content: prev.text,
+					},
+				] as any,
 			}))
 			.node(replaceString, ({ prev }) => ({
 				text: prev.text,

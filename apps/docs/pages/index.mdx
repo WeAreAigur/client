@@ -28,7 +28,7 @@ This pipeline takes an audio recording of a prompt, transcribes it using Whisper
 import { aigur } from '#/services/aigur';
 import {
   enhanceWithKeywords,
-  gpt3Prediction,
+  gpt3TurboPrediction,
   replaceString,
   stabilityTextToImage,
   stringToArrayBuffer,
@@ -59,8 +59,13 @@ export const voiceToImagePipeline = aigur.pipeline.create<
       .node(enhanceWithKeywords, ({ prev }) => ({
         text: prev.text,
       }))
-      .node(gpt3Prediction, ({ prev }) => ({
-        prompt: prev.text,
+      .node(gpt3TurboPrediction, ({ prev }) => ({
+        messages: [
+         {
+          role: 'user',
+          content: prev.text,
+         }
+       ]
       }))
       .node(replaceString, ({ prev }) => ({
         text: prev.text,
@@ -201,7 +206,7 @@ This pipeline takes a long text, summarizes it with GPT3 and converts the result
 import { aigur } from '#/services/aigur';
 import {
  googleTextToSpeech,
- gpt3Prediction,
+ gpt3TurboPrediction,
  replaceString,
  stringToArrayBuffer,
 } from '@aigur/client';
@@ -215,28 +220,33 @@ export const summarizeAndReadPipeline = aigur.pipeline.create<
  flow: (flow) =>
   flow
    .node(replaceString, ({ input }) => ({
-    text: input.text,
-    modifier: '$(text)$\n\nTl;dr',
+     text: input.text,
+     modifier: '$(text)$\n\nTl;dr',
    }))
-   .node(gpt3Prediction, ({ prev }) => ({
-    prompt: prev.text,
+   .node(gpt3TurboPrediction, ({ prev }) => ({
+     messages: [
+      {
+       role: 'user',
+       content: prev.text,
+      },
+     ]
    }))
    .node(googleTextToSpeech, ({ prev }) => ({
-    text: prev.text,
+     text: prev.text,
    }))
    .node(stringToArrayBuffer, ({ prev }) => ({
-    string: prev.audio,
+     string: prev.audio,
    }))
    .node(supabaseUpload, ({ prev }) => ({
-    bucket: 'audio',
-    extension: 'mp3',
-    file: prev.arrayBuffer,
-    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
-    supabaseUrl: process.env.SUPABASE_URL!,
+     bucket: 'audio',
+     extension: 'mp3',
+     file: prev.arrayBuffer,
+     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
+     supabaseUrl: process.env.SUPABASE_URL!,
    }))
    .output(({ prev, nodes }) => ({
-    url: prev.url,
-    summary: nodes[1].output.text,
+     url: prev.url,
+     summary: nodes[1].output.text,
    })),
 });
 ```

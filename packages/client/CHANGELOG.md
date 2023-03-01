@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.5.2
+
+### Patch Changes
+
+- 440dab44: fix node name
+
 ## 1.5.0
 
 ### Minor Changes

@@ -97,25 +97,30 @@ This pipeline takes an image, labels it with Google's Vision API and creates a p
 <ImageToPoem>
 ```ts index.ts
 import { aigur } from '#/services/aigur';
-import { googleImageLabeling, gpt3PredictionStream, replaceString } from '@aigur/client';
+import { googleImageLabeling, gpt3TurboStreamPrediction, replaceString } from '@aigur/client';
 
 export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }, ReadableStream>({
-  id: 'imageToPoemStream',
-  stream: true,
-  flow: (flow) =>
-    flow
-      .node(googleImageLabeling, ({ input }) => ({
-        image: input.image,
-      }))
-      .node(replaceString, ({ prev }) => ({
-        text: prev.labels,
-        modifier:
-          `Write a very short poem about an image with the following entities:\n$(text)$\n`,
-      }))
-      .node(gpt3PredictionStream, ({ prev }) => ({
-        prompt: prev.text,
-      }))
-      .output(({ prev }) => prev.stream),
+ id: 'imageToPoemStream',
+ stream: true,
+ flow: (flow) =>
+  flow
+   .node(googleImageLabeling, ({ input }) => ({
+    image: input.image,
+   }))
+   .node(replaceString, ({ prev }) => ({
+    text: prev.labels,
+    modifier:
+     `Write a very short poem about an image with the following entities:\n$(text)$\n`,
+   }))
+   .node(gpt3TurboStreamPrediction, ({ prev }) => ({
+    messages: [
+     {
+      role: 'user',
+      content: prev.text,
+     },
+    ]
+   }))
+   .output(({ prev }) => prev.stream),
 });
 ```
 </ImageToPoem>
@@ -141,10 +146,10 @@ import { gpt3PredictionStream, replaceString } from '@aigur/client';
 import { chatPrompt } from './chatPrompt';
 
 export const aigur = createClient({
-	apiKeys: {
-		openai: process.env.OPENAI_KEY!,
-	},
-	memoryManager: createUpstashRedisMemory(),
+ apiKeys: {
+  openai: process.env.OPENAI_KEY!,
+ },
+ memoryManager: createUpstashRedisMemory(),
 });
 
 
@@ -174,8 +179,13 @@ export const chatPipeline = aigur.pipeline.create<
     },
     modifier: `$(chatPrompt)$\n $(text)$`,
    }))
-   .node(gpt3PredictionStream, ({ prev }) => ({
-    prompt: prev.text,
+   .node(gpt3TurboStreamPrediction, ({ prev }) => ({
+    messages: [
+     {
+      role: 'user',
+      content: prev.text,
+     },
+    ],
    }))
    .output(({ prev }) => prev.stream),
 });
@@ -194,44 +204,44 @@ This pipeline takes a long text, summarizes it with GPT3 and converts the result
 ```ts index.ts
 import { aigur } from '#/services/aigur';
 import {
-	googleTextToSpeech,
-	gpt3Prediction,
-	replaceString,
-	stringToArrayBuffer,
+ googleTextToSpeech,
+ gpt3Prediction,
+ replaceString,
+ stringToArrayBuffer,
 } from '@aigur/client';
 import { supabaseUpload } from '@aigur/supabase';
 
 export const summarizeAndReadPipeline = aigur.pipeline.create<
-	{ text: string },
-	{ url: string; summary: string }
+ { text: string },
+ { url: string; summary: string }
 >({
-	id: 'summarizeAndRead',
-	flow: (flow) =>
-		flow
-			.node(replaceString, ({ input }) => ({
-				text: input.text,
-				modifier: '$(text)$\n\nTl;dr',
-			}))
-			.node(gpt3Prediction, ({ prev }) => ({
-				prompt: prev.text,
-			}))
-			.node(googleTextToSpeech, ({ prev }) => ({
-				text: prev.text,
-			}))
-			.node(stringToArrayBuffer, ({ prev }) => ({
-				string: prev.audio,
-			}))
-			.node(supabaseUpload, ({ prev }) => ({
-				bucket: 'audio',
-				extension: 'mp3',
-				file: prev.arrayBuffer,
-				supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
-				supabaseUrl: process.env.SUPABASE_URL!,
-			}))
-			.output(({ prev, nodes }) => ({
-				url: prev.url,
-				summary: nodes[1].output.text,
-			})),
+ id: 'summarizeAndRead',
+ flow: (flow) =>
+  flow
+   .node(replaceString, ({ input }) => ({
+    text: input.text,
+    modifier: '$(text)$\n\nTl;dr',
+   }))
+   .node(gpt3Prediction, ({ prev }) => ({
+    prompt: prev.text,
+   }))
+   .node(googleTextToSpeech, ({ prev }) => ({
+    text: prev.text,
+   }))
+   .node(stringToArrayBuffer, ({ prev }) => ({
+    string: prev.audio,
+   }))
+   .node(supabaseUpload, ({ prev }) => ({
+    bucket: 'audio',
+    extension: 'mp3',
+    file: prev.arrayBuffer,
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY!,
+    supabaseUrl: process.env.SUPABASE_URL!,
+   }))
+   .output(({ prev, nodes }) => ({
+    url: prev.url,
+    summary: nodes[1].output.text,
+   })),
 });
 ```
 </SummarizeAndRead>

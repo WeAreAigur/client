@@ -1,26 +1,25 @@
 import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 
-import { gpt3PredictionInputSchema as gpt3BaseInputSchema } from './gpt3';
+import { gpt3TurboInputSchema as gpt3TurboBaseInputSchema } from './gpt3-turbo';
 
-import type { APIKeys } from '#/types';
-
-const inputSchema = gpt3BaseInputSchema.merge(
+import type { APIKeys } from '../../../types';
+const inputSchema = gpt3TurboBaseInputSchema.merge(
 	z.object({
 		stream: z.literal(true).optional().default(true),
 	})
 );
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	stream: z.instanceof(globalThis.ReadableStream ?? Object),
 });
 
-export async function gpt3PredictionStream(
+export async function gpt3TurboStreamPrediction(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
-	const response = await fetch('https://api.openai.com/v1/completions', {
+	const response = await fetch('https://api.openai.com/v1/chat/completions', {
 		headers: {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${apiKeys.openai}`,
@@ -50,10 +49,7 @@ async function OpenAIStream(response: Response) {
 					}
 					try {
 						const json = JSON.parse(data);
-						const text = json.choices[0].text;
-						if (counter < 2 && (text.match(/\n/) || []).length) {
-							return;
-						}
+						const text = json.choices[0]?.delta.content;
 						const queue = encoder.encode(text);
 						controller.enqueue(queue);
 						counter++;

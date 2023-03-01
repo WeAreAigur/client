@@ -1,4 +1,6 @@
 {
 	"gpt3": "GPT3",
-	"gpt3.stream": "GPT3Stream"
+	"gpt3.stream": "GPT3Stream",
+	"gpt3turbo": "GPT3.5_Turbo",
+	"gpt3turbo.stream": "GPT3.5_TurboStream"
 }

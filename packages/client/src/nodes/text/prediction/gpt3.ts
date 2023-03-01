@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { APIKeys } from '../../../types';
 
-export const inputSchema = z.object({
+export const gpt3PredictionInputSchema = z.object({
 	prompt: z.string(),
 	model: z
 		.enum([
@@ -22,15 +22,15 @@ export const inputSchema = z.object({
 	n: z.number().default(1),
 });
 
-export const outputSchema = z.object({
+export const gpt3PredictionOutputSchema = z.object({
 	text: z.string(),
 });
 
 export async function gpt3Prediction(
-	input: z.input<typeof inputSchema>,
+	input: z.input<typeof gpt3PredictionInputSchema>,
 	apiKeys: APIKeys
-): Promise<z.infer<typeof outputSchema>> {
-	const payload = inputSchema.parse(input);
+): Promise<z.infer<typeof gpt3PredictionOutputSchema>> {
+	const payload = gpt3PredictionInputSchema.parse(input);
 	const response = await fetch('https://api.openai.com/v1/completions', {
 		headers: {
 			'Content-Type': 'application/json',

@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.5.0
+
+### Minor Changes
+
+- fdcf913b: support gpt-3.5-turbo model
+
 ## 1.4.0
 
 ### Minor Changes

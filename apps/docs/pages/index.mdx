@@ -28,7 +28,7 @@ This pipeline takes an audio recording of a prompt, transcribes it using Whisper
 import { aigur } from '#/services/aigur';
 import {
   enhanceWithKeywords,
-  gpt3TurboPrediction,
+  gpt3Prediction,
   replaceString,
   stabilityTextToImage,
   stringToArrayBuffer,
@@ -59,13 +59,8 @@ export const voiceToImagePipeline = aigur.pipeline.create<
       .node(enhanceWithKeywords, ({ prev }) => ({
         text: prev.text,
       }))
-      .node(gpt3TurboPrediction, ({ prev }) => ({
-        messages: [
-         {
-          role: 'user',
-          content: prev.text,
-         }
-       ]
+      .node(gpt3Prediction, ({ prev }) => ({
+        prompt: prev.text,
       }))
       .node(replaceString, ({ prev }) => ({
         text: prev.text,
@@ -102,7 +97,7 @@ This pipeline takes an image, labels it with Google's Vision API and creates a p
 <ImageToPoem>
 ```ts index.ts
 import { aigur } from '#/services/aigur';
-import { googleImageLabeling, gpt3TurboPredictionStream, replaceString } from '@aigur/client';
+import { googleImageLabeling, gpt3PredictionStream, replaceString } from '@aigur/client';
 
 export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }, ReadableStream>({
  id: 'imageToPoemStream',
@@ -117,13 +112,8 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }
     modifier:
      `Write a very short poem about an image with the following entities:\n$(text)$\n`,
    }))
-   .node(gpt3TurboPredictionStream, ({ prev }) => ({
-    messages: [
-     {
-      role: 'user',
-      content: prev.text,
-     },
-    ]
+   .node(gpt3PredictionStream, ({ prev }) => ({
+    prompt: prev.text,
    }))
    .output(({ prev }) => prev.stream),
 });
@@ -180,13 +170,8 @@ export const chatPipeline = aigur.pipeline.create<
     },
     modifier: `$(chatPrompt)$\n $(text)$`,
    }))
-   .node(gpt3TurboPredictionStream, ({ prev }) => ({
-    messages: [
-     {
-      role: 'user',
-      content: prev.text,
-     },
-    ],
+   .node(gpt3PredictionStream, ({ prev }) => ({
+    prompt: prev.text,
    }))
    .output(({ prev }) => prev.stream),
 });
@@ -206,7 +191,7 @@ This pipeline takes a long text, summarizes it with GPT3 and converts the result
 import { aigur } from '#/services/aigur';
 import {
  googleTextToSpeech,
- gpt3TurboPrediction,
+ gpt3Prediction,
  replaceString,
  stringToArrayBuffer,
 } from '@aigur/client';
@@ -223,13 +208,8 @@ export const summarizeAndReadPipeline = aigur.pipeline.create<
      text: input.text,
      modifier: '$(text)$\n\nTl;dr',
    }))
-   .node(gpt3TurboPrediction, ({ prev }) => ({
-     messages: [
-      {
-       role: 'user',
-       content: prev.text,
-      },
-     ]
+   .node(gpt3Prediction, ({ prev }) => ({
+     prompt: prev.text,
    }))
    .node(googleTextToSpeech, ({ prev }) => ({
      text: prev.text,

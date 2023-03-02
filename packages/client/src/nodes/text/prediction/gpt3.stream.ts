@@ -30,7 +30,6 @@ export async function gpt3PredictionStream(
 		payload.model === 'gpt-3.5-turbo'
 			? 'https://api.openai.com/v1/chat/completions'
 			: 'https://api.openai.com/v1/completions';
-	console.log(`***endpoint`, endpoint);
 	const response = await fetch(endpoint, {
 		headers: {
 			'Content-Type': 'application/json',

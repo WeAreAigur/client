@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.7.0
+
+### Minor Changes
+
+- f5490b7e: Export node input/output schemas
+
 ## 1.6.2
 
 ### Patch Changes

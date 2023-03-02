@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.6.0
+
+### Minor Changes
+
+- c52b87a3: gpt3 node defaults to gpt-3.5-turbo
+
 ## 1.5.2
 
 ### Patch Changes

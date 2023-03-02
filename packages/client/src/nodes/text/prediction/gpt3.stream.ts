@@ -26,7 +26,6 @@ export async function gpt3PredictionStream(
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
-	console.log(`***payload`, payload);
 	const endpoint =
 		payload.model === 'gpt-3.5-turbo'
 			? 'https://api.openai.com/v1/chat/completions'

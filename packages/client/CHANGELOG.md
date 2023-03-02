@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.6.1
+
+### Patch Changes
+
+- eee80567: remove excess log
+
 ## 1.6.0
 
 ### Minor Changes

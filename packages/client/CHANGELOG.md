@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.6.2
+
+### Patch Changes
+
+- 100379be: remove log
+
 ## 1.6.1
 
 ### Patch Changes

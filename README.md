@@ -23,19 +23,19 @@ export const aigur = createClient({
 
 export const jokeGptPipeline = aigur.pipeline
   .create<{ subject: string }, { joke: string }>({
-   id: 'jokegpt',
-   flow: (flow) =>
-    flow
-     .node(replaceString, ({ input }) => ({
-      text: input.subject,
-      modifier: 'tell me a joke about $(text)$',
-     }))
-     .node(gpt3Prediction, ({ prev }) => ({
-      prompt: prev.text,
-     }))
-     .output(({ prev }) => ({
-      joke: prev.text,
-     })
+    id: 'jokegpt',
+     flow: (flow) =>
+       flow
+         .node(replaceString, ({ input }) => ({
+           text: input.subject,
+           modifier: 'tell me a joke about $(text)$',
+         }))
+         .node(gpt3Prediction, ({ prev }) => ({
+           prompt: prev.text,
+         }))
+         .output(({ prev }) => ({
+           joke: prev.text,
+         })
   });
 
 const { joke } = await jokeGptPipeline.invoke({

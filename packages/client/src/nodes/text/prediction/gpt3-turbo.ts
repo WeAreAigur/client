@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { APIKeys } from '../../../types';
 
-export const gpt3TurboInputSchema = z.object({
+export const inputSchema = z.object({
 	messages: z
 		.array(
 			z.object({
@@ -20,15 +20,15 @@ export const gpt3TurboInputSchema = z.object({
 	n: z.number().default(1),
 });
 
-export const gpt3TurboOutputSchema = z.object({
+export const outputSchema = z.object({
 	text: z.string(),
 });
 
 export async function gpt3TurboPrediction(
-	input: z.input<typeof gpt3TurboInputSchema>,
+	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
-): Promise<z.infer<typeof gpt3TurboOutputSchema>> {
-	const payload = gpt3TurboInputSchema.parse(input);
+): Promise<z.infer<typeof outputSchema>> {
+	const payload = inputSchema.parse(input);
 	const response = await fetch('https://api.openai.com/v1/chat/completions', {
 		headers: {
 			'Content-Type': 'application/json',

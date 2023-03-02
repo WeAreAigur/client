@@ -44,7 +44,7 @@ export const turboTransformer = <T>(
 	return val;
 };
 
-const inputSchema = rawInputSchema.transform((val) =>
+export const inputSchema = rawInputSchema.transform((val) =>
 	turboTransformer<z.input<typeof rawInputSchema>>(val)
 );
 

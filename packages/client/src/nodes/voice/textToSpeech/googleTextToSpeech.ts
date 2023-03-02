@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { APIKeys } from '../../../types';
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	text: z.string(),
 	speakingRate: z.number().min(0.25).max(4).optional().default(1),
 	pitch: z.number().min(-20).max(20).optional().default(0),
@@ -72,7 +72,7 @@ const inputSchema = z.object({
 		}),
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	audio: z.string(), // base64
 });
 

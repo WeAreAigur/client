@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	string: z.string(), // base64
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	arrayBuffer: z.instanceof(ArrayBuffer),
 });
 

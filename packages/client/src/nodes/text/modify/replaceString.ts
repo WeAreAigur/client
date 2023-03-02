@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	text: z.string().or(z.array(z.string())),
 	modifier: z.string(),
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	text: z.string(),
 });
 

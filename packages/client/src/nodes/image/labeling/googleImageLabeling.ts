@@ -2,11 +2,11 @@ import { z } from 'zod';
 
 import type { APIKeys } from '../../../types';
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	image: z.string(), // base64
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	labels: z.array(z.string()),
 });
 

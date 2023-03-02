@@ -1,6 +1,6 @@
 import { aigur } from '#/services/aigur';
 
-import { googleImageLabeling, gpt3TurboPredictionStream, replaceString } from '@aigur/client';
+import { googleImageLabeling, gpt3PredictionStream, replaceString } from '@aigur/client';
 
 export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }, ReadableStream>({
 	id: 'imageToPoemStream',
@@ -15,13 +15,8 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }
 				text: prev.labels,
 				modifier: 'Write a very short poem about an image with the following entities:\n$(text)$\n',
 			}))
-			.node(gpt3TurboPredictionStream, ({ prev }) => ({
-				messages: [
-					{
-						role: 'user',
-						content: prev.text,
-					},
-				] as any,
+			.node(gpt3PredictionStream, ({ prev }) => ({
+				prompt: prev.text,
 			}))
 			.output(({ prev }) => prev.stream),
 });

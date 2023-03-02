@@ -2,7 +2,7 @@ import { aigur } from '#/services/aigur';
 
 import { supabaseUpload } from '@aigur/supabase';
 import {
-    googleTextToSpeech, gpt3TurboPrediction, replaceString, stringToArrayBuffer
+    googleTextToSpeech, gpt3Prediction, replaceString, stringToArrayBuffer
 } from '@aigur/client';
 
 export const summarizeAndReadPipeline = aigur.pipeline.create<
@@ -17,13 +17,8 @@ export const summarizeAndReadPipeline = aigur.pipeline.create<
 				text: input.text,
 				modifier: '$(text)$\n\nTl;dr',
 			}))
-			.node(gpt3TurboPrediction, ({ prev }) => ({
-				messages: [
-					{
-						role: 'user',
-						content: prev.text,
-					},
-				] as any,
+			.node(gpt3Prediction, ({ prev }) => ({
+				prompt: prev.text,
 			}))
 			.node(googleTextToSpeech, ({ prev }) => ({
 				text: prev.text,

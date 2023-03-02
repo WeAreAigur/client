@@ -36,8 +36,6 @@ async function OpenAIStream(response: Response) {
 	const encoder = new TextEncoder();
 	const decoder = new TextDecoder();
 
-	let counter = 0;
-
 	const stream = new ReadableStream({
 		async start(controller) {
 			function onParse(event: ParsedEvent | ReconnectInterval) {
@@ -52,7 +50,6 @@ async function OpenAIStream(response: Response) {
 						const text = json.choices[0]?.delta.content;
 						const queue = encoder.encode(text);
 						controller.enqueue(queue);
-						counter++;
 					} catch (e) {
 						controller.error(e);
 					}

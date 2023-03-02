@@ -1,14 +1,20 @@
 import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 
-import { gpt3PredictionInputSchema as gpt3BaseInputSchema } from './gpt3';
+import { rawInputSchema as gpt3BaseInputSchema, turboTransformer } from './gpt3';
 
 import type { APIKeys } from '#/types';
 
-const inputSchema = gpt3BaseInputSchema.merge(
-	z.object({
-		stream: z.literal(true).optional().default(true),
-	})
+const rawIinputSchema = gpt3BaseInputSchema
+	.merge(
+		z.object({
+			stream: z.literal(true).optional().default(true),
+		})
+	)
+	.strict();
+
+const inputSchema = rawIinputSchema.transform((val) =>
+	turboTransformer<z.input<typeof gpt3BaseInputSchema>>(val)
 );
 
 const outputSchema = z.object({
@@ -20,7 +26,13 @@ export async function gpt3PredictionStream(
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const payload = inputSchema.parse(input);
-	const response = await fetch('https://api.openai.com/v1/completions', {
+	console.log(`***payload`, payload);
+	const endpoint =
+		payload.model === 'gpt-3.5-turbo'
+			? 'https://api.openai.com/v1/chat/completions'
+			: 'https://api.openai.com/v1/completions';
+	console.log(`***endpoint`, endpoint);
+	const response = await fetch(endpoint, {
 		headers: {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${apiKeys.openai}`,
@@ -29,15 +41,20 @@ export async function gpt3PredictionStream(
 		body: JSON.stringify(payload),
 	});
 
-	const stream = await OpenAIStream(response);
+	const stream = await OpenAIStream(payload, response);
 	return { stream };
 }
 
-async function OpenAIStream(response: Response) {
+async function OpenAIStream(
+	payload:
+		| z.input<typeof inputSchema>
+		| (Omit<z.input<typeof inputSchema>, 'prompt'> & {
+				messages: Array<{ role: string; content: string }>;
+		  }),
+	response: Response
+) {
 	const encoder = new TextEncoder();
 	const decoder = new TextDecoder();
-
-	let counter = 0;
 
 	const stream = new ReadableStream({
 		async start(controller) {
@@ -50,13 +67,12 @@ async function OpenAIStream(response: Response) {
 					}
 					try {
 						const json = JSON.parse(data);
-						const text = json.choices[0].text;
-						if (counter < 2 && (text.match(/\n/) || []).length) {
-							return;
-						}
+						const text =
+							payload.model === 'gpt-3.5-turbo'
+								? json.choices[0]?.delta.content
+								: json.choices[0].text;
 						const queue = encoder.encode(text);
 						controller.enqueue(queue);
-						counter++;
 					} catch (e) {
 						controller.error(e);
 					}

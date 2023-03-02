@@ -20,7 +20,7 @@ export const stabilityClipGuidancePreset = z.enum([
 	'SLOWEST',
 ]);
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	text_prompts: z
 		.array(
 			z.object({
@@ -68,7 +68,7 @@ const inputSchema = z.object({
 		),
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	result: z.instanceof(ArrayBuffer),
 });
 

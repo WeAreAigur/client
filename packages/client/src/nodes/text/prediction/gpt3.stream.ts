@@ -13,11 +13,11 @@ const rawIinputSchema = gpt3BaseInputSchema
 	)
 	.strict();
 
-const inputSchema = rawIinputSchema.transform((val) =>
+export const inputSchema = rawIinputSchema.transform((val) =>
 	turboTransformer<z.input<typeof gpt3BaseInputSchema>>(val)
 );
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	stream: z.instanceof(globalThis.ReadableStream ?? Object),
 });
 

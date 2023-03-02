@@ -2,13 +2,13 @@ import { z } from 'zod';
 
 import type { APIKeys } from '../../../types';
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	prompt: z.string(),
 	response_format: z.literal('b64_json').default('b64_json'),
 	size: z.enum(['256x256', '512x512', '1024x1024']).default('512x512'),
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	result: z.string(),
 });
 

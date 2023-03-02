@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 
-import { gpt3TurboInputSchema as gpt3TurboBaseInputSchema } from './gpt3-turbo';
+import { inputSchema as gpt3TurboBaseInputSchema } from './gpt3-turbo';
 
 import type { APIKeys } from '../../../types';
-const inputSchema = gpt3TurboBaseInputSchema.merge(
+
+export const inputSchema = gpt3TurboBaseInputSchema.merge(
 	z.object({
 		stream: z.literal(true).optional().default(true),
 	})

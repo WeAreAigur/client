@@ -4,7 +4,7 @@ import type { APIKeys } from '../../../../types';
 
 const endpoint = 'https://transcribe.whisperapi.com';
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
 	audioUrl: z.string().url(),
 	language: z.string().default('en'),
 	autoDetectLanguage: z.boolean().default(false),
@@ -12,7 +12,7 @@ const inputSchema = z.object({
 	task: z.enum(['transcribe', 'translate']).default('transcribe'),
 });
 
-const outputSchema = z.object({
+export const outputSchema = z.object({
 	text: z.string(),
 });
 

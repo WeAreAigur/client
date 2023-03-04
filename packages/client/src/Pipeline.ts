@@ -1,13 +1,18 @@
-import {
-    APIKeys, ConcreteNode, EventType, PipelineConf, PipelineContext, PipelineProgressEvent,
-    PipelineStatusEvent
-} from './types';
-import { retrieveConcreteMemoryData } from './retrieveMemoryData';
-import { createContext } from './PipelineContext';
-import { makeid } from './makeid';
-import { placeholdersToConcreteValues } from './getConcreteNodeInput';
-import { delay } from './delay';
 import { FlowBuilder } from './builder';
+import { delay } from './delay';
+import { placeholdersToConcreteValues } from './getConcreteNodeInput';
+import { makeid } from './makeid';
+import { createContext } from './PipelineContext';
+import { retrieveConcreteMemoryData } from './retrieveMemoryData';
+import {
+	APIKeys,
+	ConcreteNode,
+	EventType,
+	PipelineConf,
+	PipelineContext,
+	PipelineProgressEvent,
+	PipelineStatusEvent,
+} from './types';
 
 const DEFAULT_RETRIES = 2;
 const RETRY_DELAY_IN_MS = 350;
@@ -249,15 +254,19 @@ export class Pipeline<
 					await nodeEndPromise;
 				}
 			}
+
+			context.output = context.values[nodes.length - 1].output;
+			console.log(`sending pipeline finish`, {
+				output: context.output instanceof ReadableStream ? 'Stream' : context.output,
+			});
 			const pipelineFinishPromise = this.notifyEvent({
 				type: 'pipeline:finish',
 				context,
+				data: { output: context.output instanceof ReadableStream ? 'Stream' : context.output },
 			});
 			if (!this.conf.stream) {
 				await pipelineFinishPromise;
 			}
-
-			context.output = context.values[nodes.length - 1].output;
 			return context;
 		} catch (e) {
 			console.error(e);

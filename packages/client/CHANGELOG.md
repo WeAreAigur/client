@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.8.0
+
+### Minor Changes
+
+- 416c2676: add output to pipeline:finish event
+
 ## 1.7.0
 
 ### Minor Changes

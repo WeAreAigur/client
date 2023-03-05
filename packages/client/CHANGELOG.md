@@ -1,5 +1,12 @@
 # @aigur/client
 
+## 1.8.2
+
+### Patch Changes
+
+- 2c5761bb: #Please enter a summary for your co
+  export node name
+
 ## 1.8.1
 
 ### Patch Changes

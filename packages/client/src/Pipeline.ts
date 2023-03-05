@@ -256,9 +256,6 @@ export class Pipeline<
 			}
 
 			context.output = context.values[nodes.length - 1].output;
-			console.log(`sending pipeline finish`, {
-				output: context.output instanceof ReadableStream ? 'Stream' : context.output,
-			});
 			const pipelineFinishPromise = this.notifyEvent({
 				type: 'pipeline:finish',
 				context,

@@ -1,9 +1,9 @@
-import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { z } from 'zod';
 
 import { rawInputSchema as gpt3BaseInputSchema, turboTransformer } from './gpt3';
 
-import type { APIKeys } from '#/types';
+import type { APIKeys } from '../../../types';
 
 const rawIinputSchema = gpt3BaseInputSchema
 	.merge(

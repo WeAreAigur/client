@@ -86,3 +86,5 @@ async function OpenAIStream(
 
 	return stream;
 }
+
+export const name = 'gpt3PredictionStream';

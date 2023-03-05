@@ -109,3 +109,5 @@ export async function googleTextToSpeech(
 		audio: data.audioContent,
 	};
 }
+
+export const name = 'googleTextToSpeech';

@@ -50,3 +50,5 @@ export async function whisperApi(
 	const data = await result.json();
 	return { text: data.text.trim() };
 }
+
+export const name = 'whisperApi';

@@ -18,3 +18,5 @@ export async function stringToArrayBuffer(
 		arrayBuffer: typedArray.buffer,
 	};
 }
+
+export const name = 'stringToArrayBuffer';

@@ -41,3 +41,5 @@ export async function enhanceWithKeywords(
 		text: enhancedText,
 	};
 }
+
+export const name = 'enhanceWithKeywords';

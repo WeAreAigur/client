@@ -3,3 +3,5 @@ export async function output<PipelineOutput extends Record<string, unknown> | Re
 ): Promise<PipelineOutput> {
 	return input;
 }
+
+export const name = 'output';

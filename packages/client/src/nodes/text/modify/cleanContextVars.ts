@@ -17,3 +17,5 @@ export async function cleanContextVars(
 		text: payload.text.replace(/\$context\..*?\..*?\$/gm, '').trim(),
 	};
 }
+
+export const name = 'cleanContextVars';

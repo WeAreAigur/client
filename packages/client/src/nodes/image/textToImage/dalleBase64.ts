@@ -33,3 +33,5 @@ export async function dalleBase64TextToImage(
 		result: data[0].b64_json,
 	};
 }
+
+export const name = 'dalleBase64TextToImage';

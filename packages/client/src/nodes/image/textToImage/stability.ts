@@ -94,3 +94,5 @@ export async function stabilityTextToImage(
 		result: image,
 	};
 }
+
+export const name = 'stabilityTextToImage';

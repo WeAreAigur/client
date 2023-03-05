@@ -41,3 +41,5 @@ export async function googleImageLabeling(
 		labels: data.responses[0].labelAnnotations.map((label) => label.description),
 	};
 }
+
+export const name = 'googleImageLabeling';

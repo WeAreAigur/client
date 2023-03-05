@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.8.1
+
+### Patch Changes
+
+- e7b1a046: fix relative import
+
 ## 1.8.0
 
 ### Minor Changes

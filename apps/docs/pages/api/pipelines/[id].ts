@@ -1,12 +1,15 @@
-import { NextRequest } from 'next/server';
-import { spammerIds } from '#/services/spammers';
 import { pipelines } from '#/pipelines/pipelines';
+import { NextRequest } from 'next/server';
 
 import { vercelEdgeFunction } from '@aigur/client';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req: NextRequest) {
-	const { userId, input } = await req.clone().json();
-	if (spammerIds.includes(userId.toLowerCase())) {
+	const { userId } = await req.clone().json();
+	const spammers = await redis.lrange('aigur-spammers', 0, -1);
+	if (spammers.includes(userId.toLowerCase())) {
 		console.log(`blocked spammer ${userId}`);
 		return new Response(JSON.stringify({}, null, 2), {
 			status: 500,

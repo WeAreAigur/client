@@ -33,3 +33,5 @@ export async function dalleUrlTextToImage(
 		url: data[0].url,
 	};
 }
+
+export const name = 'dalleUrlTextToImage';

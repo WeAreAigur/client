@@ -41,3 +41,5 @@ export async function gpt3TurboPrediction(
 	const output = await response.json();
 	return { text: output.choices[0]?.message.content.replace(/^(?:\n)+/gm, '') };
 }
+
+export const name = 'gpt3TurboPrediction';

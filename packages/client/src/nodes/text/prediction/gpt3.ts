@@ -75,3 +75,5 @@ export async function gpt3Prediction(
 		payload.model === 'gpt-3.5-turbo' ? output.choices[0]?.message.content : output.choices[0].text;
 	return { text: text.replace(/^(?:\n)+/gm, '') };
 }
+
+export const name = 'gpt3Prediction';

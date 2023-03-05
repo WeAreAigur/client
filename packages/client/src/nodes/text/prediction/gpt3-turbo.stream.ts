@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { z } from 'zod';
 
 import { inputSchema as gpt3TurboBaseInputSchema } from './gpt3-turbo';
 
@@ -66,3 +66,5 @@ async function OpenAIStream(response: Response) {
 
 	return stream;
 }
+
+export const name = 'gpt3TurboPredictionStream';

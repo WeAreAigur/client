@@ -20,3 +20,5 @@ export async function replaceString(
 		),
 	};
 }
+
+export const name = 'replaceString';

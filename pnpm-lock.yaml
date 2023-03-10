@@ -93,6 +93,7 @@ importers:
 
   packages/client:
     specifiers:
+      '@aigur/huggingface': workspace:*
       eventsource-parser: ^0.1.0
       form-data: ^4.0.0
       tsconfig: workspace:*
@@ -101,6 +102,7 @@ importers:
       vitest: ^0.28.4
       zod: ^3.20.2
     dependencies:
+      '@aigur/huggingface': link:../huggingface
       eventsource-parser: 0.1.0
       form-data: 4.0.0
       zod: 3.20.2
@@ -122,9 +124,22 @@ importers:
       eslint: 7.32.0
       eslint-config-next: 13.0.0_jofidmxrjzhj7l6vknpw5ecvfe
       eslint-config-prettier: 8.6.0_eslint@7.32.0
-      eslint-config-turbo: 0.0.8_eslint@7.32.0
+      eslint-config-turbo: 0.0.9_eslint@7.32.0
       eslint-plugin-react: 7.31.8_eslint@7.32.0
     devDependencies:
+      typescript: 4.9.5
+
+  packages/huggingface:
+    specifiers:
+      '@huggingface/inference': ^1.5.2
+      tsconfig: workspace:*
+      tsup: ^6.6.3
+      typescript: ^4.5.3
+    dependencies:
+      '@huggingface/inference': 1.5.2
+    devDependencies:
+      tsconfig: link:../tsconfig
+      tsup: 6.6.3_typescript@4.9.5
       typescript: 4.9.5
 
   packages/memory-upstash-redis:
@@ -948,6 +963,11 @@ packages:
       client-only: 0.0.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@huggingface/inference/1.5.2:
+    resolution: {integrity: sha512-n1w/HcZfJv/Xpvpat0U/6RMw3ZaFKMF3XoYuvlqWUrcYItvjdZ3krgGEIwLDkrEFnpl0c1yenMqfYDwQf3gYEw==}
+    engines: {node: '>=18'}
     dev: false
 
   /@humanwhocodes/config-array/0.5.0:
@@ -3034,13 +3054,13 @@ packages:
       eslint: 7.32.0
     dev: false
 
-  /eslint-config-turbo/0.0.8_eslint@7.32.0:
-    resolution: {integrity: sha512-ijj6uv0QX2kWahg3OYnTK1/q4MueXsqY2uE4MP9yeUA5CzVhL7GU+biKlv1BfMMqPltixHUcpZoW4yyNLCnMiw==}
+  /eslint-config-turbo/0.0.9_eslint@7.32.0:
+    resolution: {integrity: sha512-j1cTdx3tRmKo0csyfQKhpuT8dynK9oddbK5nmrShoMpXI2qMbxHLYH7MWAid4FmJN8rYympy3VKw5U63Yazycg==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
       eslint: 7.32.0
-      eslint-plugin-turbo: 0.0.8_eslint@7.32.0
+      eslint-plugin-turbo: 0.0.9_eslint@7.32.0
     dev: false
 
   /eslint-import-resolver-node/0.3.7:
@@ -3191,8 +3211,8 @@ packages:
       string.prototype.matchall: 4.0.8
     dev: false
 
-  /eslint-plugin-turbo/0.0.8_eslint@7.32.0:
-    resolution: {integrity: sha512-pExSCmjWw/KFKb3/0PVqxiWb30FbcwDEf6kKv3alvNBSVEzDHalyAGHc9klbLSG+nFmbkfNE3Ky/UHDryCqt8g==}
+  /eslint-plugin-turbo/0.0.9_eslint@7.32.0:
+    resolution: {integrity: sha512-fEsuSnYU3GLtT+s66mUuzDL1LaSieIx5uk3tPO0ToGv7hI2XzOfP24aPkQItTBGl7kq2JaVkRzPwcnfz8hkp0w==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:

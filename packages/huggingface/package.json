@@ -1,0 +1,26 @@
+{
+	"name": "@aigur/huggingface",
+	"version": "0.0.10",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"pbl": "npm publish --access public",
+		"build": "tsup src/index.ts --format cjs --dts --minify",
+		"dev": "tsup src/index.ts --format cjs --dts --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@huggingface/inference": "^1.5.2"
+	},
+	"devDependencies": {
+		"tsconfig": "workspace:*",
+		"tsup": "^6.6.3",
+		"typescript": "^4.5.3"
+	}
+}

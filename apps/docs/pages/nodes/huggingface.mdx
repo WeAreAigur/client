@@ -1,0 +1,36 @@
+## Name
+`hf`
+
+## Description
+
+The `hf` helper lets you use any Hugging Face model. It receives a callback that is passed a `HfInference` object with all the Hugging Face tasks as properties. The callback returns the HuggingFace task you want to execute. The `hf` will take the task and create an Aigur node around it.
+The input and output will then be appropriately typed.
+
+## Example
+
+```ts index.ts
+import { hf } from '@aigur/client';
+//...
+flow.node(
+  hf(hf => hf.questionAnswer),
+  ({ input }) => ({
+    model: 'deepset/roberta-base-squad2',
+    inputs: {
+      question: 'What is the capital of France?',
+      context: 'The capital of France is Paris.',
+    },
+  })
+)
+.output(({ prev }) => ({
+  capital: prev.answer, // <-- "capital" is the Pipeline's output field
+}))
+```
+
+
+## Input
+ 
+ The input depends on the task you are using.
+
+## Output
+ 
+ The output depends on the task you are using.

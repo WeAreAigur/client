@@ -1,5 +1,14 @@
 # @aigur/client
 
+## 1.9.1
+
+### Patch Changes
+
+- f6274fb3: Export hf
+- f6274fb3: configure hf package to be imported from source
+- Updated dependencies [f6274fb3]
+  - @aigur/huggingface@0.0.12
+
 ## 1.9.0
 
 ### Minor Changes

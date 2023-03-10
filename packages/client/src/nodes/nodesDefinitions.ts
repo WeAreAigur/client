@@ -1,3 +1,4 @@
+export { hf } from './huggingface';
 export { googleImageLabeling } from './image/labeling/googleImageLabeling';
 export { dalleBase64TextToImage } from './image/textToImage/dalleBase64';
 export { dalleUrlTextToImage } from './image/textToImage/dalleUrl';

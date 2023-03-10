@@ -13,7 +13,7 @@ import { hf } from '@aigur/client';
 //...
 flow.node(
   hf(hf => hf.questionAnswer),
-  ({ input }) => ({
+  () => ({
     model: 'deepset/roberta-base-squad2',
     inputs: {
       question: 'What is the capital of France?',
@@ -22,7 +22,7 @@ flow.node(
   })
 )
 .output(({ prev }) => ({
-  capital: prev.answer, // <-- "capital" is the Pipeline's output field
+  capital: prev.answer, // <-- `answer` is typed according to the `questionAnswer` task
 }))
 ```
 

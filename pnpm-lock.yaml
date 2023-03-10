@@ -93,7 +93,7 @@ importers:
 
   packages/client:
     specifiers:
-      '@aigur/huggingface': workspace:*
+      '@huggingface/inference': ^1.5.2
       eventsource-parser: ^0.1.0
       form-data: ^4.0.0
       tsconfig: workspace:*
@@ -102,7 +102,7 @@ importers:
       vitest: ^0.28.4
       zod: ^3.20.2
     dependencies:
-      '@aigur/huggingface': link:../huggingface
+      '@huggingface/inference': 1.5.2
       eventsource-parser: 0.1.0
       form-data: 4.0.0
       zod: 3.20.2

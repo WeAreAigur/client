@@ -1,5 +1,16 @@
 # @aigur/client
 
+## 1.9.0
+
+### Minor Changes
+
+- 91436811: Add support for HuggingFace models
+
+### Patch Changes
+
+- Updated dependencies [91436811]
+  - @aigur/huggingface@0.0.11
+
 ## 1.8.2
 
 ### Patch Changes

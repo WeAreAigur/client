@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.9.3
+
+### Patch Changes
+
+- 863aa79a: Internalize hf node
+
 ## 1.9.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @aigur/huggingface
 
+## 0.0.14
+
+### Patch Changes
+
+- 1614b2f0: configure hf package to publish
+
 ## 0.0.12
 
 ### Patch Changes

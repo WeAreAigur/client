@@ -1,5 +1,12 @@
 # @aigur/client
 
+## 1.9.2
+
+### Patch Changes
+
+- Updated dependencies [1614b2f0]
+  - @aigur/huggingface@0.0.14
+
 ## 1.9.1
 
 ### Patch Changes

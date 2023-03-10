@@ -3,5 +3,6 @@
 	"voice": "Voice",
 	"image": "Image",
 	"transformation": "Transformation",
-	"output": "Output"
+	"output": "Output",
+	"huggingface": "Hugging Face"
 }

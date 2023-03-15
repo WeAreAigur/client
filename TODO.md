@@ -1,7 +1,10 @@
+- tag nodes
 - stream protocol
 - split
 - loop
+  - for/while
 - fix enum in pipelines (cant set string)
 - nodes
   - image to image
   - more gpt3 apis
+  - multiple results (multiple images)

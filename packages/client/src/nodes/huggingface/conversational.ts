@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { HfInference } from '@huggingface/inference';
 
 import { APIKeys } from '../../types';
-import { optionsSchema } from '../huggingface';
+import { optionsSchema } from './huggingface';
 
 export const inputSchema = z.object({
 	model: z.string(),

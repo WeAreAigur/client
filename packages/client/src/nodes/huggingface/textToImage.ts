@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 import { HfInference } from '@huggingface/inference';
 
-import { optionsSchema } from '../huggingface';
 import { APIKeys } from '../../types';
+import { optionsSchema } from './huggingface';
 
 export const inputSchema = z.object({
 	model: z.string(),
@@ -19,7 +19,7 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-	result: z.instanceof(global.ArrayBuffer ?? Object),
+	result: z.instanceof(ArrayBuffer),
 });
 
 export async function textToImage(

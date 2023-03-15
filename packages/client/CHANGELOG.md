@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.10.0
+
+### Minor Changes
+
+- c42e895c: Add specific HuggingFace nodes
+
 ## 1.9.3
 
 ### Patch Changes

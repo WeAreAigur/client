@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.11.0
+
+### Minor Changes
+
+- ce92010e: Export and fix hf nodes
+
 ## 1.10.0
 
 ### Minor Changes

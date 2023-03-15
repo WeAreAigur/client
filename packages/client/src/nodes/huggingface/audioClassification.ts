@@ -8,9 +8,9 @@ import { APIKeys } from '../../types';
 export const inputSchema = z.object({
 	model: z.string(),
 	/**
-	 * A string to be classified
+	 * Binary audio data
 	 */
-	inputs: z.string(),
+	data: z.instanceof(global.ArrayBuffer ?? Object),
 	options: optionsSchema,
 });
 
@@ -22,23 +22,21 @@ export const outputSchema = z.object({
 			 */
 			label: z.string(),
 			/**
-			 * A floats that represents how likely is that the text belongs to this class.
+			 * A float that represents how likely it is that the audio file belongs to this class.
 			 */
 			score: z.number(),
 		})
 	),
 });
 
-export async function textClassification(
+export async function audioClassification(
 	input: z.input<typeof inputSchema>,
 	APIKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
 	const { options, ...payload } = inputSchema.parse(input);
 	const hf = new HfInference(APIKeys.huggingface);
-	const result = await hf.textClassification(payload, options);
-	return {
-		result,
-	};
+	const result = await hf.audioClassification(payload, options);
+	return { result };
 }
 
-export const name = 'textClassification';
+export const name = 'audioClassification';

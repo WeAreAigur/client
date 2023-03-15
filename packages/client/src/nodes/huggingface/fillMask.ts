@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 import { HfInference } from '@huggingface/inference';
 
-import { APIKeys } from '../../types';
 import { optionsSchema } from '../huggingface';
+import { APIKeys } from '../../types';
 
 export const inputSchema = z.object({
 	model: z.string(),
@@ -12,7 +12,7 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-	results: z.array(
+	result: z.array(
 		z.object({
 			/**
 			 * The probability for this token.
@@ -40,9 +40,9 @@ export async function fillMask(
 ): Promise<z.infer<typeof outputSchema>> {
 	const { options, ...payload } = inputSchema.parse(input);
 	const hf = new HfInference(APIKeys.huggingface);
-	const results = await hf.fillMask(payload, options);
+	const result = await hf.fillMask(payload, options);
 	return {
-		results,
+		result,
 	};
 }
 

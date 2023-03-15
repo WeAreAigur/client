@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { HfInference } from '@huggingface/inference';
 
 import { APIKeys } from '../../types';
-import { optionsSchema } from '../huggingface';
+import { optionsSchema } from './huggingface';
 
 // TODO: check if array buffer works instead of regular buffer
 export const inputSchema = z.object({
@@ -11,7 +11,7 @@ export const inputSchema = z.object({
 	/**
 	 * Binary audio data
 	 */
-	data: z.instanceof(global.ArrayBuffer ?? Object),
+	data: z.instanceof(ArrayBuffer),
 	options: optionsSchema,
 });
 

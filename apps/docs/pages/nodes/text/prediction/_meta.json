@@ -1,4 +1,6 @@
 {
+	"gpt4": "GPT4",
+	"gpt4.stream": "GPT4Stream",
 	"gpt3": "GPT3",
 	"gpt3.stream": "GPT3Stream",
 	"gpt3turbo": "GPT3Turbo",

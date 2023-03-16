@@ -40,7 +40,6 @@ export async function gpt4Prediction(
 	});
 
 	const output = await response.json();
-	console.log(`***output`, output);
 	const text = output.choices[0]?.message.content;
 	return { text: text.replace(/^(?:\n)+/gm, '') };
 }

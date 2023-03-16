@@ -1,6 +1,6 @@
 import { aigur } from '#/services/aigur';
 
-import { gpt3PredictionStream, replaceMultipleStrings } from '@aigur/client';
+import { gpt4PredictionStream, replaceMultipleStrings } from '@aigur/client';
 
 import { chatPrompt } from './chatPrompt';
 
@@ -34,8 +34,13 @@ export const chatPipeline = aigur.pipeline.create<
 				},
 				modifier: `$(chatPrompt)$\n $(text)$`,
 			}))
-			.node(gpt3PredictionStream, ({ prev }) => ({
-				prompt: prev.text,
+			.node(gpt4PredictionStream, ({ prev }) => ({
+				messages: [
+					{
+						role: 'user',
+						content: prev.text,
+					},
+				],
 			}))
 			.output(({ prev }) => prev.stream),
 });

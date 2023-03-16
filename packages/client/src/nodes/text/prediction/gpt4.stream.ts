@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
+import { inputSchema as gpt4BaseInputSchema } from './gpt4';
 import { OpenAIStream } from './openaiStream';
-import { inputSchema as gpt3TurboBaseInputSchema } from './gpt3-turbo';
 
 import type { APIKeys } from '../../../types';
-export const inputSchema = gpt3TurboBaseInputSchema.merge(
+export const inputSchema = gpt4BaseInputSchema.merge(
 	z.object({
 		stream: z.literal(true).optional().default(true),
 	})
@@ -14,7 +14,7 @@ export const outputSchema = z.object({
 	stream: z.instanceof(globalThis.ReadableStream ?? Object),
 });
 
-export async function gpt3TurboPredictionStream(
+export async function gpt4PredictionStream(
 	input: z.input<typeof inputSchema>,
 	apiKeys: APIKeys
 ): Promise<z.infer<typeof outputSchema>> {
@@ -32,4 +32,4 @@ export async function gpt3TurboPredictionStream(
 	return { stream };
 }
 
-export const name = 'gpt3TurboPredictionStream';
+export const name = 'gpt4PredictionStream';

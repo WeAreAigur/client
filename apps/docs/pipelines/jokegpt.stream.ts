@@ -1,6 +1,6 @@
 import { aigur } from '#/services/aigur';
 
-import { gpt3PredictionStream, replaceString } from '@aigur/client';
+import { gpt4PredictionStream, replaceString } from '@aigur/client';
 
 export const jokeGptPipelineStream = aigur.pipeline.create<{ subject: string }, ReadableStream>({
 	id: 'jokegptStream',
@@ -11,8 +11,13 @@ export const jokeGptPipelineStream = aigur.pipeline.create<{ subject: string }, 
 				text: input.subject,
 				modifier: 'tell me a joke about $(text)$',
 			}))
-			.node(gpt3PredictionStream, ({ prev }) => ({
-				prompt: prev.text,
+			.node(gpt4PredictionStream, ({ prev }) => ({
+				messages: [
+					{
+						role: 'user',
+						content: prev.text,
+					},
+				],
 			}))
 			.output(({ prev }) => prev.stream),
 });

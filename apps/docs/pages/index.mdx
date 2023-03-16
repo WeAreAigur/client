@@ -122,18 +122,23 @@ export const imageToPoemStreamPipeline = aigur.pipeline.create<{ image: string }
 
 ### Chatbot with Memory
 
-A simple chatbot (same model as ChatGPT) with a 1 hour memory in a few lines of code. Try asking it about facts from previous messages (**even after refreshing the page**):
+A simple chatbot (using GPT-4) with a 1 hour memory in a few lines of code. Try asking it about facts from previous messages (**even after refreshing the page**):
 
 ```
 > `My name is John`
 > `What is my name?`
 ```
 
+<Callout>
+  If you're looking for hour long conversations check out ChatGPT, they have bigger pockets than me :)
+  Please be considerate!
+</Callout>
+
 <Chat>
 ```ts index.ts
 import { createClient } from '@aigur/client';
 import { createUpstashRedisMemory } from '@aigur/memory-upstash-redis';
-import { gpt3PredictionStream, replaceString } from '@aigur/client';
+import { gpt4PredictionStream, replaceMultipleStrings } from '@aigur/client';
 import { chatPrompt } from './chatPrompt';
 
 export const aigur = createClient({
@@ -170,8 +175,13 @@ export const chatPipeline = aigur.pipeline.create<
     },
     modifier: `$(chatPrompt)$\n $(text)$`,
    }))
-   .node(gpt3PredictionStream, ({ prev }) => ({
-    prompt: prev.text,
+   .node(gpt4PredictionStream, ({ prev }) => ({
+    messages: [
+     {
+      role: 'user',
+      content: prev.text,
+     },
+    ],
    }))
    .output(({ prev }) => prev.stream),
 });

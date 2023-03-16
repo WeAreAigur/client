@@ -12,6 +12,8 @@ export { gpt3Prediction } from './text/prediction/gpt3';
 export { gpt3TurboPrediction } from './text/prediction/gpt3-turbo';
 export { gpt3TurboPredictionStream } from './text/prediction/gpt3-turbo.stream';
 export { gpt3PredictionStream } from './text/prediction/gpt3.stream';
+export { gpt4Prediction } from './text/prediction/gpt4';
+export { gpt4PredictionStream } from './text/prediction/gpt4.stream';
 export { stringToArrayBuffer } from './transformation/stringToArrayBuffer';
 export { googleTextToSpeech } from './voice/textToSpeech/googleTextToSpeech';
 export { whisperApi } from './voice/transcribe/whisper/whisperapi';

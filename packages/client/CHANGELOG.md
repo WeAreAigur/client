@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.12.0
+
+### Minor Changes
+
+- 2883a14e: Add support for GPT-4
+
 ## 1.11.0
 
 ### Minor Changes

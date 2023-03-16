@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.12.1
+
+### Patch Changes
+
+- 577ff850: Remove excess log
+
 ## 1.12.0
 
 ### Minor Changes

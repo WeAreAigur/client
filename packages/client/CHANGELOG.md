@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.12.2
+
+### Patch Changes
+
+- 86bf101e: Fix types for strict mode
+
 ## 1.12.1
 
 ### Patch Changes

@@ -1,5 +1,5 @@
-import { ConcreteNode, NodeAction } from './types';
 import { output } from './nodes/output/output';
+import { ConcreteNode, NodeAction } from './types';
 
 export class FlowBuilder<
 	Input extends Record<string, unknown>,
@@ -71,7 +71,7 @@ export class FlowBuilder<
 	private createDynamicPlaceholders(source: number | 'input' | 'memory') {
 		const output = {};
 		const safeNotInstanciatedWarningProxy = {
-			get: function (object, prop) {
+			get: function (_object: any, prop: string) {
 				return `$context.${source}.${prop}$`;
 			},
 		};

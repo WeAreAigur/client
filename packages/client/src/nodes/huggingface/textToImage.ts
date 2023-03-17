@@ -28,7 +28,7 @@ export async function textToImage(
 ): Promise<z.infer<typeof outputSchema>> {
 	const { options, ...payload } = inputSchema.parse(input);
 	const hf = new HfInference(APIKeys.huggingface);
-	const result = await hf.textToImage(payload, options);
+	const result: any = await hf.textToImage(payload, options);
 	return {
 		result,
 	};

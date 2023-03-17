@@ -11,7 +11,7 @@ export function hf<T extends HfInference[keyof HfInference]>(
 ) => Promise<ReturnType<T>> {
 	return (input: Parameters<ReturnType<typeof cb>>['0'], APIKeys: Record<string, string>) => {
 		const hf = new HfInference(APIKeys.huggingface);
-		const hfInferenceFunction = cb(hf);
+		const hfInferenceFunction: any = cb(hf);
 		return hfInferenceFunction.call(hf, input as any, options);
 	};
 }

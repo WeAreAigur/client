@@ -2,7 +2,7 @@ import { Pipeline } from './Pipeline';
 import { vercelGenericEdge } from './vercelGenericEdge';
 
 export function vercelEdgeFunction(pipelines: Record<string, Pipeline<any, any, any>>) {
-	return async (req) => {
+	return async (req: any) => {
 		const result = await vercelGenericEdge(pipelines, req);
 
 		if (result instanceof Response) {

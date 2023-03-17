@@ -1,4 +1,9 @@
-export async function vercelGenericEdge(pipelines, req) {
+import type { Pipeline } from './Pipeline';
+
+export async function vercelGenericEdge(
+	pipelines: Record<string, Pipeline<any, any, any>>,
+	req: any
+) {
 	const { pipelineInstanceId, userId, input } = await req.json();
 	const { searchParams } = new URL(req.url);
 	if (!searchParams.has('id')) {

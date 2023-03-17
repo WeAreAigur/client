@@ -12,14 +12,14 @@ export function placeholdersToConcreteValues(
 	return handleInputAsObject({ ...inputPlaceholders });
 
 	function handleInputAsObject(input: Record<string, any>) {
-		const newInput = {};
+		const newInput: Record<string, any> = {};
 		for (const key in input) {
 			newInput[key] = handleInputAsSingleValue(input[key]);
 		}
 		return newInput;
 	}
 
-	function handleInputAsSingleValue(value) {
+	function handleInputAsSingleValue(value: any) {
 		if (Array.isArray(value)) {
 			return value.map((item) => handleInputAsObject(item));
 		}

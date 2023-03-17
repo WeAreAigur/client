@@ -26,7 +26,7 @@ export const rawInputSchema = z
 	.strict();
 
 export const turboTransformer = <T>(
-	val
+	val: any
 ): T | (Omit<T, 'prompt'> & { messages: Array<{ role: string; content: string }> }) => {
 	// gpt 3.5 turbo has a different prompt schema
 	if (val.model === 'gpt-3.5-turbo') {

@@ -38,7 +38,9 @@ export async function googleImageLabeling(
 	const data = await response.json();
 
 	return {
-		labels: data.responses[0].labelAnnotations.map((label) => label.description),
+		labels: data.responses[0].labelAnnotations.map(
+			(label: { description: string }) => label.description
+		),
 	};
 }
 

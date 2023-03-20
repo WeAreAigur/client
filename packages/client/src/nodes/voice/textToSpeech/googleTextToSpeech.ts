@@ -73,7 +73,7 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-	audio: z.string(), // base64
+	audio: z.string().describe('base64'),
 });
 
 export async function googleTextToSpeech(

@@ -2,15 +2,15 @@ import { z } from 'zod';
 
 import { HfInference } from '@huggingface/inference';
 
-import { APIKeys } from '../../types';
 import { optionsSchema } from './huggingface';
+import { APIKeys } from '../../types';
 
 export const inputSchema = z.object({
 	model: z.string(),
 	/**
 	 * Binary audio data
 	 */
-	data: z.instanceof(ArrayBuffer),
+	data: z.instanceof(ArrayBuffer).describe('ArrayBuffer'),
 	options: optionsSchema,
 });
 

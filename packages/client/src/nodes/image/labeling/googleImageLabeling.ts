@@ -1,9 +1,10 @@
+import { isBase64 } from '#/nodes/base64';
 import { z } from 'zod';
 
 import type { APIKeys } from '../../../types';
 
 export const inputSchema = z.object({
-	image: z.string(), // base64
+	image: z.string().refine(isBase64, { message: 'Must be base64 string' }).describe('base64'),
 });
 
 export const outputSchema = z.object({

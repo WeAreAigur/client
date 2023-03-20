@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
+import { isBase64 } from '../base64';
+
 export const inputSchema = z.object({
-	string: z.string(), // base64
+	string: z.string().refine(isBase64, { message: 'Must be base64 string' }).describe('base64'),
 });
 
 export const outputSchema = z.object({

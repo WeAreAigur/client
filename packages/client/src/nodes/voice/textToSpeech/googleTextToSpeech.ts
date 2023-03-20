@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isBase64 } from '#/nodes/base64';
 
 import { APIKeys } from '../../../types';
 
@@ -73,7 +74,7 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-	audio: z.string(), // base64
+	audio: z.string().refine(isBase64, { message: 'Must be base64 string' }).describe('base64'),
 });
 
 export async function googleTextToSpeech(

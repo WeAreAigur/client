@@ -1,5 +1,6 @@
-import { isBase64 } from '#/nodes/base64';
 import { z } from 'zod';
+
+import { isBase64 } from '../../base64';
 
 import type { APIKeys } from '../../../types';
 

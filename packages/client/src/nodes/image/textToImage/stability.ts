@@ -69,7 +69,7 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-	result: z.instanceof(ArrayBuffer),
+	result: z.instanceof(ArrayBuffer).describe('ArrayBuffer'),
 });
 
 export async function stabilityTextToImage(

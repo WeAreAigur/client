@@ -9,7 +9,7 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-	result: z.string(),
+	result: z.string().describe('base64'),
 });
 
 export async function dalleBase64TextToImage(

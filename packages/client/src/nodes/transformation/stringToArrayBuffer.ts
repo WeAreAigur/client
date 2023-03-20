@@ -7,7 +7,7 @@ export const inputSchema = z.object({
 });
 
 export const outputSchema = z.object({
-	arrayBuffer: z.instanceof(ArrayBuffer),
+	arrayBuffer: z.instanceof(ArrayBuffer).describe('ArrayBuffer'),
 });
 
 export async function stringToArrayBuffer(

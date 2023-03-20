@@ -6,7 +6,7 @@ const inputSchema = z.object({
 	supabaseUrl: z.string(),
 	supabaseServiceKey: z.string(),
 	bucket: z.string(),
-	file: z.instanceof(ArrayBuffer),
+	file: z.instanceof(ArrayBuffer).describe('ArrayBuffer'),
 	extension: z.string(),
 	name: z.string().optional(),
 });

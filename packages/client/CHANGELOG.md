@@ -1,5 +1,11 @@
 # @aigur/client
 
+## 1.13.0
+
+### Minor Changes
+
+- 33784016: Add refinements for base64 strings and description for base64/arrayBuffers
+
 ## 1.12.2
 
 ### Patch Changes

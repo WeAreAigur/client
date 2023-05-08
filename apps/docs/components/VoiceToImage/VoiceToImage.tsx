@@ -6,9 +6,9 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { Tabs } from '../Tabs';
-import { premadeAudio } from './premadeAudio';
 import { VoiceRecorder } from './VoiceRecorder';
 import { VoiceToImagePipelineView } from './VoiceToImagePipelineView';
+import { premadeAudio } from './premadeAudio';
 
 interface VoiceToImageProps {
 	children: React.ReactNode;
@@ -57,7 +57,7 @@ export function VoiceToImage(props: VoiceToImageProps) {
 			<div className="flex flex-col items-center flex-1 space-y-4 md:w-1/2">
 				<VoiceRecorder toggleRecording={toggleRecording} isRecording={isRecording} />
 				<div className="text-sm">
-					Try saying things like: a small house, a sports car, an large balloon, an empty street
+					Try saying things like: a small house, a sports car, a large balloon, an empty street
 				</div>
 				<div className="space-y-4">
 					<div>Use one of these examples if you&apos;re too lazy:</div>

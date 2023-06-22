@@ -21,4 +21,13 @@ export default withNextra({
 	images: {
 		domains: ['rxbcnsluyhrlazakjohf.supabase.co', 'oaidalleapiprodscus.blob.core.windows.net'],
 	},
+	async redirects() {
+		return [
+			{
+				source: '/',
+				destination: 'https://aigur.dev',
+				permanent: false,
+			},
+		];
+	},
 });
